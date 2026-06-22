@@ -2,7 +2,7 @@
 // @name            TP路由器增强
 // @name:en         Bro-Stat-TP
 // @namespace       ucxn
-// @version         5.9.2
+// @version         5.9.3
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Mi-Stat_Max
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -245,6 +245,12 @@ async function rSD() {
 
       let ol = document.getElementById('gege-global-overlay'), cM = Object.keys(cI), iD = window.gegeForceUIRedraw || (cM.length !== window.gegeRenderedMacs.size);
       if (!iD && cM.length > 0) { for (let i = 0; i < cM.length; i++) { if (!window.gegeRenderedMacs.has(cM[i])) { iD = !0; break; } } }
+	if (iD) {
+        for (let m in S.cls) if (!cI[m]) {
+          S.cls[m].intUp += S.cls[m].upR * (n - S.cls[m].lUT) * 0.0005;
+          S.cls[m].intDn += S.cls[m].dnR * (n - S.cls[m].lUT) * 0.0005;
+          S.cls[m].upR = S.cls[m].dnR = 0;
+        }}
       if (ol && ol.style.display === 'block' && (iD || !ol.querySelector('.gege-list-item'))) {
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
       }
@@ -290,6 +296,9 @@ async function rSD() {
             cS.dpD = 0;
           }
         }
+        if (cC.upRate > 6e8) { cSU -= cC.upRate; cC.upRate = 0; }
+        if (cC.dnRate > 24e8) { cSD -= cC.dnRate; cC.dnRate = 0; }
+		  
         if (cS.lOS !== cC.onSec) {
           cS.onS = cC.onSec;
           cS.lOS = cC.onSec;
