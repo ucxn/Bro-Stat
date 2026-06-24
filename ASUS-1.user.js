@@ -2,7 +2,7 @@
 // @name            华硕路由器增强
 // @name:en         Bro-Stat-ASUS
 // @namespace       ucxn
-// @version         5.9.1
+// @version         5.9.2
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -80,17 +80,9 @@
     }
   }
 
+  const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
   function escapeHTML(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>'"]/g, function (match) {
-      return {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-      } [match];
-    });
+    return str ? String(str).replace(/[&<>'"]/g, m => ESC_MAP[m]) : '';
   }
 
   const S = {
@@ -112,12 +104,13 @@
         return `${Math.round(bps)} bps`;
     }
 
+  const F_ARR_16 = ['0', '[1/16]', '[2/16]', '[3/16]', '[1/4]', '[5/16]', '[6/16]', '[7/16]', '[4/8]', '[9/16]', '[10/16]', '[11/16]', '[3/4]', '[13/16]', '[14/16]', '[15/16]', '[1]'];
   function fBy(bps) {
         if (bps === 0) return '0  B';
         if (bps > 8388608) return `${(bps / 8388608).toFixed(2)} MiB/s`;
         return bps < 8601.6
             ? ((bps * 0.002 | 0) === bps * 0.002 && bps <= 8000
-                ? `${['0', '[1/16]', '[2/16]', '[3/16]', '[1/4]', '[5/16]', '[6/16]', '[7/16]', '[4/8]', '[9/16]', '[10/16]', '[11/16]', '[3/4]', '[13/16]', '[14/16]', '[15/16]', '[1]'][bps / 500]} KB/s`
+                ? `${F_ARR_16[bps * 0.002]} KB/s`
                 : `${(bps * 0.000125).toFixed(2)} KB/s`)
             : `${(bps / 8192).toFixed(1)} KB/s`;
     }
@@ -145,13 +138,13 @@
     return `${Math.round(bits / 8)}B`;}
 
   function fOT(totalSec) {
-		totalSec = Math.floor(totalSec);
+		totalSec = totalSec | 0;
         if (totalSec < 0) return "";
-		const d = Math.floor(totalSec / 86400);
+		const d = (totalSec / 86400) | 0;
 		let r = totalSec - d * 86400;
-		const h = Math.floor(r / 3600);
+		const h = (r / 3600) | 0;
 		r = r - h * 3600;
-		const m = Math.floor(r / 60);
+		const m = (r / 60) | 0;
 		const s = r - m * 60;
         return d > 0 
         ? `${d}天${h}时${m}分${s}秒` 
@@ -338,41 +331,21 @@ const calcStageRatio = (W, L_int, L_hp) => {
       abD += CONFIG.readSaveData === 2 ? sessD : (cC ? (cC.offDn || 0) : (s.lD || 0));
       s.hU.push(cC ? cC.upRate : 0); if (s.hU.length > 30) s.hU.shift();
       s.hD.push(cC ? cC.dnRate : 0); if (s.hD.length > 30) s.hD.shift();
-      cln[k] = {
-        up: cU,
-        down: cD,
-        integral_up: s.intUp || 0,
-        integral_down: s.intDn || 0,
-        status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
-        name: cC?.name || k,
-        ip: cC?.ip || "",
-        raw_up: cC?.offUp || 0,
-        raw_down: cC?.offDn || 0
-      };
-    }
-    if (typeof GM_setValue !== 'undefined') {
-      try {
-        GM_setValue('ha_snapshot', {
-          timestamp: Date.now(),
-          global: {
-            wan_up: S.wTotUp,
-            wan_down: S.wTotDn,
-            lan_integral_up: LUp,
-            lan_integral_down: LDn,
-            lan_high_up: hpU,
-            lan_high_down: hpD,
-            lan_off_up: abU,
-            lan_off_down: abD
-          },
-          devices: cln
-        });
-      } catch(e) {console.warn(e);}
     }
 
-S.rTick = ((S.rTick || 0) + 1) & 15;  //内外网比消除抖动
+S.rTick = ((S.rTick || 0) + 1) & 15;
+    if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
+      let cln = {};
+      for (let k in S.cls) {
+        let s = S.cls[k], cC = cI[k];
+        cln[k] = { up: Math.max(0, (s.lU || 0) - (s.uB || 0)), down: Math.max(0, (s.lD || 0) - (s.dB || 0)), integral_up: s.intUp || 0, integral_down: s.intDn || 0, status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"), name: cC?.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 };
+      }
+      try { GM_setValue('ha_snapshot', { timestamp: Date.now(), global: { wan_up: S.wTotUp, wan_down: S.wTotDn, lan_integral_up: LUp, lan_integral_down: LDn, lan_high_up: hpU, lan_high_down: hpD, lan_off_up: abU, lan_off_down: abD }, devices: cln }); } catch(e) {console.warn(e)}
+    }
+
     let state_fault = S._qosAdj || 0; 
     let mird_qos_delay = 1 - state_fault;
-  if (S.rTick === 0) {  
+  if (S.rTick === 0) {
         let el = document.getElementById('zte-geek-board'), ol = document.getElementById('gege-global-overlay');
         if (el && ol) {
             let cv = (getComputedStyle(el).transitionTimingFunction.match(/[\d.]+/g) || []).map(Number);
@@ -403,7 +376,8 @@ S.rTick = ((S.rTick || 0) + 1) & 15;  //内外网比消除抖动
         } else {
             let rUp = calcStageRatio(S.dTU, LUp, hpU), rDn = calcStageRatio(S.dTD, LDn, hpD);
             S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#ff4c00' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#ff4c00' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
-        }}
+        }if (document.getElementById('gb-ratio-display')) document.getElementById('gb-ratio-display').innerHTML = S.cRT;
+    }
     let bd = document.getElementById('zte-geek-board');
     if (!bd) {
       bd = document.createElement('div');
@@ -508,7 +482,6 @@ S.rTick = ((S.rTick || 0) + 1) & 15;  //内外网比消除抖动
         if (bd.querySelector('#gb-ratio-display')) {
           bd.querySelector('#gb-cur-up-vol').textContent = `🔼 ${fV(curHpU)}`;
           bd.querySelector('#gb-cur-down-vol').textContent = `🔽 ${fV(curHpD)}`;
-          bd.querySelector('#gb-ratio-display').innerHTML = S.cRT;
           if (bd.querySelector('#gb-wan-zero-up')) {
               bd.querySelector('#gb-wan-zero-up').textContent = !S.wZEU ? '' : fSV(S.wZEU);
               bd.querySelector('#gb-wan-zero-down').textContent = !S.wZED ? '' : fSV(S.wZED);
@@ -517,7 +490,11 @@ S.rTick = ((S.rTick || 0) + 1) & 15;  //内外网比消除抖动
           }
         }
       }
-            for (let m in cI) {
+      const inv_tot_cU = tot_cU > 0 ? 100 / tot_cU : 0;
+      const inv_tOD = tOD > 0 ? 100 / tOD : 0;
+      const inv_sU = sU > 0 ? 100 / sU : 0;
+      const inv_sD = sD > 0 ? 100 / sD : 0;
+      for (let m in cI) {
         let it = oDC[m];
         if (!it) continue;
         const cC = cI[m] || { upRate: 0, dnRate: 0, iface: "", offUp: 0, offDn: 0 },
@@ -538,7 +515,7 @@ S.rTick = ((S.rTick || 0) + 1) & 15;  //内外网比消除抖动
             dI.appendChild(bx);
             cache.upBox = bx;
           }
-          let p = tot_cU > 0 ? (hqU * 100 / tot_cU) : 0;
+          let p = hqU * inv_tot_cU;
           (cache.upVol ??= bx.querySelector('.v-vol')).textContent = fVD(cS.intUp, cC.offUp);
           (cache.upPct ??= bx.querySelector('.v-pct')).textContent = p.toFixed(1) + '%';
           (cache.upBar ??= bx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(p, 100) + '%';
@@ -595,7 +572,7 @@ S.rTick = ((S.rTick || 0) + 1) & 15;  //内外网比消除抖动
             inf.appendChild(dBx);
             cache.dBox = dBx;
           }
-          let dp = tOD > 0 ? ((cC.offDn || 0) * 100 / tOD) : 0;
+          let dp = (cC.offDn || 0) * inv_tOD;
           (cache.dBoxVol ??= dBx.querySelector('.v-vol')).textContent = fVD(cS.intDn, cC.offDn);
           (cache.dBoxPct ??= dBx.querySelector('.v-pct')).textContent = dp.toFixed(1) + '%';
           (cache.dBoxBar ??= dBx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(dp, 100) + '%';
@@ -611,14 +588,16 @@ S.rTick = ((S.rTick || 0) + 1) & 15;  //内外网比消除抖动
             sp.appendChild(enh);
             cache.enh = enh;
           }
-          let pu = sU > 0 ? (cC.upRate * 100 / sU) : 0,
-              pd = sD > 0 ? (cC.dnRate * 100 / sD) : 0,
+          let pu = cC.upRate * inv_sU,
+              pd = cC.dnRate * inv_sD,
               bU = cache.bU ??= enh.querySelector('.zte-bar-up'),
               bD = cache.bD ??= enh.querySelector('.zte-bar-down');
           
           const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
-          let clU = Math.max(...cS.hU, (S.aWu * 0.1) || 0, 512000);
-          let clD = Math.max(...cS.hD, (S.aWd / 8) || 0);
+          let clU = (S.aWu * 0.1) || 0; if (clU < 512000) clU = 512000;
+          for (let i = 0; i < cS.hU.length; i++) { if (cS.hU[i] > clU) clU = cS.hU[i]; }
+          let clD = (S.aWd * 0.125) || 0;
+          for (let i = 0; i < cS.hD.length; i++) { if (cS.hD[i] > clD) clD = cS.hD[i]; }
           (cache.bUSpk ??= bU.querySelector('.v-spark')).textContent = cS.hU.slice(-15).map(v => SPRK[v < 73000 ? 0 : Math.min(7, Math.max(1, Math.floor((v / clU) * 7)))]).join('');
           (cache.bDSpk ??= bD.querySelector('.v-spark')).textContent = cS.hD.slice(-15).map(v => SPRK[v < 1000000 ? 0 : Math.min(7, Math.max(1, Math.floor((v / clD) * 7)))]).join('');
 
