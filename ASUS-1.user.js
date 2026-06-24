@@ -206,7 +206,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         let m = nM(i[0]), oU = (+i[1] || 0) * 8, oD = (+i[2] || 0) * 8;
         let cS = S.cls[m], u = 0, dn = 0;
         if (cS) {
-            let dtS = (n - cS.lUT) * 0.001;
+            let dtS = (n - (cS.lT || cS.lUT)) * 0.001;
             if (dtS > 0) {
                 u = Math.max(0, oU - cS.lU) / dtS;
                 dn = Math.max(0, oD - cS.lD) / dtS;
@@ -666,7 +666,6 @@ S.rTick = ((S.rTick || 0) + 1) & 15;
     }
     
     if (mM) {
-      // 灭掉官方标签的灯，点亮我们的灯
       document.querySelectorAll('#nav ul li').forEach(n => n.classList.remove('active'));
       mM.classList.add('active');
     }
