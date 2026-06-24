@@ -7,8 +7,9 @@
 // @description:en  https://github.com/ucxn/Mi-Stat_Max
 // @tag             路由器 小米 网络 监控 统计 数据 可视化 极客 WiFi 米家 HA 智能 定时 后台 雷军 RUOK WRT OP
 // @author          哥哥科技 QQ群 680464365
-// @contributor     https://github.com/tiejiang29/miwifi_router
-// @contributor     https://github.com/Samuel-Knight            
+// @contributor     https://github.com/1-Reality
+// @contributor     https://github.com/Samuel-Knight   
+// @reference       https://github.com/tiejiang29/miwifi_router
 // @noframes
 // @icon            https://scriptcat.org/api/v2/resource/image/duygQktL5QjWtkLc
 // @match           *://*/cgi-bin/luci*
