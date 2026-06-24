@@ -335,7 +335,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
 
 S.rTick = ((S.rTick || 0) + 1) & 15;
     if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
-      let cln = {};
+      cln = {};
       for (let k in S.cls) {
         let s = S.cls[k], cC = cI[k];
         cln[k] = { up: Math.max(0, (s.lU || 0) - (s.uB || 0)), down: Math.max(0, (s.lD || 0) - (s.dB || 0)), integral_up: s.intUp || 0, integral_down: s.intDn || 0, status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"), name: cC?.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 };
@@ -458,8 +458,6 @@ S.rTick = ((S.rTick || 0) + 1) & 15;
         bd.querySelector('#gb-lan-down-bytes').textContent = `🔽 ${fBy(sD)}`;
         bd.querySelector('#gb-perc-up').textContent = `🔼 ${wU>0?(sU*100/wU).toFixed(1):0.0}%`;
         bd.querySelector('#gb-perc-down').textContent = `🔽 ${wD>0?(sD*100/wD).toFixed(1):0.0}%`;
-        bd.querySelector('#gb-lan-up-vol').textContent = `🔼 ${fV(LUp)}`;
-        bd.querySelector('#gb-lan-down-vol').textContent = `🔽 ${fV(LDn)}`;
         bd.querySelector('#gb-lan-up-vol').textContent = `🔼 ${fV(LUp)}`;
         bd.querySelector('#gb-lan-down-vol').textContent = `🔽 ${fV(LDn)}`;
         bd.querySelector('#gb-wan-up-vol').textContent = `🔼 ${fV(S.wTotUp)}`;
