@@ -2,7 +2,7 @@
 // @name            TP路由器增强
 // @name:en         Bro-Stat-TP
 // @namespace       ucxn
-// @version         5.9.3
+// @version         5.9.4
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Mi-Stat_Max
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -28,20 +28,11 @@
 
 (function () {
   'use strict';
+  console.log("🚀 哥哥科技 V5.9.9 引擎已装载...");
 
-  console.log("🚀 哥哥科技 V5.9.9 终极引擎已装载...");
-
+const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
   function escapeHTML(str) {
-    if (!str) return '';
-    return String(str).replace(/[&<>'"]/g, function (match) {
-      return {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        "'": '&#39;',
-        '"': '&quot;'
-      } [match];
-    });
+    return str ? String(str).replace(/[&<>'"]/g, m => ESC_MAP[m]) : '';
   }
 
   // ======== [0] 用户极客环境变量配置区 ========
@@ -122,12 +113,13 @@ let _saved = null;
         return `${Math.round(bps)} bps`;
     }
 
+const F_ARR_8 = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/8]', '[1]'];
   function fBy(bps) {
         if (bps === 0) return '0  B';
         if (bps > 8388608) return `${(bps / 8388608).toFixed(2)} MiB/s`;
         return bps < 8602
             ? ((bps * 0.001 | 0) === bps * 0.001
-                ? `${['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/8]', '[1]'][bps * 0.001]} KB/s`
+                ? `${F_ARR_8[bps * 0.001]} KB/s`
                 : `${(bps * 0.000125).toFixed(2)} KB/s`)
             : `${(bps / 8192).toFixed(1)} KB/s`;
     }
@@ -147,15 +139,15 @@ let _saved = null;
     return `${Math.round(bits / 8)}B`;}
 
   function fOT(totalSec) {
-		totalSec = Math.floor(totalSec);
+		totalSec = totalSec | 0;
         if (totalSec < 0) return "";
-		const d = Math.floor(totalSec / 86400);
+		const d = (totalSec / 86400) | 0;
 		let r = totalSec - d * 86400;
-		const h = Math.floor(r / 3600);
+		const h = (r / 3600) | 0;
 		r = r - h * 3600;
-		const m = Math.floor(r / 60);
+		const m = (r / 60) | 0;
 		const s = r - m * 60;
-        return d > 0 
+        return d > 0
         ? `${d}天${h}时${m}分${s}秒` 
         : `${h}小时${m}分${s}秒`;}
 
@@ -298,7 +290,6 @@ async function rSD() {
         }
         if (cC.upRate > 6e8) { cSU -= cC.upRate; cC.upRate = 0; }
         if (cC.dnRate > 24e8) { cSD -= cC.dnRate; cC.dnRate = 0; }
-		  
         if (cS.lOS !== cC.onSec) {
           cS.onS = cC.onSec;
           cS.lOS = cC.onSec;
@@ -347,10 +338,9 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
   };
   function rUI(wU, wD, sU, sD, cI) {
-    let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0, cln = {};
+    let LUp = 0, LDn = 0, hpU = 0, hpD = 0;
     for (let k in S.cls) {
       let s = S.cls[k];
-      let cC = cI[k];
       let cU = s.intUp || 0;
       let cD = s.intDn || 0;
       let sessU = cU;
@@ -359,23 +349,25 @@ const calcStageRatio = (W, L_int, L_hp) => {
       LDn += s.intDn || 0;
       hpU += sessU; 
       hpD += sessD;
-      if (cC) {
-        curHpU += sessU;
-        curHpD += sessD;
-      }
-      cln[k] = {
-        up: cU,
-        down: cD,
-        integral_up: s.intUp || 0,
-        integral_down: s.intDn || 0,
-        status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
-        name: cC?.name || k,
-        ip: cC?.ip || "",
-        raw_up: cC?.offUp || 0,
-        raw_down: cC?.offDn || 0
-      };
     }
-    if (typeof GM_setValue !== 'undefined') {
+  S.rTick = ((S.rTick || 0) + 1) & 15;
+    if (S.rTick === 1 || !S.cRT) {
+      let cln = {};
+      for (let k in S.cls) {
+      let s = S.cls[k];
+      let cC = cI[k];
+      cln[k] = {
+          up: s.intUp || 0,
+          down: s.intDn || 0,
+          integral_up: s.intUp || 0,
+          integral_down: s.intDn || 0,
+          status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
+          name: cC?.name || k,
+          ip: cC?.ip || "",
+          raw_up: cC?.offUp || 0,
+          raw_down: cC?.offDn || 0
+      };
+    }if (typeof GM_setValue !== 'undefined') {
       try {
         GM_setValue('ha_snapshot', {
           timestamp: Date.now(),
@@ -391,19 +383,17 @@ const calcStageRatio = (W, L_int, L_hp) => {
         });
       } catch(e) {console.warn(e);}
     }
-     S.rTick = ((S.rTick || 0) + 1) & 15;
-    if (S.rTick === 1 || !S.cRT) {
         S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 4); S.lwTU = S.wTotUp;
         S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 4); S.lwTD = S.wTotDn;
         if (S.hasW2) {
             let rU = S.w2TotUp > 0 ? (S.wTotUp / S.w2TotUp) : (S.wTotUp > 0 ? Infinity : 0), rD = S.w2TotDn > 0 ? (S.wTotDn / S.w2TotDn) : (S.wTotDn > 0 ? Infinity : 0);
             let fR = (r) => r === Infinity ? '∞' : (r > 1 ? r.toFixed(2) + 'x' : (r * 100).toPrecision(3) + '%');
-            S.cRT = `<span style="font-weight: bold;"><span style="color:#9c27b0;">${fR(rU)}</span>，<span style="color:#4caf50;">${fR(rD)}</span></span>`;
+            S.cRT = `<span style="font-weight: bold;"><span class="c-up">${fR(rU)}</span>，<span class="c-down">${fR(rD)}</span></span>`;
         } else {
             let rUp = calcStageRatio(S.wTotUp, LUp, hpU), rDn = calcStageRatio(S.wTotDn, LDn, hpD);
-            S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#9c27b0' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#9c27b0' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
+            S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#ff4c00' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#ff4c00' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
         }
-    }
+        if (document.getElementById('gb-ratio-display')) document.getElementById('gb-ratio-display').innerHTML = S.cRT;}
     let bd = document.getElementById('zte-geek-board');
     if (!bd) {
       bd = document.createElement('div');
@@ -495,9 +485,6 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             if (pb) pb.style.display = 'none'; if (pv) pv.style.display = 'none';
         }
         if (bd.querySelector('#gb-ratio-display')) {
-          setText('#gb-cur-up-vol', `🔼 ${fV(curHpU)}`);
-          setText('#gb-cur-down-vol', `🔽 ${fV(curHpD)}`);
-          bd.querySelector('#gb-ratio-display').innerHTML = S.cRT;
           if (bd.querySelector('#gb-wan-zero-up')) {
               setText('#gb-wan-zero-up', !S.wZEU ? '' : fSV(S.wZEU));
               setText('#gb-wan-zero-down', !S.wZED ? '' : fSV(S.wZED));
@@ -506,7 +493,12 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
           }
         }
       }
-            for (let m in cI) {
+      const inv_hpU = hpU > 0 ? 100 / hpU : 0;
+      const inv_LDn = LDn > 0 ? 100 / LDn : 0;
+      const inv_sU = sU > 0 ? 100 / sU : 0;
+      const inv_sD = sD > 0 ? 100 / sD : 0;
+
+      for (let m in cI) {
         let it = oDC[m];
         if (!it) continue;
         const cC = cI[m] || { upRate: 0, dnRate: 0, iface: "", offUp: 0, offDn: 0 },
@@ -571,7 +563,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             inf.appendChild(bx);
             cache.upBox = bx;
           }
-          let p = hpU > 0 ? (hqU * 100 / hpU) : 0;
+          let p = hqU * inv_hpU;
           (cache.upVol ??= bx.querySelector('.v-vol')).textContent = fV(cS.intUp);
           (cache.upPct ??= bx.querySelector('.v-pct')).textContent = p.toFixed(1) + '%';
           (cache.upBar ??= bx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(p, 100) + '%';
@@ -585,7 +577,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             inf.appendChild(dBx);
             cache.dBox = dBx;
           }
-          let dp = LDn > 0 ? (cS.intDn * 100 / LDn) : 0; 
+          let dp = cS.intDn * inv_LDn;
           (cache.dBoxVol ??= dBx.querySelector('.v-vol')).textContent = fV(cS.intDn);
           (cache.dBoxPct ??= dBx.querySelector('.v-pct')).textContent = dp.toFixed(1) + '%';
           (cache.dBoxBar ??= dBx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(dp, 100) + '%';
@@ -601,14 +593,16 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             sp.appendChild(enh);
             cache.enh = enh;
           }
-          let pu = sU > 0 ? (cC.upRate * 100 / sU) : 0,
-              pd = sD > 0 ? (cC.dnRate * 100 / sD) : 0,
+          let pu = cC.upRate * inv_sU,
+              pd = cC.dnRate * inv_sD,
               bU = cache.bU ??= enh.querySelector('.zte-bar-up'),
               bD = cache.bD ??= enh.querySelector('.zte-bar-down');
           
           const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
-          let clU = Math.max(...cS.hU, (S.aWu * 0.1) || 0, 512000);
-          let clD = Math.max(...cS.hD, (S.aWd / 8) || 0);
+          let clU = (S.aWu * 0.1) || 0; if (clU < 512000) clU = 512000;
+          for (let i = 0; i < cS.hU.length; i++) { if (cS.hU[i] > clU) clU = cS.hU[i]; }
+          let clD = (S.aWd * 0.125) || 0;
+          for (let i = 0; i < cS.hD.length; i++) { if (cS.hD[i] > clD) clD = cS.hD[i]; }
           (cache.bUSpk ??= bU.querySelector('.v-spark')).textContent = cS.hU.slice(-60).map(v => SPRK[v < 73000 ? 0 : Math.min(7, Math.max(1, Math.floor((v / clU) * 7)))]).join('');
           (cache.bDSpk ??= bD.querySelector('.v-spark')).textContent = cS.hD.slice(-60).map(v => SPRK[v < 1000000 ? 0 : Math.min(7, Math.max(1, Math.floor((v / clD) * 7)))]).join('');
 
