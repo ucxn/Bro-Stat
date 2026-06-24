@@ -395,7 +395,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
             let fR = (r) => r === Infinity ? '∞' : (r > 1 ? r.toFixed(2) + 'x' : (r * 100).toPrecision(3) + '%');
             S.cRT = `<span style="font-weight: bold;"><span class="c-up">${fR(rU)}</span>，<span class="c-down">${fR(rD)}</span></span>`;
         } else {
-            let rUp = calcStageRatio(S.dTU, LUp, hpU), rDn = calcStageRatio(S.dTD, LDn, hpD);
+            let rUp = calcStageRatio(S.wTotUp, LUp, hpU), rDn = calcStageRatio(S.wTotDn, LDn, hpD);
             S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#ff4c00' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#ff4c00' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
         }
         if (document.getElementById('gb-ratio-display')) document.getElementById('gb-ratio-display').innerHTML = S.cRT;}
@@ -490,8 +490,6 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             if (pb) pb.style.display = 'none'; if (pv) pv.style.display = 'none';
         }
         if (bd.querySelector('#gb-ratio-display')) {
-          setText('#gb-cur-up-vol', `🔼 ${fV(curHpU)}`);
-          setText('#gb-cur-down-vol', `🔽 ${fV(curHpD)}`);
           if (bd.querySelector('#gb-wan-zero-up')) {
               setText('#gb-wan-zero-up', !S.wZEU ? '' : fSV(S.wZEU));
               setText('#gb-wan-zero-down', !S.wZED ? '' : fSV(S.wZED));
