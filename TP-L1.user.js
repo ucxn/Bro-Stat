@@ -338,7 +338,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
   };
   function rUI(wU, wD, sU, sD, cI) {
-    let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0, cln = {};
+    let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0;
     for (let k in S.cls) {
       let s = S.cls[k];
       let cC = cI[k];
@@ -361,28 +361,16 @@ const calcStageRatio = (W, L_int, L_hp) => {
       for (let k in S.cls) {
       let s = S.cls[k];
       let cC = cI[k];
-      let cU = s.intUp || 0;
-      let cD = s.intDn || 0;
-      let sessU = cU;
-      let sessD = cD;
-      LUp += s.intUp || 0;
-      LDn += s.intDn || 0;
-      hpU += sessU; 
-      hpD += sessD;
-      if (cC) {
-        curHpU += sessU;
-        curHpD += sessD;
-      }
       cln[k] = {
-        up: cU,
-        down: cD,
-        integral_up: s.intUp || 0,
-        integral_down: s.intDn || 0,
-        status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
-        name: cC?.name || k,
-        ip: cC?.ip || "",
-        raw_up: cC?.offUp || 0,
-        raw_down: cC?.offDn || 0
+          up: s.intUp || 0,
+          down: s.intDn || 0,
+          integral_up: s.intUp || 0,
+          integral_down: s.intDn || 0,
+          status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
+          name: cC?.name || k,
+          ip: cC?.ip || "",
+          raw_up: cC?.offUp || 0,
+          raw_down: cC?.offDn || 0
       };
     }if (typeof GM_setValue !== 'undefined') {
       try {
