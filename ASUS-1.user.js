@@ -215,7 +215,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         let iN = window.__aD[m] || {};
         cI[m] = {
             upRate: u, dnRate: dn, 
-            iface: iN.wl === '1' ? 'wl0' : (iN.wl === '2' ? 'wl1' : 'eth1'),
+            iface: iN.wl == '1' ? 'wl0' : (iN.wl == '2' ? 'wl1' : 'eth1'),
             offUp: oU, offDn: oD, 
             onSec: 0, name: iN.n || "华硕设备", ip: iN.ip || "-.-.-.-"
         };
@@ -279,7 +279,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
           else if (cC.dnRate > 0) { let eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
           cS.upR = cC.upRate; cS.dnR = cC.dnRate; cS.lUT = n;
         }
-        cS.lU = cC.offUp; cS.lD = cC.offDn;
+        cS.lU = cC.offUp; cS.lD = cC.offDn; cS.lT = n;
       }
       S.lt = n;
       S.wInstUp = cWU; S.wInstDn = cWD;
