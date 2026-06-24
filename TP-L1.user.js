@@ -338,10 +338,9 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
   };
   function rUI(wU, wD, sU, sD, cI) {
-    let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0;
+    let LUp = 0, LDn = 0, hpU = 0, hpD = 0;
     for (let k in S.cls) {
       let s = S.cls[k];
-      let cC = cI[k];
       let cU = s.intUp || 0;
       let cD = s.intDn || 0;
       let sessU = cU;
@@ -350,10 +349,6 @@ const calcStageRatio = (W, L_int, L_hp) => {
       LDn += s.intDn || 0;
       hpU += sessU; 
       hpD += sessD;
-      if (cC) {
-        curHpU += sessU;
-        curHpD += sessD;
-      }
     }
   S.rTick = ((S.rTick || 0) + 1) & 15;
     if (S.rTick === 1 || !S.cRT) {
