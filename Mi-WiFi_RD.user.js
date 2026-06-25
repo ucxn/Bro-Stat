@@ -2,14 +2,13 @@
 // @name            小米路由器增强 Mi-Stat_Max
 // @name:en         MiWiFi-Stat_Max
 // @namespace       ucxn
-// @version         5.9.7
+// @version         5.9.8
 // @description     哥哥科技 space.bilibili.com/501430041
 // @description:en  https://github.com/ucxn/Mi-Stat_Max
 // @tag             路由器 小米 网络 监控 统计 数据 可视化 极客 WiFi 米家 HA 智能 定时 后台 雷军 RUOK WRT OP
 // @author          哥哥科技 QQ群 680464365
 // @contributor     https://github.com/1-Reality
 // @contributor     https://github.com/Samuel-Knight   
-// @reference       https://github.com/tiejiang29/miwifi_router
 // @noframes
 // @icon            https://scriptcat.org/api/v2/resource/image/duygQktL5QjWtkLc
 // @match           *://*/cgi-bin/luci*
@@ -294,7 +293,7 @@ async function rSD() {
           uB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offUp - (spD.up || 0) : cC.offUp), 
           dB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offDn - (spD.down || 0) : cC.offDn),
           lU: cC.offUp, lD: cC.offDn, aR: !1, dpU: 0, dpD: 0,
-          oU: cC.offUp, oD: cC.offDn, hU: [], hD: [] // 真实流量
+          oU: cC.offUp, oD: cC.offDn, hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0 // 真实流量与环形缓冲
         };
         let cS = S.cls[m], dU = cC.offUp - cS.lU, dD = cC.offDn - cS.lD;
         if (dU < 0 || dD < 0) {
@@ -337,6 +336,15 @@ const calcStageRatio = (W, L_int, L_hp) => {
         return (Math.abs(L_int - W) < Math.abs(L_hp - W) ? L_int : L_hp) / W;
     }
   };
+  const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+  function getSpark(ringArr, headIdx, maxVal, minVal = 0) {
+    let s = "";
+    for (let i = 26; i >= 0; i--) {
+      let v = ringArr[(headIdx - i) & 63];
+      s += SPRK[v < minVal ? 0 : Math.min(7, Math.max(1, ((v / maxVal) * 7) | 0))];
+    }
+    return s;
+  }
   function rUI(wU, wD, sU, sD, cI) {
     let tOD = 0,
       LUp = 0,
@@ -362,8 +370,9 @@ for (let k in S.cls) {
       if (cC) { curHpU += (CONFIG.readSaveData === 2 ? cU : sessU); curHpD += (CONFIG.readSaveData === 2 ? cD : sessD); tOD += cC.offDn || 0; }
       abU += CONFIG.readSaveData === 2 ? sessU : (cC ? (cC.offUp || 0) : (s.lU || 0));
       abD += CONFIG.readSaveData === 2 ? sessD : (cC ? (cC.offDn || 0) : (s.lD || 0));
-      s.hU.push(cC ? cC.upRate : 0); if (s.hU.length > 48) s.hU.shift();
-      s.hD.push(cC ? cC.dnRate : 0); if (s.hD.length > 48) s.hD.shift();
+      s.hIdx = (s.hIdx + 1) & 63;
+      s.hU[s.hIdx] = cC ? cC.upRate : 0;
+      s.hD[s.hIdx] = cC ? cC.dnRate : 0;
     }
 if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
       try {
@@ -626,13 +635,11 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
               bU = cache.bU ??= enh.querySelector('.zte-bar-up'),
               bD = cache.bD ??= enh.querySelector('.zte-bar-down');
           
-          const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
           let clU = (S.aWu * 0.1) || 0; if (clU < 512000) clU = 512000;
-          for (let i = 0; i < cS.hU.length; i++) { if (cS.hU[i] > clU) clU = cS.hU[i]; }
           let clD = (S.aWd * 0.125) || 0;
-          for (let i = 0; i < cS.hD.length; i++) { if (cS.hD[i] > clD) clD = cS.hD[i]; }
-          (cache.bUSpk ??= bU.querySelector('.v-spark')).textContent = cS.hU.slice(-24).map(v => SPRK[v <= 0 ? 0 : Math.min(7, Math.ceil((v / clU) * 7))]).join('');
-          (cache.bDSpk ??= bD.querySelector('.v-spark')).textContent = cS.hD.slice(-24).map(v => SPRK[v <= 0 ? 0 : Math.min(7, Math.ceil((v / clD) * 7))]).join('');
+          for (let i = 0; i < 64; i++) { if (cS.hU[i] > clU) clU = cS.hU[i]; if (cS.hD[i] > clD) clD = cS.hD[i]; }
+          (cache.bUSpk ??= bU.querySelector('.v-spark')).textContent = getSpark(cS.hU, cS.hIdx, clU, 73000);
+          (cache.bDSpk ??= bD.querySelector('.v-spark')).textContent = getSpark(cS.hD, cS.hIdx, clD, 1000000);
 
           bU.style.setProperty('--p-up', Math.min(pu, 100) + '%');
           (cache.bUVal ??= bU.querySelector('.v-val')).textContent = `🔼 ${fBy(cC.upRate)}`;
@@ -662,7 +669,7 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
         ol.innerHTML = `<div style="padding: 20px; width: 96%; max-width: 1600px; margin: 0 auto; min-height: 100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container">${hMesh.length ? `<div class="gege-section"><div class="config-title">Mesh 组网设备</div>${hMesh.join('')}</div>` : ''}<div class="gege-section"><div class="config-title">有线设备${(window.gegeHiddenDevices && Object.keys(window.gegeHiddenDevices).length > 0) ? '<span style="color: #ff4c00; font-size: 13px; font-weight: normal; margin-left: 10px; font-family: Consolas;">(哥哥科技：智能Mesh适配)</span>' : ''}</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.8GHz':'5.2GHz'}）</div>${h52.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.2GHz':'5.8GHz'}）</div>${h58.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}
         </div>
         </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序基于 GNU Affero GPL v3.0 协议开源，按“原样 (AS IS)”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作任何明示或暗示的担保。<br>根据 AGPL-3.0 第 5(d) 及 7(b) 条规定，基于本程序的任何修改均不得移除或篡改本界面的署名与法律声明。保留此界面是使用本软件代码的合法性的前置条件。
-        </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Mi-Stat_Max" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat_Max 增强组件</a><span title="构建日期：2026-06.24 12时&#10;架构设计：哥哥科技 BroTech&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px;">5.9.7</span> Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1LZ6yBXESq" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/zh-CN/script-show-page/6592" target="_blank" style="color: #666; text-decoration: none;">点此分享</a>
+        </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Mi-Stat_Max" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat_Max 增强组件</a><span title="构建日期：2026-06.25 23.5时&#10;架构设计：哥哥科技 BroTech&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px;">5.9.8</span> Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1LZ6yBXESq" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/zh-CN/script-show-page/6592" target="_blank" style="color: #666; text-decoration: none;">点此分享</a>
         <div style="font-size: 10.5px; color: #aaa; margin-top: 6px; font-weight: normal;">小米设计适配参考了 MIT 开源项目 <a href="https://greasyfork.org/zh-CN/scripts/525238-小米路由器增强脚本" target="_blank" style="color:#999; text-decoration:none;">小米路由器增强脚本@kirin</a> 和 <a href="https://github.com/tiejiang29/miwifi_router" target="_blank" style="color:#999; text-decoration:none;">miwifi_router@tiejiang29</a> 的接口思路，特此致谢。</div>
         </div></div></div></div>`;
       S._domRebuilt = true;});}

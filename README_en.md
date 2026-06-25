@@ -2,13 +2,15 @@
 
 **English** | [简体中文](README.md)
 
-**Bro-Stat** is a browser-based extension designed to improve the native web management experience of consumer and prosumer routers across multiple brands. The current universal edition primarily supports and enhances routers from **TP-Link, Xiaomi (MiWiFi), ASUS/ROG**, and other mainstream vendors.
+**Bro-Stat** is a browser-based extension designed to improve the native web management experience of consumer and prosumer routers across multiple brands. The current universal edition primarily supports and enhances routers from **TP-Link, Xiaomi (MiWiFi), ASUS/ROG，HUAWEI**, and other mainstream vendors.
 
 Developed by **BroTech**, Bro-Stat provides a lightweight network telemetry and multi-end data forwarding solution for modern home and enthusiast networks.
 
 Integrated with smart home ecosystems and Home Assistant, it delivers advanced UI enhancements, telemetry synchronization, and router monitoring capabilities without requiring custom firmware. It serves as an ideal companion for hardware-accelerated routing platforms and supports the entire ZTE router ecosystem. Device lists become cleaner, dashboards become larger, and network insights become instantly accessible without endless page switching.
 
 Native router dashboards usually provide only basic instantaneous bandwidth information. In many cases, all traffic statistics disappear after a reboot or device reconnection. Bro-Stat aims to provide a persistent, intuitive, and lightweight LAN traffic visualization layer while preserving the original router interface.
+
+![logo](./logo.png)
 
 ---
 
