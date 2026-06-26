@@ -2,7 +2,7 @@
 // @name            华为路由器增强 Bro-Stat_HUAWEI
 // @name:en         Bro-Stat_HUAWEI
 // @namespace       ucxn
-// @version         5.9.7
+// @version         5.9.5
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/ZTE-Stat_Max
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -46,8 +46,8 @@
     ratioWarnUp: 0.07, // 重度上传警告阈值 (> 7%)
     ratioExtremeDown: 0.01, // 极端下载判定阈值 (< 1%)
     ratioThreshold: 7, // (仅calcMode=0时有效) 上传占比报警阈值(%)
-    lanRefreshInterval: 2, // LAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
-    wanRefreshInterval: 2, // 【新增】WAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
+    lanRefreshInterval: 0.5, // LAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
+    wanRefreshInterval: 0.5, // 【新增】WAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
     宽带最大外网上行速率: 3e8,
     宽带最大外网下行速率: 24e8, // 配置外网最大上传|下载比特(bit/bps)速率，请略微大于真实值；500兆为5e8，一千兆1e9
     portMap: {
@@ -87,9 +87,16 @@ async function gWT() {
         if (bps > 1e3) return `${Math.round(bps * 1e-3)} Kbps`;
         return `${Math.round(bps)} bps`;
     }
-function fBy(bps) {
-    return bps === 0 ? '0  B' : ((bps * 0.000125) > 1023.9 ? `${(bps * 1.220703125e-7).toFixed(2)} MiB/s` : `${(bps * 0.000125) | 0} KB/s`);
-  }
+const F_ARR = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/8]', '1'];
+  function fBy(bps) {
+        if (bps === 0) return '0  B';
+        if (bps > 8388608) return `${(bps * 1.1920928955078125e-7).toFixed(2)} MiB/s`;
+        return bps < 8700
+            ? ((bps * 0.001 | 0) === bps * 0.001
+                 ? `${F_ARR[bps * 0.001]} KB/s`
+                : `${(bps * 0.000125).toFixed(2)} KB/s`)
+            : `${(bps * 0.0001220703125).toFixed(1)} KB/s`;
+    }
 
   function fV(bits) {
         if (bits > 83886080000) return `${(bits / 8589934592).toFixed(4)} GiB`;
@@ -277,6 +284,73 @@ function fBy(bps) {
       }
       S.wInstUp = cWU;
       S.wInstDn = cWD;
+
+      // ====================================================================
+      // --- [新增] 心跳间隔雷达 (10秒硬预热 + 紧凑UI) ---
+      // ====================================================================
+      if (!window.__gegeDebugCache) { window.__gegeDebugCache = { isFrozen: false, targets: {}, bootTime: performance.now() }; }
+      let hasChange = false;
+      let currentNow = performance.now();
+      let bootElapsed = currentNow - window.__gegeDebugCache.bootTime;
+      let isWarmingUp = bootElapsed < 10000;
+      let monitorTargets = { "WAN_MASTER": { name: "[⭐总线 WAN口]", up: cWU, down: cWD, isWan: true } }; // 获取 WAN 速率
+      for(let m in cI) { monitorTargets[m] = { name: m.slice(-8), up: cI[m].upRate, down: cI[m].dnRate, isWan: false }; } // 获取 LAN 速率
+      if (!window.__gegeDebugCache.isFrozen) {
+          for (let mac in monitorTargets) {
+              let target = monitorTargets[mac];
+              let cache = window.__gegeDebugCache.targets[mac];
+              if (!cache) { window.__gegeDebugCache.targets[mac] = { up: target.up, down: target.down, lastTime: currentNow, deltas: [], isFirstJump: true }; continue; }
+              if (cache.up !== target.up || cache.down !== target.down) {
+                  hasChange = true;
+                  if (isWarmingUp) { cache.up = target.up; cache.down = target.down; cache.lastTime = currentNow; cache.isFirstJump = true; continue; }
+                  let timeDiff = parseFloat((currentNow - cache.lastTime).toFixed(1));
+                  if (cache.isFirstJump) { cache.isFirstJump = false; } 
+                  else { cache.deltas.push(timeDiff); if (cache.deltas.length > 10000) cache.deltas.shift(); }
+                  cache.up = target.up; cache.down = target.down; cache.lastTime = currentNow;
+              }
+          }
+      }
+      if (isWarmingUp) hasChange = true;
+      if (hasChange && !window.__gegeDebugCache.isFrozen) {
+          let dbgBox = document.getElementById('gege-debug-box');
+          if (!dbgBox) {
+              dbgBox = document.createElement('div'); dbgBox.id = 'gege-debug-box';
+              dbgBox.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:1080px; max-height:85vh; background:rgba(0,0,0,0.92); color:#0f0; font-family:Consolas, monospace; font-size:12px; z-index:99999; overflow-y:auto; padding:10px 12px; border-radius:6px; box-shadow:0 5px 20px rgba(0,0,0,0.9); border: 1px solid #444; backdrop-filter: blur(5px);';
+              document.body.appendChild(dbgBox);
+              dbgBox.addEventListener('click', (e) => {
+                  if (e.target.id === 'gege-freeze-btn') {
+                      window.__gegeDebugCache.isFrozen = !window.__gegeDebugCache.isFrozen;
+                      let isF = window.__gegeDebugCache.isFrozen;
+                      if (!isF) { let now = performance.now(); for(let k in window.__gegeDebugCache.targets) { window.__gegeDebugCache.targets[k].lastTime = now; window.__gegeDebugCache.targets[k].isFirstJump = true; } }
+                      e.target.textContent = isF ? "▶️ 恢复侦测 (采集已停)" : "⏸️ 定格分析";
+                      e.target.style.color = isF ? "#ff0" : "#fff"; e.target.style.background = isF ? "#520" : "#333";
+                  }
+              });
+          }
+          let warmUpHtml = isWarmingUp ? `<span style="color:#ff4c00; background:rgba(255,76,0,0.2); padding:0 5px; border-radius:3px; margin-left:10px;">⚠️ 硬件预热中... 规避初始 CPU 抖动 (剩余 ${((10000 - bootElapsed) / 1000).toFixed(1)}s)</span>` : "";
+          let timeStr = new Date().toTimeString().split(' ')[0] + '.' + String(new Date().getMilliseconds()).padStart(3, '0');
+          let html = `<div style="border-bottom:1px solid #0f0; padding-bottom:4px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;"><span style="font-size:14px; font-weight:bold; text-shadow:0 0 3px #0f0;">[哥哥科技] 企业级心跳雷达${warmUpHtml}</span><div style="display:flex; align-items:center; gap:10px;"><span style="color:#aaa;">时钟: ${timeStr}</span><button id="gege-freeze-btn" style="background:#333; color:#fff; border:1px solid #555; padding:2px 8px; border-radius:3px; cursor:pointer; font-weight:bold; font-size:11px;">⏸️ 定格分析</button></div></div>`;
+          let macs = Object.keys(window.__gegeDebugCache.targets).sort((a, b) => (a === "WAN_MASTER" ? -1 : (b === "WAN_MASTER" ? 1 : 0)));
+          for (let mac of macs) {
+              let c = window.__gegeDebugCache.targets[mac]; let n = c.deltas.length;
+              if (n === 0 && !isWarmingUp) continue;
+              let isWan = mac === "WAN_MASTER"; let nameTag = isWan ? "<span style='color:#ffd700; font-weight:bold;'>[WAN] 出口</span>" : "<span style='color:#aaa;'>MAC: " + mac.slice(-8) + "</span>"; let colorBase = isWan ? "#ffd700" : "#0f0";
+              let mean=0, variance=0, stdDev=0, jitter=0, cv=0, d95=0, d98=0, maxD=0;
+              if (n > 0) {
+                  let sum = 0; for(let i=0; i<n; i++) sum += c.deltas[i];
+                  mean = sum / n; let varianceSum = 0, jitterSum = 0, deviations = [];
+                  for(let i=0; i<n; i++) { let diff = c.deltas[i] - mean; varianceSum += diff * diff; deviations.push(Math.abs(diff)); if (i > 0) jitterSum += Math.abs(c.deltas[i] - c.deltas[i-1]); }
+                  variance = varianceSum / n; stdDev = Math.sqrt(variance); jitter = n > 1 ? (jitterSum / (n - 1)) : 0; cv = mean > 0 ? (stdDev / mean * 100) : 0; 
+                  deviations.sort((a, b) => a - b); d95 = deviations[Math.floor(n * 0.95)] || 0; d98 = deviations[Math.floor(n * 0.98)] || 0; maxD = deviations[n - 1] || 0;
+              }
+              let statsHtml = `<div style="font-size:11px; color:#999; display:flex; gap:12px; background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:3px;"><span style="width:50px;">N:<b style="color:${colorBase}">${n}</b></span><span style="width:70px;">μ:<b style="color:#fff">${mean.toFixed(1)}</b></span><span style="width:85px;">Jitter:<b style="color:#ff4c00">${jitter.toFixed(1)}</b></span><span style="width:65px;">CV:<b style="color:#00ffff">${cv.toFixed(1)}%</b></span><span style="width:65px;">σ²:<b style="color:#aaa">${variance.toFixed(1)}</b></span><span style="width:75px;">95%:<b style="color:#fff">±${d95.toFixed(1)}</b></span><span style="width:75px;">Max:<b style="color:#ff0000">±${maxD.toFixed(1)}</b></span></div>`;
+              let deltaStr = isWarmingUp ? "<span style='color:#666;'>[预热静默中... 数据暂不入库]</span>" : c.deltas.join(', ');
+              html += `<div style="border:1px solid ${isWan ? 'rgba(255,215,0,0.2)' : 'rgba(255,255,255,0.08)'}; background:${isWan ? 'rgba(255,215,0,0.05)' : 'transparent'}; margin-bottom:4px; padding:4px 8px; border-radius:4px; display:flex; flex-direction:column; gap:2px;"><div style="display:flex; justify-content:space-between; align-items:center;"><div style="width:110px; font-size:12px;">${nameTag}</div><div style="width:190px; color:#bbb; font-size:11px;">↑${fB(c.up).padEnd(10)} ↓${fB(c.down)}</div><div style="flex:1;">${statsHtml}</div></div><div style="width:100%; font-size:11px; overflow-x:auto; white-space:nowrap; padding:2px 4px; color:#aaa; background:#111; border-radius:2px; scrollbar-width:none; user-select:all;">${deltaStr}</div></div>`;
+          }
+          dbgBox.innerHTML = html;
+      }
+      // --- 探针代码结束 ---
+
       rUI(cWU, cWD, cSU, cSD, cI);
     }
     catch (e) {
@@ -539,7 +613,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
             rRs = lRs; cS.dbC = ((cS.dbC || 0) + 1) & 7; // 憋住不闪，压力槽+1
           } else { cS.dbC = 0; cS.lRs = rRs; } // 压力爆表或正常滑动，放行并归零
         }
-        (cache.logo ??= it.querySelector('.dev-logo')).innerHTML = getIconSvg(rRs, !cC.rssi) + (cC.rate ? `<div style="font-size:10.5px;color:${cC.rate===2500?'#000':cC.rate===100?'#ff4c00':cC.rate===10?'#4caf50':'#999'};font-family:Consolas;margin-top:2px;font-weight:${cC.rate===2500||cC.rate===100?'bold':'normal'};">rate:${cC.rate}</div>` : '');
+        (cache.logo ??= it.querySelector('.dev-logo')).innerHTML = getIconSvg(rRs, !cC.rssi) + (cC.rate ? `<div style="font-size:10.5px;color:#999;font-family:Consolas;margin-top:2px;">rate:${cC.rate}</div>` : '');
 
         let hqU = Math.max(0, (cS.lU || 0) - (cS.uB || 0));
         let hqD = Math.max(0, (cS.lD || 0) - (cS.dB || 0));
