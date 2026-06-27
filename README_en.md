@@ -13,7 +13,23 @@ Native router dashboards usually provide only basic instantaneous bandwidth info
 
 ![logo](./logo.png)
 
----
+**Bro-Stat Enhancement Suite**
+Copyright © 2026 BroTech (哥哥科技) | All Rights Reserved
+
+Bilibili：[哥哥科技：501430041](https://space.bilibili.com/501430041)
+
+## 🔗 Specialized Editions for WhiteBox Routers Brand
+
+**Mi-Stat_Max (Xiaomi Routers)**
+https://github.com/ucxn/Mi-Stat_Max
+
+**ZTE-Stat_Max (ZTE Routers)**
+https://github.com/ucxn/ZTE-Stat_Max
+
+**Home Assistant Integration (HACS)**
+[Universal Edition](https://github.com/ucxn/ZTE-Stat_HA)
+
+![signal](Wi-Fi图标映射设计稿.png)
 
 ## 💡 Core Features
 
@@ -78,7 +94,8 @@ Companion project:
 **ZTE-Stat_HA**
 https://github.com/ucxn/ZTE-Stat_HA
 
----
+### 7. Customized, Precise Wi-Fi Signal SVG Icons
+
 
 ## ⚙️ Supported Layouts & Modes
 
@@ -98,8 +115,6 @@ Compact, information-dense, and optimized for monitoring a large number of devic
 
 A cleaner and more spacious presentation style, ideal for always-on secondary displays and dedicated monitoring screens.
 
----
-
 ## 📦 Installation
 
 1. Install **Tampermonkey** or **ScriptCat** in your browser.
@@ -109,7 +124,6 @@ A cleaner and more spacious presentation style, ideal for always-on secondary di
 
 You may also pin the panel to the top of the page using the 📌 icon for permanent visibility.
 
----
 
 ## 📜 Legal Notice & Open Source Statement
 
@@ -120,16 +134,3 @@ This software is released under the **哥哥科技许可证 v3.0 (哥哥科技�
 Out of respect for open-source contributors, any modification, redistribution, or derivative work based on this project must preserve the attribution and legal notice section displayed at the bottom of the interface.
 
 Maintaining the visibility of these notices is a prerequisite for lawful use of the source code provided by this project.
-
-**Bro-Stat Enhancement Suite**
-Copyright © 2026 BroTech (哥哥科技) | All Rights Reserved
-
----
-
-## 🔗 Specialized Editions
-
-**Mi-Stat_Max (Xiaomi Routers)**
-https://github.com/ucxn/Mi-Stat_Max
-
-**ZTE-Stat_Max (ZTE Routers)**
-https://github.com/ucxn/ZTE-Stat_Max
