@@ -2,9 +2,9 @@
 // @name            TP路由器增强
 // @name:en         Bro-Stat-TP
 // @namespace       ucxn
-// @version         5.9.6
+// @version         5.9.7
 // @description     哥哥科技 QQ群 680464365
-// @description:en  https://github.com/ucxn/Mi-Stat_Max
+// @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
 // @noframes
 // @icon            https://scriptcat.org/api/v2/resource/image/duygQktL5QjWtkLc
@@ -88,7 +88,8 @@ let _saved = null;
     cls: {}, isPinned: !0,
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
     hasW2: !1, is5G_149: !1,
-    Warn_MS: 0, Force_MS: 0
+    Warn_MS: 0, Force_MS: 0, _RST: !1,
+    aWu: 0, aWd: 0, lwTU: 0, lwTD: 0
   };
 
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
@@ -297,11 +298,11 @@ async function rSD() {
         else if (cS.aR === 3) {
           if (dU > 0 || dD > 0) {
           if (cS.dpU && dU >= cS.dpU && cS.dpD && dD >= cS.dpD) {
-            if (dU <= cS.dpU * 1.1 || dU <= cS.dpU + CONFIG.宽带最大外网上行速率 * CONFIG.lanRefreshInterval) {
+            if (dU < cS.dpU * 1.1 || dU < cS.dpU + CONFIG.宽带最大外网上行速率 * CONFIG.lanRefreshInterval) {
               cS.uB += cS.dpU; cS.oU += cS.dpU;
               } else {
                 cS.uB += dU; cS.oU += dU; cS.dB += dD; cS.oD += dD; }
-             if (dD <= cS.dpD * 1.1 || dD <= cS.dpD + CONFIG.宽带最大外网下行速率 * CONFIG.lanRefreshInterval) {
+             if (dD < cS.dpD * 1.1 || dD < cS.dpD + CONFIG.宽带最大外网下行速率 * CONFIG.lanRefreshInterval) {
               cS.dB += cS.dpD; cS.oD += cS.dpD;
               } else {cS.dB += dD; cS.oD += dD;
               }
@@ -353,7 +354,7 @@ async function rSD() {
   function buildCSV() {
     return ((sp, now, start) => '\uFEFF' + [
       `"哥哥科技 硬路由 NPU 增强系列：专用组件 ${版本号} 生成"`,
-      `"统计周期：${new Date(start + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} 至 ${new Date(now + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} (UTC+8)${CONFIG.readSaveData === 1 ? ' （含本地历史读档）' : ''}"`,
+      `"统计周期：${new Date(start + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} 至 ${new Date(now + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} (UTC${CONFIG.时区补偿 > 0 ? '+' : ''}${CONFIG.时区补偿 / 3600000})${CONFIG.readSaveData === 1 ? ' （含本地历史读档）' : ''}"`,
       `"--- [全局统计] ---"`,
       `"WAN总上传(B)","WAN总下载(B)","高精全局上行(B)","高精全局下行(B)","LAN积分总上行(B)","LAN积分总下行(B)","本次在线总上行(B)","本次在线总下行(B)"`,
       `"${Math.round(sp.global?.wan_up||0)}","${Math.round(sp.global?.wan_down||0)}","${Math.round(sp.global?.lan_high_up||0)}","${Math.round(sp.global?.lan_high_down||0)}","${Math.round(sp.global?.lan_integral_up||0)}","${Math.round(sp.global?.lan_integral_down||0)}","${Math.round(sp.global?.lan_off_up||0)}","${Math.round(sp.global?.lan_off_down||0)}"`,
@@ -405,9 +406,9 @@ const calcStageRatio = (W, L_int, L_hp) => {
 const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
       function getSpark(ringArr, headIdx, maxVal) {
         let s = "";
-        for (let i = 63; i >= 0; i--) {
+        for (let i = 64; i--; ) {
           let v = ringArr[(headIdx - i) & 127];
-          s += SPRK[v <= 0 ? 0 : Math.min(7, Math.max(1, ((v / maxVal) * 7) | 0))];
+          s += SPRK[v > 0 ? Math.min(7, Math.max(1, ((v / maxVal) * 7) | 0)) : 0];
         }
         return s;
       }
@@ -425,7 +426,7 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
       hpU += sessU; 
       hpD += sessD;
     }
-  S.rTick = ((S.rTick || 0) + 1) & 15;
+  S.rTick = ((S.rTick || 0) + 1) & 3;
     if (S.rTick === 1 || !S.cRT) {
       let cln = {};
       for (let k in S.cls) {
@@ -446,6 +447,8 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
       s.hU[s.hIdx] = cC ? cC.upRate : 0;
       s.hD[s.hIdx] = cC ? cC.dnRate : 0;
     }if (typeof GM_setValue !== 'undefined') {
+      S.haTick = ((S.haTick || 0) + 1) & 63;
+      if (S.haTick === 1) {
       try {
         GM_setValue('ha_snapshot', {
           timestamp: Date.now(),
@@ -459,6 +462,8 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
           },
           devices: cln
         });
+        }
+ catch(e) {console.warn(e);}}
       let nowMs = Date.now();
           if (nowMs >= S.Force_MS && !S._RST) {doSettle(nowMs);
         } else if (nowMs >= S.Warn_MS && !document.getElementById('gb-w-bnr')) {
@@ -470,11 +475,9 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
             bd.insertBefore(bn, bd.firstChild);
             document.getElementById('gb-f-btn').onclick = () => doSettle(Date.now());}
           }
-        }
- catch(e) {console.warn(e);}
     }
-        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 4); S.lwTU = S.wTotUp;
-        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 4); S.lwTD = S.wTotDn;
+        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 1); S.lwTU = S.wTotUp;
+        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 1); S.lwTD = S.wTotDn;
         if (S.hasW2) {
             let rU = S.w2TotUp > 0 ? (S.wTotUp / S.w2TotUp) : (S.wTotUp > 0 ? Infinity : 0), rD = S.w2TotDn > 0 ? (S.wTotDn / S.w2TotDn) : (S.wTotDn > 0 ? Infinity : 0);
             let fR = (r) => r === Infinity ? '∞' : (r > 1 ? r.toFixed(2) + 'x' : (r * 100).toPrecision(3) + '%');
