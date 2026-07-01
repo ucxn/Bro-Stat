@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name            华为路由器增强 HUAWEI-Stat_Max 测控 离散采样 微积分
+// @name            华为路由器增强 HUAWEI-Stat_Max
 // @name:en         Bro-Stat_HUAWEI
 // @namespace       ucxn
 // @version         5.9.8
@@ -19,7 +19,7 @@
 // @grant           GM_getValue
 // @storageName     GBNPA_Storage
 // @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享）
-// @run-at          document-end
+// @run-at          document-start
 // @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/Huawei-1.user.js
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/Huawei-1.user.js
 // ==/UserScript==

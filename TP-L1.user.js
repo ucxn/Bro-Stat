@@ -2,9 +2,9 @@
 // @name            TP路由器增强
 // @name:en         Bro-Stat-TP
 // @namespace       ucxn
-// @version         5.9.4
+// @version         5.9.7
 // @description     哥哥科技 QQ群 680464365
-// @description:en  https://github.com/ucxn/Mi-Stat_Max
+// @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
 // @noframes
 // @icon            https://scriptcat.org/api/v2/resource/image/duygQktL5QjWtkLc
@@ -30,14 +30,10 @@
   'use strict';
   console.log("🚀 哥哥科技 V5.9.9 引擎已装载...");
 
-const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
-  function escapeHTML(str) {
-    return str ? String(str).replace(/[&<>'"]/g, m => ESC_MAP[m]) : '';
-  }
-
   // ======== [0] 用户极客环境变量配置区 ========
   const CONFIG = {
-    forceMeshMode: 0, // 【Mesh探测模式】0: 官方拓扑驱动 | 1: n秒智能等待(默认) | 2: 强制大包抓取(专治阉割、不出数据)
+    readSaveData: 1, // 【历史记录】 从本地长期历史读档 [自动保存！] | 0: 新局模式
+    forceMeshMode: 0,
     uiLayout: 2,//【面板拓扑结构】 0: 经典版 | 1: 详细紧凑版(驾驶舱美学) | 2: 详细平铺版(报表流美学)
     injectMode: 3, //1: 优先，10秒悬浮舱(D)| 3：强制模式
     calcMode: 1,// 1: 上行/下行倍数模式, 0: 上行占总和比例模式
@@ -45,9 +41,17 @@ const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&q
     ratioWarnUp: 0.07, // 重度上传警告阈值 (> 7%)
     ratioExtremeDown: 0.01, // 极端下载判定阈值 (< 1%)
     ratioThreshold: 7, // (仅calcMode=0时有效) 上传占比报警阈值(%)
-    readSaveData: 1, // 【开关切换】 1: 读档模式(继承本次历史量) | 0: 新局模式(从打开网页此刻归零重新计流)
     lanRefreshInterval: 3, // LAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
-    wanRefreshInterval: 3, // 【新增】WAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
+    wanRefreshInterval: 3, // WAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
+    宽带最大外网上行速率: 3e8,
+    宽带最大外网下行速率: 24e8, // 配置外网最大上传|下载比特(bit/bps)速率，请略微大于真实值；500兆为5e8，一千兆1e9
+    周期类型: 'M', // 'M'(每月), 'W'(每周), 'D'(固定天数), 其它任意字符：不开启周期重置+自动导出功能
+    周_天设置: 1, // M: 1~31号; W: 0~6(周日~周六); D: 间隔天数(如 7)
+    基准日期: '2026-06-20', // 原点时间(仅 D 模式有效) 任意一个历史周期的零点
+    报告时间: -1080, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
+    自动导出: 0, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
+    时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
+    盲漫游: undefined, //是否拦截漫游可能产生的异常高网速
     portMap: {
       "eth1": "网口 1",
       "eth2": "网口 2",
@@ -58,6 +62,12 @@ const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&q
       "wl2": "5.8G"
     }
   };
+
+const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
+  function escapeHTML(str) {
+    return str ? String(str).replace(/[&<>'"]/g, m => ESC_MAP[m]) : '';
+  }
+
 const __origOpen = XMLHttpRequest.prototype.open;
   XMLHttpRequest.prototype.open = function(method, url) {
     let m = String(url).match(/stok=([a-zA-Z0-9]+)/i);
@@ -77,11 +87,18 @@ let _saved = null;
     wTotDn: _saved?.global?.wan_down || 0,
     cls: {}, isPinned: !0,
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
-    hasW2: !1, is5G_149: !1
+    hasW2: !1, is5G_149: !1,
+    Warn_MS: 0, Force_MS: 0, _RST: !1,
+    aWu: 0, aWd: 0, lwTU: 0, lwTD: 0
   };
 
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
-  
+  S.calcTime = (L) => {
+    S.Force_MS = (CONFIG.周期类型 === 'M' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth() + (L >= Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), CONFIG.周_天设置) ? 1 : 0), CONFIG.周_天设置) : (CONFIG.周期类型 === 'W' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + ((CONFIG.周_天设置 - new Date(L).getUTCDay() <= 0 ? CONFIG.周_天设置 - new Date(L).getUTCDay() + 7 : CONFIG.周_天设置 - new Date(L).getUTCDay()) * 86400000) : (CONFIG.周期类型 === 'D' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + CONFIG.周_天设置 * 86400000 : Infinity))) - CONFIG.时区补偿;
+    S.Warn_MS = S.Force_MS + CONFIG.报告时间 * 60000;
+    S.Force_MS += CONFIG.自动导出 * 60000;
+  };S.calcTime((typeof GM_getValue !== 'undefined' && GM_getValue('gege_reset_ms')) ? (GM_getValue('gege_reset_ms') + CONFIG.时区补偿) : Date.now() + CONFIG.时区补偿);
+  const 版本号 = (typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号';
   if (location.pathname.includes('main.html')) {
     const jumpToPc = (stok) => {
       if (!window.__gegeJumped && location.hash.includes('#/home')) {
@@ -117,6 +134,7 @@ const F_ARR_8 = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/
   function fBy(bps) {
         if (bps === 0) return '0  B';
         if (bps > 8388608) return `${(bps / 8388608).toFixed(2)} MiB/s`;
+        if (bps === 1) return `拦截中…`;
         return bps < 8602
             ? ((bps * 0.001 | 0) === bps * 0.001
                 ? `${F_ARR_8[bps * 0.001]} KB/s`
@@ -133,7 +151,7 @@ const F_ARR_8 = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/
 
   function fSV(bits) {
     if (bits >= 84607500288) return `${(bits / 8589934592).toPrecision(4)}GB`;
-	if (bits > 8388608000) return `${Math.round(bits / 8388608)}MB`;
+    if (bits > 8388608000) return `${Math.round(bits / 8388608)}MB`;
     if (bits > 8388608) return `${(bits / 8388608).toFixed(2)}MB`;
     if (bits >= 8192) return `${(bits / 8192).toFixed(1)}KB`;
     return `${Math.round(bits / 8)}B`;}
@@ -200,9 +218,6 @@ async function rSD() {
       let cWU = (+curW.up_speed || 0) * 8000; // TP 的 up_speed 单位是 KBps，转成 bps 需要 * 8000
       let cWD = (+curW.down_speed || 0) * 8000;
       
-      // ... 后面的设备解析逻辑保持不变 ...
-      
-      // 容错双拨抓取（如果有万能马甲双WAN需求的话），若没有自然 fallback 到静默 false
       S.hasW2 = !!(dW?.network?.wan_status_2?.ipaddr && dW.network.wan_status_2.ipaddr !== "0.0.0.0");
       if (S.hasW2) {
         let u2 = (+dW.network.wan_status_2.up_speed || 0) * 8, d2 = (+dW.network.wan_status_2.down_speed || 0) * 8;
@@ -217,8 +232,6 @@ async function rSD() {
       }
 
       let cSU = 0, cSD = 0, cI = Object.create(null);
-
-      // 解衣：只剥 online_host 这种它自己唯一稳定的原生外皮
       (dL.hosts_info?.online_host || []).forEach(obj => {
         let i = obj[Object.keys(obj)[0]]; 
         if (i && i.mac) {
@@ -260,36 +273,51 @@ async function rSD() {
       }
       for (const [m, cC] of Object.entries(cI)) {
         S.cls[m] ??= {
-          upR: cC.upRate, dnR: cC.dnRate, lUT: n,
+          upR: cC.upRate, dnR: cC.dnRate, lUT: n, aR: 0,
           intUp: _saved?.devices?.[m]?.integral_up || 0,
           intDn: _saved?.devices?.[m]?.integral_down || 0,
-          onS: cC.onSec, lOS: cC.onSec, hU: [], hD: []
+          onS: cC.onSec, lOS: cC.onSec, hU: new Float64Array(128), hD: new Float64Array(128), hIdx: 0, ifc: cC.iface
         };
         let cS = S.cls[m],
           dU = cC.offUp - cS.lU,
           dD = cC.offDn - cS.lD;
+        if (cS.ifc !== cC.iface) { if (CONFIG.盲漫游 != 0) cS.aR = 1; if (CONFIG.盲漫游 === 1) cS.aR = 2; cS.ifc = cC.iface; }
         if (dU < 0 || dD < 0) {
           if (dU < 0) {
             cS.uB += dU;
+            cS.oU += dU;
             cS.dpU = cS.lU;
           }
           if (dD < 0) {
             cS.dB += dD;
+            cS.oD += dD;
             cS.dpD = cS.lD;
           }
-          cS.aR = !0;
+          cS.aR = 3;
         }
-        else if (cS.aR) {
-          if (dD > 2516582400 || dU > 671088640 || (cS.dpD && dD >= cS.dpD) || (cS.dpU && dU >= cS.dpU)) {
-            cS.uB += dU;
-            cS.dB += dD;
-            cS.aR = !1;
-            cS.dpU = 0;
-            cS.dpD = 0;
+        else if (cS.aR === 3) {
+          if (dU > 0 || dD > 0) {
+          if (cS.dpU && dU >= cS.dpU && cS.dpD && dD >= cS.dpD) {
+            if (dU < cS.dpU * 1.1 || dU < cS.dpU + CONFIG.宽带最大外网上行速率 * CONFIG.lanRefreshInterval) {
+              cS.uB += cS.dpU; cS.oU += cS.dpU;
+              } else {
+                cS.uB += dU; cS.oU += dU; cS.dB += dD; cS.oD += dD; }
+             if (dD < cS.dpD * 1.1 || dD < cS.dpD + CONFIG.宽带最大外网下行速率 * CONFIG.lanRefreshInterval) {
+              cS.dB += cS.dpD; cS.oD += cS.dpD;
+              } else {cS.dB += dD; cS.oD += dD;
+              }
+            cS.aR = 2; 
+            if (CONFIG.盲漫游 === undefined) CONFIG.盲漫游 = 1;
+            } else {
+              cS.aR = 0; 
+            }
+            cS.dpU = 0; cS.dpD = 0; 
           }
         }
-        if (cC.upRate > 6e8) { cSU -= cC.upRate; cC.upRate = 0; }
-        if (cC.dnRate > 24e8) { cSD -= cC.dnRate; cC.dnRate = 0; }
+        else if (cS.aR > 0) { cS.aR--; }
+        if (cS.aR === 2 || (cS.aR == 1 && cC.upRate > CONFIG.宽带最大外网上行速率 * 0.6) || cC.upRate > 6e8) { cSU -= cC.upRate; cC.upRate = 1; }
+        if (cS.aR === 2 || (cS.aR == 1 && cC.dnRate > CONFIG.宽带最大外网下行速率 * 0.6) || cC.dnRate > 24e8) { cSD -= cC.dnRate; cC.dnRate = 1; }
+
         if (cS.lOS !== cC.onSec) {
           cS.onS = cC.onSec;
           cS.lOS = cC.onSec;
@@ -309,8 +337,6 @@ async function rSD() {
         }
         cS.lU = cC.offUp;
         cS.lD = cC.offDn;
-        cS.hU.push(cC ? cC.upRate : 0); if (cS.hU.length > 120) cS.hU.shift();
-        cS.hD.push(cC ? cC.dnRate : 0); if (cS.hD.length > 120) cS.hD.shift();
       }
       S.lt = n;
       S.wInstUp = cWU;
@@ -324,6 +350,45 @@ async function rSD() {
       window.__gIsF = !1;
     }
   }
+
+  function buildCSV() {
+    return ((sp, now, start) => '\uFEFF' + [
+      `"哥哥科技 硬路由 NPU 增强系列：专用组件 ${版本号} 生成"`,
+      `"统计周期：${new Date(start + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} 至 ${new Date(now + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} (UTC${CONFIG.时区补偿 > 0 ? '+' : ''}${CONFIG.时区补偿 / 3600000})${CONFIG.readSaveData === 1 ? ' （含本地历史读档）' : ''}"`,
+      `"--- [全局统计] ---"`,
+      `"WAN总上传(B)","WAN总下载(B)","高精全局上行(B)","高精全局下行(B)","LAN积分总上行(B)","LAN积分总下行(B)","本次在线总上行(B)","本次在线总下行(B)"`,
+      `"${Math.round(sp.global?.wan_up||0)}","${Math.round(sp.global?.wan_down||0)}","${Math.round(sp.global?.lan_high_up||0)}","${Math.round(sp.global?.lan_high_down||0)}","${Math.round(sp.global?.lan_integral_up||0)}","${Math.round(sp.global?.lan_integral_down||0)}","${Math.round(sp.global?.lan_off_up||0)}","${Math.round(sp.global?.lan_off_down||0)}"`,
+      ``,
+      `"--- [设备明细] ---"`,
+      `"设备名称","MAC地址","IP地址","状态/接口","高精上行","高精下行","积分上行","积分下行","官方上行","官方下行"`,
+      ...Object.entries(sp.devices || {}).map(d => `"${d[1].name}","${d[0]}","${d[1].ip}","${d[1].status}","${Math.round(d[1].up||0)}","${Math.round(d[1].down||0)}","${Math.round(d[1].integral_up||0)}","${Math.round(d[1].integral_down||0)}","${Math.round(d[1].raw_up||0)}","${Math.round(d[1].raw_down||0)}"`),
+      ``,
+      `"Bro-Stat@哥哥科技 https://space.bilibili.com/501430041"`,
+      `"项目主页: https://github.com/ucxn/Bro-Stat"`,
+      `"脚本下载: https://scriptcat.org/users/203510"`
+
+    ].join('\r\n'))(
+      typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot', {}) : {}, 
+      Date.now(), 
+      (CONFIG.readSaveData !== 0 && typeof GM_getValue !== 'undefined' ? GM_getValue('gege_reset_ms', null) : null) || performance.timeOrigin || Date.now()
+    );
+  }
+function doSettle(nowMs) {
+    S._RST = !0; // 防重入锁
+    let csv = buildCSV(), b = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    let u = URL.createObjectURL(b), a = document.createElement('a');
+    a.href = u; a.download = `哥哥科技_路由器统计数据导出_${new Date(nowMs + CONFIG.时区补偿).toISOString().slice(2, 19).replace(/[-:]/g, '').replace('T', '_')}_${nowMs}.csv`; a.click(); // 文件
+    let w = window.open('about:blank', '_blank');
+    if (w) w.document.write(`<!DOCTYPE html><html><head><title>流量结算备份</title></head><body style="background:#f3f4f5;font-family:system-ui,sans-serif;padding:40px 20px;color:#333;"><div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.05);max-width:850px;margin:0 auto;"><h2 style="color:#0059fa;margin-top:0;border-bottom:2px solid #f0f0f0;padding-bottom:15px;">本次数据结算周期已结束</h2><p style="font-size:14px;line-height:1.7;color:#555;"><b>哥哥科技提示您：</b>请点击下方下载按钮将 CSV 报表保存到本地。<br>若下载失败，请点击复制按钮，新建文本文档粘贴后将拓展名改为 .csv 即可。</p><button id="dl-btn" style="background:#0059fa;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;margin-right:10px;">📥 再次下载 CSV</button><button id="cp-btn" style="background:#4caf50;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 一键复制内容</button><div style="background:#282c34;color:#abb2bf;padding:15px;border-radius:8px;overflow-x:auto;margin-top:20px;"><pre id="csv-data" style="margin:0;font-size:13px;line-height:1.5;">${csv}</pre></div></div><script>document.getElementById('dl-btn').onclick=function(){let b=new Blob([document.getElementById('csv-data').textContent],{type:'text/csv;charset=utf-8;'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='哥哥科技_路由器统计数据补下_${nowMs}.csv';a.click();};document.getElementById('cp-btn').onclick=function(){let t=document.createElement('textarea');t.value=document.getElementById('csv-data').textContent;document.body.appendChild(t);t.select();try{document.execCommand('copy');alert('复制成功！');}catch(e){alert('复制失败，请手动全选复制');}document.body.removeChild(t);};</script></body></html>`);
+    GM_setValue('gege_reset_ms', nowMs);
+    S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn = 0; // 内存原地清零
+    for (let k in S.cls) { let s = S.cls[k]; s.intUp = s.intDn = 0; s.uB = s.oU = s.lU; s.dB = s.oD = s.lD; s.hU.fill(0); s.hD.fill(0); } // 内存原地清零底表
+    document.getElementById('gb-w-bnr')?.remove(); // 预警横幅
+    S.calcTime(Math.max(nowMs, S.Force_MS - CONFIG.自动导出 * 60000 + 1000) + CONFIG.时区补偿); // 瞬间算出下月/下周新线
+    window.gegeForceUIRedraw = !0; // 重绘 UI
+    setTimeout(() => { S._RST = !1; }, 2000); // 解开安全锁
+  }
+
 const calcStageRatio = (W, L_int, L_hp) => {
     if (W === 0) return 1.0;
     let L_max = Math.max(L_int, L_hp);
@@ -337,6 +402,17 @@ const calcStageRatio = (W, L_int, L_hp) => {
         return (Math.abs(L_int - W) < Math.abs(L_hp - W) ? L_int : L_hp) / W;
     }
   };
+
+const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+      function getSpark(ringArr, headIdx, maxVal) {
+        let s = "";
+        for (let i = 64; i--; ) {
+          let v = ringArr[(headIdx - i) & 127];
+          s += SPRK[v > 0 ? Math.min(7, Math.max(1, ((v / maxVal) * 7) | 0)) : 0];
+        }
+        return s;
+      }
+
   function rUI(wU, wD, sU, sD, cI) {
     let LUp = 0, LDn = 0, hpU = 0, hpD = 0;
     for (let k in S.cls) {
@@ -350,7 +426,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
       hpU += sessU; 
       hpD += sessD;
     }
-  S.rTick = ((S.rTick || 0) + 1) & 15;
+  S.rTick = ((S.rTick || 0) + 1) & 3;
     if (S.rTick === 1 || !S.cRT) {
       let cln = {};
       for (let k in S.cls) {
@@ -365,9 +441,14 @@ const calcStageRatio = (W, L_int, L_hp) => {
           name: cC?.name || k,
           ip: cC?.ip || "",
           raw_up: cC?.offUp || 0,
-          raw_down: cC?.offDn || 0
+          raw_down: cC?.offDn || 0,
       };
+      s.hIdx = (s.hIdx + 1) & 127;
+      s.hU[s.hIdx] = cC ? cC.upRate : 0;
+      s.hD[s.hIdx] = cC ? cC.dnRate : 0;
     }if (typeof GM_setValue !== 'undefined') {
+      S.haTick = ((S.haTick || 0) + 1) & 63;
+      if (S.haTick === 1) {
       try {
         GM_setValue('ha_snapshot', {
           timestamp: Date.now(),
@@ -381,10 +462,22 @@ const calcStageRatio = (W, L_int, L_hp) => {
           },
           devices: cln
         });
-      } catch(e) {console.warn(e);}
+        }
+ catch(e) {console.warn(e);}}
+      let nowMs = Date.now();
+          if (nowMs >= S.Force_MS && !S._RST) {doSettle(nowMs);
+        } else if (nowMs >= S.Warn_MS && !document.getElementById('gb-w-bnr')) {
+          let bd = document.getElementById('zte-geek-board');
+          if (bd) {
+            let bn = document.createElement('div'); bn.id = 'gb-w-bnr';
+            bn.style.cssText = 'background:#fff3cd;color:#856404;padding:10px 15px;margin-bottom:10px;border-radius:6px;border-left:5px solid #ffc107;font-weight:bold;font-size:13px;display:flex;justify-content:space-between;align-items:center;width:100%;box-sizing:border-box;';
+            bn.innerHTML = `<span> 统计周期即将结束，流量将在跨越边界时自动清零备份。</span><button id="gb-f-btn" style="background:#ffc107;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:bold;color:#333;">立即导出并清零</button>`;
+            bd.insertBefore(bn, bd.firstChild);
+            document.getElementById('gb-f-btn').onclick = () => doSettle(Date.now());}
+          }
     }
-        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 4); S.lwTU = S.wTotUp;
-        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 4); S.lwTD = S.wTotDn;
+        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 1); S.lwTU = S.wTotUp;
+        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 1); S.lwTD = S.wTotDn;
         if (S.hasW2) {
             let rU = S.w2TotUp > 0 ? (S.wTotUp / S.w2TotUp) : (S.wTotUp > 0 ? Infinity : 0), rD = S.w2TotDn > 0 ? (S.wTotDn / S.w2TotDn) : (S.wTotDn > 0 ? Infinity : 0);
             let fR = (r) => r === Infinity ? '∞' : (r > 1 ? r.toFixed(2) + 'x' : (r * 100).toPrecision(3) + '%');
@@ -598,13 +691,11 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
               bU = cache.bU ??= enh.querySelector('.zte-bar-up'),
               bD = cache.bD ??= enh.querySelector('.zte-bar-down');
           
-          const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
           let clU = (S.aWu * 0.1) || 0; if (clU < 512000) clU = 512000;
-          for (let i = 0; i < cS.hU.length; i++) { if (cS.hU[i] > clU) clU = cS.hU[i]; }
           let clD = (S.aWd * 0.125) || 0;
-          for (let i = 0; i < cS.hD.length; i++) { if (cS.hD[i] > clD) clD = cS.hD[i]; }
-          (cache.bUSpk ??= bU.querySelector('.v-spark')).textContent = cS.hU.slice(-60).map(v => SPRK[v < 73000 ? 0 : Math.min(7, Math.max(1, Math.floor((v / clU) * 7)))]).join('');
-          (cache.bDSpk ??= bD.querySelector('.v-spark')).textContent = cS.hD.slice(-60).map(v => SPRK[v < 1000000 ? 0 : Math.min(7, Math.max(1, Math.floor((v / clD) * 7)))]).join('');
+          for (let i = 0; i < 128; i++) { if (cS.hU[i] > clU) clU = cS.hU[i]; if (cS.hD[i] > clD) clD = cS.hD[i]; }
+          (cache.bUSpk ??= bU.querySelector('.v-spark')).textContent = getSpark(cS.hU, cS.hIdx, clU);
+          (cache.bDSpk ??= bD.querySelector('.v-spark')).textContent = getSpark(cS.hD, cS.hIdx, clD);
 
           bU.style.setProperty('--p-up', Math.min(pu, 100) + '%');
           (cache.bUVal ??= bU.querySelector('.v-val')).textContent = `🔼 ${fBy(cC.upRate)}`;
@@ -632,7 +723,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
       requestAnimationFrame(() => {
         ol.innerHTML = `<div style="padding: 20px; width: 96%; margin: 0 auto; min-height: 100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container"><div class="gege-section"><div class="config-title">有线设备${(window.gegeHiddenDevices && Object.keys(window.gegeHiddenDevices).length > 0) ? '<span style="color: #ff4c00; font-size: 13px; font-weight: normal; margin-left: 10px; font-family: system-ui, sans-serif;">(哥哥科技：智能Mesh适配)</span>' : ''}</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.8GHz':'5.2GHz'}）</div>${h52.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.2GHz':'5.8GHz'}）</div>${h58.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}
         </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: system-ui, sans-serif, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序属于“哥哥软件”系列；需持续遵守署名条款方可获得使用权，二开或发行请参阅许可证；按“原样且免费”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作担保；个人分享请直接转载官方链接。<br>基于本程序的任何修改、使用任意部分代码、再发布或相关衍生版本的合法性的前置条件是：在提供最终用户界面时，均应显著保留所有“哥哥科技”与法律声明，不得删除、隐藏或降低其可见性。
-        </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Bro-Stat" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件</a> Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1PtR7B8ECC" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/zh-CN/users/203510" target="_blank" style="color: #666; text-decoration: none;">点此分享</a></div></div></div></div>`;
+        </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Bro-Stat" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件 TP-${版本号}</a> Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1PtR7B8ECC" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/zh-CN/users/203510" target="_blank" style="color: #666; text-decoration: none;">点此分享</a></div></div></div></div>`;
       });}
     catch (e) {
       requestAnimationFrame(() => {

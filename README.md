@@ -11,7 +11,19 @@
 
 ![logo](./logo.png)
 
+
+**Bro-Stat 增强组件** Copyright © 2026 哥哥科技 (BroTech) | [点击分享](https://scriptcat.org/users/203510)
+
+B站：[哥哥科技：501430041](https://space.bilibili.com/501430041)
+
 ---
+
+**品牌硬路由专版**
+* 小米路由器：[Mi-Stat_Max](https://github.com/ucxn/Mi-Stat_Max)
+* 中兴路由器：[ZTE-Stat_Max](https://github.com/ucxn/ZTE-Stat_Max)
+* **HA上报联动**：[全品牌通用](https://github.com/ucxn/ZTE-Stat_HA)
+
+![signal](Wi-Fi图标映射设计稿.png)
 
 ### 💡 核心特性
 
@@ -37,8 +49,10 @@
 作为一个需要长期挂在后台的监控面板，流畅度至关重要。
 组件底层采用纯数学的梯形积分算法剥离了冗余的 API 轮询，渲染层则利用原生 DOM 穿透与 Flex 布局锁死重排（Reflow）。哪怕局域网内有上百台智能设备同时刷新，浏览器的内存与 CPU 占用曲线依然能保持一条平稳的直线。
 
-#### 6.🏠 联动 Home Assistant**：
+#### 6.🏠 **联动 Home Assistant**：
 搭配专属的 哥哥科技 中枢集成，支持通过 Webhook 将状态实时推送到 HACS 插件。避免Web只能单端接入，实现多端并发观测。详见兄弟项目：[ZTE-Stat_HA](https://github.com/ucxn/ZTE-Stat_HA)
+
+#### 7. 定制化精准 Wi-Fi 信号图标 SVG
 
 ---
 
@@ -62,14 +76,3 @@
 > *“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”*
 
 本交互式程序基于 **哥哥科技许可证** 协议开源，按“原样 (AS IS)”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作任何明示或暗示的担保。
-
-**Bro-Stat 增强组件** Copyright © 2026 哥哥科技 (BroTech) | [点击分享](https://scriptcat.org/users/203510)
-
-B站：[哥哥科技：501430041](https://space.bilibili.com/501430041)
-
----
-
-**附：专版链接**
-* 小米路由器：[Mi-Stat_Max](https://github.com/ucxn/Mi-Stat_Max)
-* 中兴路由器：[ZTE-Stat_Max](https://github.com/ucxn/ZTE-Stat_Max)
-* **HA上报联动**：[全品牌通用](https://github.com/ucxn/ZTE-Stat_HA)
