@@ -2,12 +2,11 @@
 // @name            新华三路由器增强
 // @name:en         Bro-Stat-H3C
 // @namespace       ucxn
-// @version         5.9.2
+// @version         5.9.3
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Mi-Stat_Max
 // @author          哥哥科技 space.bilibili.com/501430041
 // @noframes
-// @icon            https://scriptcat.org/api/v2/resource/image/duygQktL5QjWtkLc
 // @include         http://10.*.*.*
 // @include         http://192.168.*.*
 // @include         http://172.16.*
@@ -19,8 +18,8 @@
 // @grant           GM_getValue
 // @storageName     GBNPA_Storage
 // @license         AGPL-3.0-or-later
-// @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/TP-L1.user.js
-// @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/TP-L1.user.js
+// @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/H3C-TX_1801.user.js
+// @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/H3C-TX_1801.user.js
 
 // ==/UserScript==
 
@@ -73,15 +72,16 @@ let _saved = null;
 
   const S = {
     lt: 0, wInstUp: 0, wInstDn: 0,
-    // [修改] 启动时将 WAN口 总量继承为存档数据
     wTotUp: _saved?.global?.wan_up || 0,
     wTotDn: _saved?.global?.wan_down || 0,
     cls: {}, isPinned: !0,
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
-    hasW2: !1, is5G_149: !1
+    hasW2: !1, is5G_149: !1,
+    无线缓存: Object.create(null), 无线请求中: !1, DOM缓存: null, DOM已重建: !1, 面板状态: null, HA小齿轮: 0, 包数据可用: !1, 总上行图: new Float64Array(128), 总下行图: new Float64Array(128), 总图头: 0, 总图点数: 0, 图表拖: null, 图表待画: 0
   };
 
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
+  const GBK = new TextDecoder('gbk');
   
   if (location.pathname.includes('main.html')) {
     const jumpToPc = (stok) => {
@@ -154,6 +154,126 @@ let _saved = null;
   function nM(m) {
     return m ? m.toLowerCase().replace(/-/g, ':').replace(/\s/g, '') : '';
   }
+  function 取名单项(t, 名) {
+    let m = t.match(new RegExp('var\\s+' + 名 + '\\s*=\\s*new\\s+Array\\(([\\s\\S]*?)\\);'));
+    return m ? (m[1].match(/"[^"]*"|'[^']*'/g) || []) : [];
+  }
+  function 净设备名(x) {
+    x = (x || '').trim();
+    return x && !/^(allow|deny|on|out|LAN|WLAN\d*|static|dynamic|0|未绑定|离线)$/i.test(x) ? x : '';
+  }
+  function H3C接口(x) {
+    x = (x || '').toUpperCase();
+    return x.includes('WLAN6') ? 'wl1' : x.includes('WLAN') ? 'wl0' : x.includes('LAN') ? 'eth1' : '';
+  }
+  function 写设备名(d, mac, 名, 覆盖 = 0) {
+    名 = 净设备名(名);
+    if (!mac || !名) return;
+    d[mac] ??= {};
+    if (覆盖 || !d[mac].name) d[mac].name = 名;
+  }
+
+  function 短数(n) { return (+(n || 0).toPrecision(3)).toString(); }
+  function 计算包比(u, d) { return d > 0 ? u / d : (u > 0 ? Infinity : 0); }
+  function 格式化包比(r) { return r === Infinity ? '∞' : (!r || r < 0 ? '0%' : (r < 1e-3 ? `${短数(r * 1e4)}/万` : (r < 10 ? `${短数(r * 100)}%` : `${短数(r)}倍`))); }
+  function 取设备图标(信号, 有线) {
+    if (有线) return `<svg viewBox="0 0 64 64" width="50" height="50" aria-hidden="true"><rect x="16" y="20" width="32" height="24" rx="4" fill="#f3f6fb" stroke="#7b8aa0" stroke-width="3"/><path d="M24 44v7h16v-7M20 51h24" stroke="#7b8aa0" stroke-width="3" stroke-linecap="round"/><path d="M24 28h16M24 35h16" stroke="#0059fa" stroke-width="3" stroke-linecap="round"/></svg>`;
+    let r = 信号 | 0, c = r > -24 ? '#4caf50' : r > -35 ? '#9c27b0' : '#0059fa';
+    if (r > -40) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="${c}"/></svg>`;
+    if (r > -46) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="#e0e0e0"/><path d="M 50,85 L 18,45 A 50,50 0 0,1 82,45 Z" fill="${c}"/></svg>`;
+    if (r > -50) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="#e0e0e0"/><path d="M 50,85 L 23,51 A 43,43 0 0,1 77,51 Z" fill="${c}"/></svg>`;
+    if (r > -56) return `<svg viewBox="0 0 100 100" width="45" height="45"><circle cx="50" cy="80" r="9" fill="${c}"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/></svg>`;
+    if (r > -61) return `<svg viewBox="0 0 100 100" width="45" height="45"><circle cx="50" cy="80" r="9" fill="${c}"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></svg>`;
+    if (r > -67) return `<svg viewBox="0 0 100 100" width="45" height="45"><circle cx="50" cy="80" r="9" fill="${c}"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></svg>`;
+    if (r > -72) return `<svg viewBox="0 0 100 100" width="45" height="45"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff9800" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></svg>`;
+    if (r > -76) return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ffb300" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></g><text x="70" y="86" fill="#ffb300" font-weight="900" font-size="48" font-family="sans-serif">!</text></svg>`;
+    if (r > -80) return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff4c00" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></g><text x="70" y="86" fill="#ff4c00" font-weight="900" font-size="48" font-family="sans-serif">!</text></svg>`;
+    if (r > -85) return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff4c00" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></g><text x="65" y="86" fill="#ff4c00" font-weight="900" font-size="44" font-family="sans-serif">?</text></svg>`;
+    return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff4c00" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#ff4c00" stroke-width="7" stroke-linecap="round" opacity="0.3"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#ff4c00" stroke-width="7" stroke-linecap="round" opacity="0.3"/></g><text x="65" y="80" fill="#ff4c00" font-weight="900" font-size="35" font-family="sans-serif">✖</text></svg>`;
+  }
+  const 火花字符 = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+  function 取火花线(环, 头, 最大, 最小 = 0) {
+    let s = '';
+    for (let i = 31; i >= 0; i--) {
+      let v = 环[(头 - i) & 31] || 0;
+      s += 火花字符[(v < 最小 || 最大 <= 0) ? 0 : Math.min(7, Math.max(1, (v / 最大 * 7) | 0))];
+    }
+    return s;
+  }
+  async function 刷无线信息(ts = Date.now()) {
+    if (S.无线请求中) return;
+    S.无线请求中 = !0;
+    try {
+      let r = await fetch(`/wlan_ap_client_list.asp?_=${ts}`);
+      if (!r.ok) return;
+      let t = GBK.decode(await r.arrayBuffer()), 新缓存 = Object.create(null), 要重绘 = !1;
+      取名单项(t, 'dhcpd_client_list').forEach(s => {
+        let p = s.slice(1, -1).split(';'), mac = nM(p[1]), 接口 = (p[5] || '').toUpperCase().includes('5G') ? 'wl1' : 'wl0';
+        if (mac) {
+          if (!S.无线缓存[mac] || S.无线缓存[mac].接口 !== 接口) 要重绘 = !0;
+          新缓存[mac] = { 信号: (+p[6] || 0) - 92, 协商: +p[7] || 0, SSID: p[4] || '', 频段: p[5] || '', 接入点: p[8] || '', 接口, 名称: p[3] || '' };
+          window.__h3cDict ??= {}; window.__h3cDict[mac] ??= {}; window.__h3cDict[mac].iface = 接口;
+          if (p[3] && p[3].trim()) window.__h3cDict[mac].name = window.__h3cDict[mac].name || p[3].trim();
+        }
+      });
+      for (let mac in S.无线缓存) if (!新缓存[mac]) { 要重绘 = !0; if (window.__h3cDict?.[mac]) delete window.__h3cDict[mac].iface; }
+      S.无线缓存 = 新缓存;
+      if (要重绘) { window.gegeForceUIRedraw = !0; S.DOM缓存 = null; }
+    } catch(e) { console.warn(e); }
+    finally { S.无线请求中 = !1; }
+  }
+
+
+  function 记总速率图(u, d) {
+    S.总图头 = (S.总图头 + 1) & 127;
+    S.总上行图[S.总图头] = u || 0;
+    S.总下行图[S.总图头] = d || 0;
+    if (S.总图点数 < 128) S.总图点数++;
+  }
+  function 初始化总速率图(bd) {
+    let box = bd.querySelector('#gege-speed-chart');
+    if (box) return box;
+    box = document.createElement('div');
+    box.id = 'gege-speed-chart';
+    box.innerHTML = '<canvas></canvas><div class="gege-chart-head"><b data-gc="meta"></b></div><div class="gege-chart-foot"><span class="gc-up" data-gc="up"></span><span class="gc-down" data-gc="down"></span><span class="gc-extra" data-gc="extra"></span></div><div class="gege-chart-resize" title="缩放"></div>';
+    bd.appendChild(box);
+    let bw = bd.clientWidth || 1800, w = Math.max(320, Math.min(650, bw * .30));
+    box.style.left = Math.max(520, bw * .52) + 'px';
+    box.style.top = '2px';
+    box.style.width = w + 'px';
+    box.style.height = '112px';
+    const 起手 = (e, 模式) => { e.preventDefault(); S.图表拖 = { 模式, x: e.clientX, y: e.clientY, l: box.offsetLeft, t: box.offsetTop, w: box.offsetWidth, h: box.offsetHeight }; box.setPointerCapture?.(e.pointerId); };
+    box.addEventListener('pointerdown', e => { if (!e.target.classList.contains('gege-chart-resize')) 起手(e, '拖'); });
+    box.querySelector('.gege-chart-resize').addEventListener('pointerdown', e => 起手(e, '缩'));
+    box.addEventListener('pointermove', e => {
+      let g = S.图表拖; if (!g) return;
+      if (g.模式 === '拖') { box.style.left = Math.max(330, g.l + e.clientX - g.x) + 'px'; box.style.top = Math.max(0, g.t + e.clientY - g.y) + 'px'; }
+      else { box.style.width = Math.max(260, g.w + e.clientX - g.x) + 'px'; box.style.height = Math.max(88, g.h + e.clientY - g.y) + 'px'; }
+      if (!S.图表待画) { S.图表待画 = 1; requestAnimationFrame(() => { S.图表待画 = 0; 画总速率图(bd); }); }
+    });
+    box.addEventListener('pointerup', () => S.图表拖 = null);
+    box.addEventListener('lostpointercapture', () => S.图表拖 = null);
+    return box;
+  }
+  function 画总速率图(bd) {
+    let box = 初始化总速率图(bd), cv = box.querySelector('canvas'), W = box.clientWidth | 0, H = box.clientHeight | 0, R = window.devicePixelRatio || 1;
+    if (W < 40 || H < 40) return;
+    if (cv.width !== (W * R | 0) || cv.height !== (H * R | 0)) { cv.width = W * R | 0; cv.height = H * R | 0; cv.style.width = '100%'; cv.style.height = '100%'; }
+    let x = cv.getContext('2d'); x.setTransform(R,0,0,R,0,0); x.clearRect(0,0,W,H);
+    let l = 34, r = 8, t = 20, b = 25, gw = W - l - r, gh = H - t - b, n = S.总图点数, mx = 1, su = 0, sd = 0;
+    for (let i = n; i--; ) { let j = (S.总图头 - i) & 127, u = S.总上行图[j] || 0, d = S.总下行图[j] || 0; if (u > mx) mx = u; if (d > mx) mx = d; su += u; sd += d; }
+    x.fillStyle = 'rgba(255,255,255,.58)'; x.strokeStyle = 'rgba(0,89,250,.88)'; x.lineWidth = 1.5; x.beginPath(); x.roundRect ? x.roundRect(.5,.5,W-1,H-1,8) : x.rect(.5,.5,W-1,H-1); x.fill(); x.stroke();
+    x.setLineDash([4,4]); x.strokeStyle = 'rgba(0,89,250,.45)'; x.lineWidth = 1;
+    for (let i = 5; i--; ) { let y = t + gh * i / 4; x.beginPath(); x.moveTo(l,y); x.lineTo(W-r,y); x.stroke(); }
+    for (let i = 7; i--; ) { let xx = l + gw * i / 6; x.beginPath(); x.moveTo(xx,t); x.lineTo(xx,H-b); x.stroke(); }
+    x.setLineDash([]);
+    (box._gcMeta ??= box.querySelector('[data-gc="meta"]')).textContent = `采样:${CONFIG.lanRefreshInterval}s  点:${n}`;
+    (box._gcUp ??= box.querySelector('[data-gc="up"]')).textContent = `发 ${fBy(S.总上行图[S.总图头]||0)}`;
+    (box._gcDown ??= box.querySelector('[data-gc="down"]')).textContent = `收 ${fBy(S.总下行图[S.总图头]||0)}`;
+    (box._gcExtra ??= box.querySelector('[data-gc="extra"]')).textContent = `峰 ${fBy(mx)}  均↑${fBy(n?su/n:0)} ↓${fBy(n?sd/n:0)}`;
+    const 画线 = (arr, col) => { x.strokeStyle = col; x.lineWidth = 2.4; x.beginPath(); for (let k = 0; k < n; k++) { let j = (S.总图头 - n + 1 + k) & 127, xx = l + (n > 1 ? gw * k / (n - 1) : gw), yy = H - b - ((arr[j] || 0) / mx) * gh; k ? x.lineTo(xx, yy) : x.moveTo(xx, yy); } x.stroke(); };
+    n && (画线(S.总上行图, '#ff1b00'), 画线(S.总下行图, '#006400'));
+  }
 
   const st = document.createElement('style');
   st.innerHTML = `.config-item{
@@ -165,7 +285,7 @@ clear:both;}.config-item-box{display:flex!important;
     .zte-bar-wrap{position:relative;width:100%;border-radius:4px;border:1px solid;font-size:13px;font-weight:bold;overflow:hidden;padding:3px 8px;display:flex;justify-content:space-between;align-items:center;z-index:1;box-sizing:border-box;}.zte-bar-wrap span{font-size:inherit;font-weight:inherit;}.zte-bar-up{color:#ff4c00;border-color:rgba(255,76,0,0.3);}.zte-bar-down{color:#0059fa;border-color:rgba(0,89,250,0.3);}.zte-bar-up::before{content:'';position:absolute;left:0;top:0;bottom:0;z-index:-1;background:rgba(255,76,0,0.12);width:var(--p-up,0%);transition:width 0.5s;}.zte-bar-down::before{content:'';position:absolute;left:0;top:0;bottom:0;z-index:-1;background:rgba(0,89,250,0.12);width:var(--p-down,0%);transition:width 0.5s;}#config-list.gege-list-container{contain:content!important;background-color:#ffffff!important;border-radius:8px!important;border:1px solid #e0e0e0!important;padding:20px 30px!important;box-shadow:0 2px 10px rgba(0,0,0,0.02)!important;margin-top:10px!important;}.gege-section{margin-bottom:10px;}
     .gege-section:last-child{margin-bottom:0;}.gege-list-container .config-title{font-size:16px!important;font-weight:bold!important;color:#333!important;margin:15px 0 10px 0!important;padding-bottom:5px!important;}.gege-list-container .gege-section:first-child .config-title{margin-top:0!important;}.gege-empty-state{color:#999!important;font-size:14px!important;padding:0 0 15px 5px!important;border-bottom:1px solid #f0f0f0!important;margin-bottom:5px!important;}.gege-list-item{background-color:transparent!important;border-bottom:1px solid #f0f0f0!important;padding:6px 10px!important;margin-bottom:0!important;border-radius:0!important;}
     .gege-list-item:last-child{border-bottom:none!important;}#zte-geek-board{contain:content;background-color:transparent!important;border-left:4px solid #0059fa!important;border-radius:0!important;padding:5px 0 5px 15px!important;margin:10px 0 15px 0!important;box-shadow:none!important;border-bottom:1px solid #f0f0f0!important;font-size:14px;display:flex;flex-direction:column;gap:6px;padding-bottom:15px!important;}#gege-global-overlay #zte-geek-board.geek-frozen-pane{position:sticky!important;top:0px!important;z-index:100!important;background-color:#f3f4f5!important;margin-top:0!important;padding-top:15px!important;box-shadow:0 10px 15px -3px rgba(0,0,0,0.05)!important;border-radius:0 0 8px 8px!important;}.gege-pin{cursor:pointer;font-size:11px;filter:grayscale(100%);opacity:0.5;transition:transform 0.2s;margin-left:2px;}
-    .gege-pin.active{filter:none;opacity:1;transform:scale(1.1);}#gege-global-overlay{position:fixed;top:7.5%;right:0;bottom:0;background:#f3f4f5;z-index:9999;overflow-y:auto;padding-bottom:50px;left:0!important;border-radius:16px 16px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,0.15);transition:top 0.3s ease;}@media (max-width: 768px){.geek-right-box:has(#gb-wan-zero-up),.geek-right-box:has(#gb-cur-up-vol){display:none!important}.gege-list-item{padding:12px 10px!important;position:relative!important}.config-item-box{flex-direction:column!important;padding-bottom:0!important}.config-item .info,.config-item .logo,.config-item .speed{width:100%!important;border:none!important;padding:0!important;position:static!important}.config-item .dev-intro{min-height:auto!important;justify-content:center!important;padding-right:90px!important}.config-item .logo{padding-bottom:4px!important}.config-item .info{flex-direction:column!important;margin:0 0 6px 0!important;gap:2px!important}.dev-ip{position:absolute!important;top:12px!important;right:10px!important;font-size:11px!important;background:rgba(0,89,250,0.08);color:#0059fa!important;padding:2px 6px!important;border-radius:4px;font-weight:bold;line-height:1.2;z-index:10;width:auto!important}.dev-number{width:auto!important;margin:0!important;font-size:11px!important}.gege-ratio-box{width:100%!important;margin-top:2px!important;margin-bottom:0!important}.gege-down-box{width:100%!important;margin-top:2px!important}#zte-geek-board{padding:8px!important;gap:0!important;font-size:11.5px!important}.geek-row{height:auto!important;flex-wrap:wrap!important;margin-bottom:4px!important;justify-content:flex-start!important;gap:2px 6px!important;line-height:1.3!important}.geek-label{width:auto!important;min-width:60px!important;font-size:11.5px!important;flex:0 0 auto!important}.geek-val-box{width:auto!important;flex:1 1 0%!important;display:flex!important;flex-wrap:wrap!important;margin-left:0!important;gap:2px 6px!important}.geek-fixed-width{width:auto!important}.geek-right-box{width:100%!important;flex:0 0 100%!important;text-align:left!important;font-size:11.5px!important;margin-top:2px!important;margin-left:0!important}.gege-list-container{padding:8px!important}.zte-enhance-speed{gap:4px!important}}`;
+    .gege-pin.active{filter:none;opacity:1;transform:scale(1.1);}#gege-global-overlay{position:fixed;top:7.5%;right:0;bottom:0;background:#f3f4f5;z-index:9999;overflow-y:auto;padding-bottom:50px;left:0!important;border-radius:16px 16px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,0.15);transition:top 0.3s ease;}@media (max-width: 768px){.geek-right-box:has(#gb-wan-zero-up),.geek-right-box:has(#gb-cur-up-vol){display:none!important}.gege-list-item{padding:12px 10px!important;position:relative!important}.config-item-box{flex-direction:column!important;padding-bottom:0!important}.config-item .info,.config-item .logo,.config-item .speed{width:100%!important;border:none!important;padding:0!important;position:static!important}.config-item .dev-intro{min-height:auto!important;justify-content:center!important;padding-right:90px!important}.config-item .logo{padding-bottom:4px!important}.config-item .info{flex-direction:column!important;margin:0 0 6px 0!important;gap:2px!important}.dev-ip{position:absolute!important;top:12px!important;right:10px!important;font-size:11px!important;background:rgba(0,89,250,0.08);color:#0059fa!important;padding:2px 6px!important;border-radius:4px;font-weight:bold;line-height:1.2;z-index:10;width:auto!important}.dev-number{width:auto!important;margin:0!important;font-size:11px!important}.gege-ratio-box{width:100%!important;margin-top:2px!important;margin-bottom:0!important}.gege-down-box{width:100%!important;margin-top:2px!important}#zte-geek-board{padding:8px!important;gap:0!important;font-size:11.5px!important}.geek-row{height:auto!important;flex-wrap:wrap!important;margin-bottom:4px!important;justify-content:flex-start!important;gap:2px 6px!important;line-height:1.3!important}.geek-label{width:auto!important;min-width:60px!important;font-size:11.5px!important;flex:0 0 auto!important}.geek-val-box{width:auto!important;flex:1 1 0%!important;display:flex!important;flex-wrap:wrap!important;margin-left:0!important;gap:2px 6px!important}.geek-fixed-width{width:auto!important}.geek-right-box{width:100%!important;flex:0 0 100%!important;text-align:left!important;font-size:11.5px!important;margin-top:2px!important;margin-left:0!important}.gege-list-container{padding:8px!important}.zte-enhance-speed{gap:4px!important}} .gege-pkt-line{color:#666;font-size:11.5px;font-family:system-ui, sans-serif;line-height:1.35;white-space:normal}.dev-title-line{display:flex;align-items:center;justify-content:space-between;gap:10px;width:95%;}.dev-title-line .dev-name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.gege-rssi{font-size:11.5px;font-weight:normal;color:#666;margin-left:2em;white-space:nowrap;flex-shrink:0;}#zte-geek-board{position:relative!important;overflow:visible!important;}#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;}#gege-speed-chart canvas{display:block;width:100%;height:100%;}.gege-chart-head,.gege-chart-foot{position:absolute;left:clamp(28px,8%,36px);right:8px;display:flex;align-items:center;pointer-events:none;font:bold clamp(9px,2.1cqw,11px) system-ui,sans-serif;white-space:nowrap;overflow:hidden;}.gege-chart-head{top:2px;justify-content:flex-start;color:#111;}.gege-chart-foot{bottom:4px;justify-content:flex-start;gap:clamp(3px,1.1cqw,12px);}.gege-chart-foot span{min-width:0;overflow:hidden;text-overflow:ellipsis;}.gc-up{color:#ff4c00;flex:0 1 auto;}.gc-down{color:#0b5;flex:0 1 auto;}.gc-extra{color:#666;text-align:right;margin-left:auto;flex:1 1 0;min-width:0;}#gege-speed-chart .gege-chart-resize{position:absolute;right:-4px;bottom:-4px;width:13px;height:13px;border-right:3px solid #0059fa;border-bottom:3px solid #0059fa;cursor:nwse-resize;border-radius:2px;}@media (max-width: 768px){#gege-speed-chart{left:210px!important;width:calc(100% - 220px)!important;height:96px!important;}}`;
   document.
   head.
   appendChild(st);
@@ -178,8 +298,8 @@ async function rSD() {
 const ts = Date.now();
       let resW, resL, tW = "", tL = "";
       
-      try { resW = await fetch(`/flow_polling.asp?_=${ts}`); if(resW.ok) tW = new TextDecoder('gbk').decode(await resW.arrayBuffer()); } catch(e){console.warn(e)}
-      try { resL = await fetch(`/ip_statistics.asp?_=${ts}`); if(resL.ok) tL = new TextDecoder('gbk').decode(await resL.arrayBuffer()); } catch(e){console.warn(e)}
+      try { resW = await fetch(`/flow_polling.asp?_=${ts}`); if(resW.ok) tW = GBK.decode(await resW.arrayBuffer()); } catch(e){console.warn(e)}
+      try { resL = await fetch(`/ip_statistics.asp?_=${ts}`); if(resL.ok) tL = GBK.decode(await resL.arrayBuffer()); } catch(e){console.warn(e)}
 
       let wB_m = tW.match(/wan_bytes\[0\]\s*=\s*\[(\d+),\s*(\d+)\]/);
       let wM_m = tW.match(/wan_ms\[0\]\s*=\s*\[(\d+),\s*(\d+)\]/);
@@ -188,6 +308,7 @@ const ts = Date.now();
       
       let cWU = (+wM[0] || 0) * 8;
       let cWD = (+wM[1] || 0) * 8;
+      记总速率图(cWU, cWD);
       
       S.oWU = (+wB[0] || 0) * 8; S.oWD = (+wB[1] || 0) * 8; 
       if (S.bWU === undefined) { S.bWU = S.oWU; S.wTotUp_Base = S.wTotUp; }
@@ -226,38 +347,33 @@ const ts = Date.now();
       // 2. 重量级慢车道：仅当设备指纹发生变化时触发
       if (S.lMacHash !== macHash) {
           S.lMacHash = macHash;
+          let D = window.__h3cDict;
           
-          let nL_m = tL.match(/var\s+net_mac_list\s*=\s*new\s+Array\(([\s\S]*?)\);/);
-          if (nL_m) {
-              nL_m[1].split(',').forEach(s => {
-                  let p = s.replace(/["'\n\r]/g, '').split(';');
-                  if(p[1] && p[3]) {
-                      let m = nM(p[1]);
-                      window.__h3cDict[m] ??= {};
-                      if (p[3].trim()) window.__h3cDict[m].name = p[3].trim();
-                  }
-              });
-          }
+          // 官方 getUserNameByIp 的顺序：ARP 定位 MAC -> 家长控制 net_mac_list -> WiFi 接入控制 wifi_mac_list -> DHCP 客户端表
+          取名单项(tL, 'net_mac_list').forEach(s => {
+              let p = s.slice(1, -1).split(';'), mac = nM(p[1]);
+              if (!mac) return;
+              D[mac] ??= {};
+              写设备名(D, mac, p[3] || p[2], 1);
+              let 接口 = H3C接口(p[6] || p[5]);
+              if (接口) D[mac].iface = 接口;
+          });
+          取名单项(tL, 'wifi_mac_list').forEach(s => {
+              let p = s.slice(1, -1).split(';'), mac = nM(p[1]);
+              if (!mac) return;
+              D[mac] ??= {};
+              写设备名(D, mac, p[3] || p[2]);
+              let 接口 = H3C接口(p[6] || p[5]);
+              if (接口 && !D[mac].iface) D[mac].iface = 接口;
+          });
+          取名单项(tL, 'dhcpd_client_list').forEach(s => {
+              let p = s.slice(1, -1).split(';'), mac = nM(p[0]);
+              if (!mac) return;
+              D[mac] ??= {};
+              写设备名(D, mac, p[2]);
+          });
           
-          try {
-              let resWlan = await fetch(`/wlan_ap_client_list.asp?_=${ts}`);
-              if (resWlan.ok) {
-                  let tWlan = new TextDecoder('gbk').decode(await resWlan.arrayBuffer());
-                  let wL_m = tWlan.match(/var\s+dhcpd_client_list\s*=\s*new\s+Array\(([\s\S]*?)\);/);
-                  if (wL_m) {
-                      wL_m[1].split(',').forEach(s => {
-                          let p = s.replace(/["'\n\r]/g, '').split(';');
-                          if(p[1] && p[5]) {
-                              let m = nM(p[1]);
-                              window.__h3cDict[m] ??= {};
-                              // 核心：检测到 5G 默认分到 wl1(5.2G)
-                              window.__h3cDict[m].iface = p[5].toUpperCase().includes('5G') ? 'wl1' : 'wl0';
-                              if (p[3] && p[3].trim()) window.__h3cDict[m].name = window.__h3cDict[m].name || p[3].trim();
-                          }
-                      });
-                  }
-              }
-          } catch(e){console.warn(e)}
+
       }
 
       // 3. 回归快车道：纯数字提取与字典命中
@@ -265,26 +381,35 @@ const ts = Date.now();
       let m;
       while ((m = iS_re.exec(tL)) !== null) {
           let p = m[1].replace(/["']/g, '').split(',');
-          let ip = p[0];
+          let ip = p[0].trim();
           let mac = arp[ip];
           if (mac) {
               let u = parseFloat(p[6]) * 1000 || 0;
               let dn = parseFloat(p[8]) * 1000 || 0;
-              let dict = window.__h3cDict[mac] || {};
+              let dict = window.__h3cDict[mac] || {}, 无线 = S.无线缓存[mac] || {};
               cI[mac] = {
-                  upRate: u, dnRate: dn,
-                  iface: dict.iface || 'eth1', // 没有在 WiFi 列表里出现的，默认分配为有线
+                  upRate: u, dnRate: dn, 包上: +p[5] || 0, 包下: +p[7] || 0,
+                  iface: 无线.接口 || dict.iface || 'eth1', // 没有在 WiFi 列表里出现的，默认分配为有线
                   offUp: 0, offDn: 0,
                   onSec: 0,
-                  name: dict.name || "未知设备",
-                  ip: ip || ""
+                  name: dict.name || 无线.名称 || "未知设备",
+                  ip: ip || "", 信号: 无线.信号 || 0, 协商: 无线.协商 || 0, SSID: 无线.SSID || "", 频段: 无线.频段 || ""
               };
+              S.包数据可用 = S.包数据可用 || cI[mac].包上 > 0 || cI[mac].包下 > 0;
               cSU += u; cSD += dn;
           }
       }
 
       let ol = document.getElementById('gege-global-overlay'), cM = Object.keys(cI), iD = window.gegeForceUIRedraw || (cM.length !== window.gegeRenderedMacs.size);
       if (!iD && cM.length > 0) { for (let i = 0; i < cM.length; i++) { if (!window.gegeRenderedMacs.has(cM[i])) { iD = !0; break; } } }
+      if (iD) for (let m in S.cls) if (!cI[m]) {
+        let cS = S.cls[m], ms = n - cS.lUT;
+        if (cS.upR > 0) cS.intUp += cS.upR * ms * 0.0005;
+        if (cS.dnR > 0) cS.intDn += cS.dnR * ms * 0.0005;
+        if (cS.上次包上 > 0) cS.包上总 += cS.上次包上 * ms * 0.0005;
+        if (cS.上次包下 > 0) cS.包下总 += cS.上次包下 * ms * 0.0005;
+        cS.upR = cS.dnR = cS.上次包上 = cS.上次包下 = 0; cS.lUT = n;
+      }
       if (ol && ol.style.display === 'block' && (iD || !ol.querySelector('.gege-list-item'))) {
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
       }
@@ -305,7 +430,8 @@ const ts = Date.now();
           upR: cC.upRate, dnR: cC.dnRate, lUT: n,
           intUp: _saved?.devices?.[m]?.integral_up || 0,
           intDn: _saved?.devices?.[m]?.integral_down || 0,
-          onS: cC.onSec, lOS: cC.onSec, hU: [], hD: []
+          包上总: _saved?.devices?.[m]?.packet_up || 0, 包下总: _saved?.devices?.[m]?.packet_down || 0, 上次包上: cC.包上, 上次包下: cC.包下,
+          onS: cC.onSec, lOS: cC.onSec, hU: new Float64Array(32), hD: new Float64Array(32), hIdx: 0
         };
         let cS = S.cls[m],
           dU = cC.offUp - cS.lU,
@@ -337,20 +463,27 @@ const ts = Date.now();
         else {
           cS.onS = (cS.onS || cC.onSec || 0) + gDt;
         }
-        if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) {
+        if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cC.包上 !== cS.上次包上 || cC.包下 !== cS.上次包下) {
           let ms = n - cS.lUT;
           if (cS.upR > 0) { cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
           else if (cC.upRate > 0) { let eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
           if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
           else if (cC.dnRate > 0) { let eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
+          if (cS.上次包上 > 0) cS.包上总 += (cS.上次包上 + cC.包上) * ms * 0.0005;
+          else if (cC.包上 > 0) cS.包上总 += cC.包上 * CONFIG.lanRefreshInterval * 0.5;
+          if (cS.上次包下 > 0) cS.包下总 += (cS.上次包下 + cC.包下) * ms * 0.0005;
+          else if (cC.包下 > 0) cS.包下总 += cC.包下 * CONFIG.lanRefreshInterval * 0.5;
           cS.upR = cC.upRate;
           cS.dnR = cC.dnRate;
+          cS.上次包上 = cC.包上;
+          cS.上次包下 = cC.包下;
           cS.lUT = n;
         }
         cS.lU = cC.offUp;
         cS.lD = cC.offDn;
-        cS.hU.push(cC ? cC.upRate : 0); if (cS.hU.length > 120) cS.hU.shift();
-        cS.hD.push(cC ? cC.dnRate : 0); if (cS.hD.length > 120) cS.hD.shift();
+        cS.hIdx = (cS.hIdx + 1) & 31;
+        cS.hU[cS.hIdx] = cC ? cC.upRate : 0;
+        cS.hD[cS.hIdx] = cC ? cC.dnRate : 0;
       }
       S.lt = n;
       S.wInstUp = cWU;
@@ -378,7 +511,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
   };
   function rUI(wU, wD, sU, sD, cI) {
-    let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0, cln = {};
+    let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0, 包上总 = 0, 包下总 = 0;
     for (let k in S.cls) {
       let s = S.cls[k];
       let cC = cI[k];
@@ -390,24 +523,17 @@ const calcStageRatio = (W, L_int, L_hp) => {
       LDn += s.intDn || 0;
       hpU += sessU; 
       hpD += sessD;
+      包上总 += s.包上总 || 0;
+      包下总 += s.包下总 || 0;
       if (cC) {
         curHpU += sessU;
         curHpD += sessD;
       }
-      cln[k] = {
-        up: cU,
-        down: cD,
-        integral_up: s.intUp || 0,
-        integral_down: s.intDn || 0,
-        status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
-        name: cC?.name || k,
-        ip: cC?.ip || "",
-        raw_up: cC?.offUp || 0,
-        raw_down: cC?.offDn || 0
-      };
     }
-    if (typeof GM_setValue !== 'undefined') {
+    if (typeof GM_setValue !== 'undefined' && !((S.HA小齿轮 = ((S.HA小齿轮 || 0) + 1) & 1023))) {
       try {
+        let cln = {};
+        for (let k in S.cls) { let s = S.cls[k], cC = cI[k]; cln[k] = { up: s.intUp || 0, down: s.intDn || 0, integral_up: s.intUp || 0, integral_down: s.intDn || 0, packet_up: s.包上总 || 0, packet_down: s.包下总 || 0, status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"), name: cC?.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 }; }
         GM_setValue('ha_snapshot', {
           timestamp: Date.now(),
           global: {
@@ -417,6 +543,8 @@ const calcStageRatio = (W, L_int, L_hp) => {
             lan_integral_down: LDn,
             lan_high_up: hpU,
             lan_high_down: hpD,
+            lan_packet_up: 包上总,
+            lan_packet_down: 包下总,
           },
           devices: cln
         });
@@ -424,6 +552,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
      S.rTick = ((S.rTick || 0) + 1) & 15;
     if (S.rTick === 1 || !S.cRT) {
+        刷无线信息(Date.now());
         S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 4); S.lwTU = S.wTotUp;
         S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 4); S.lwTD = S.wTotDn;
         if (S.hasW2) {
@@ -445,19 +574,19 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
                 <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span><span style="font-weight: normal; margin-left: 5px;"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></span><span id="gb-pwan-vol-container" style="display:none; position:absolute; left:clamp(450px, 60%, 700px); color:#333; font-weight:bold; white-space:nowrap;">副WAN总：<span class="c-up" id="gb-pwan-tot-up"></span> | <span class="c-down" id="gb-pwan-tot-down"></span></span></div><div class="geek-right-box" style="font-weight: normal; color: #666;" id="gb-wpeak-avg">峰值获取中...</div></div>
                 <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span><span style="font-weight: normal; margin-left: 5px;"><span class="c-up" id="gb-lan-up-bps"></span> | <span class="c-down" id="gb-lan-down-bps"></span></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
                 <div class="geek-row"><span class="geek-label">WAN总计：</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-wan-up-vol" title="高精积分存档"></span><span class="c-down geek-fixed-width" id="gb-wan-down-vol" title="高精积分存档"></span><span style="font-weight: bold; margin-left: 5px;" title="本次打开网页后的官方差值">本次官方：<span class="c-up" id="gb-sowan-up-vol"></span> | <span class="c-down" id="gb-sowan-down-vol"></span></span></div><div class="geek-right-box"><span style="font-weight: normal;">总官方：</span><span class="c-up" id="gb-owan-up-vol"></span> | <span class="c-down" id="gb-owan-down-vol"></span></div></div>
-                <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span><span style="font-weight: normal; margin-left: 5px; color:#666;">高精统计：<span class="c-up" id="gb-int-up-vol"></span> | <span class="c-down" id="gb-int-down-vol"></span></span></div><div class="geek-right-box">${S.hasW2?'主次网比':'内外网比'}：<span id="gb-ratio-display"></span></div></div>`;
+                <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span><span id="gb-packet-line" style="font-weight:bold;margin-left:5px;white-space:nowrap;"></span><span style="font-weight: normal; margin-left: 5px; color:#666;">高精统计：<span class="c-up" id="gb-int-up-vol"></span> | <span class="c-down" id="gb-int-down-vol"></span></span></div><div class="geek-right-box">${S.hasW2?'主次网比':'内外网比'}：<span id="gb-ratio-display"></span></div></div>`;
         } else if (CONFIG.uiLayout === 2) { // 平铺版 (报表流)
             layoutHtml = `
                 <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span><span style="font-weight: normal; margin-left: 5px;"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></span><span id="gb-pwan-vol-container" style="display:none; position:absolute; left:clamp(450px, 60%, 700px); color:#333; font-weight:bold; white-space:nowrap;">副WAN总：<span class="c-up" id="gb-pwan-tot-up"></span> | <span class="c-down" id="gb-pwan-tot-down"></span></span></div><div class="geek-right-box" style="font-weight: normal; color: #666;" id="gb-wpeak-avg">峰值获取中...</div></div>
                 <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span><span style="font-weight: normal; margin-left: 5px;"><span class="c-up" id="gb-lan-up-bps"></span> | <span class="c-down" id="gb-lan-down-bps"></span></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
                 <div class="geek-row"><span class="geek-label">WAN总计：</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-wan-up-vol" title="高精积分存档"></span><span class="c-down geek-fixed-width" id="gb-wan-down-vol" title="高精积分存档"></span><span style="font-weight: bold; margin-left: 5px;" title="本次打开网页后的官方差值">本次官方：<span class="c-up" id="gb-sowan-up-vol"></span> | <span class="c-down" id="gb-sowan-down-vol"></span></span></div><div class="geek-right-box"><span style="font-weight: normal;">总官方：</span><span class="c-up" id="gb-owan-up-vol"></span> | <span class="c-down" id="gb-owan-down-vol"></span></div></div>
-                <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span></div><div class="geek-right-box"><span style="font-weight: normal;">${S.hasW2?'主次网比':'内外网比'}：</span><span id="gb-ratio-display"></span></div></div>`;
+                <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span><span id="gb-packet-line" style="font-weight:bold;margin-left:5px;white-space:nowrap;"></span></div><div class="geek-right-box"><span style="font-weight: normal;">${S.hasW2?'主次网比':'内外网比'}：</span><span id="gb-ratio-display"></span></div></div>`;
         } else { // 经典版 (0)
             layoutHtml = `
                 <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span><span style="font-weight: normal; margin-left: 5px;"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></span><span id="gb-pwan-vol-container" style="display:none; position:absolute; left:clamp(450px, 60%, 700px); color:#333; font-weight:bold; white-space:nowrap;">副WAN总：<span class="c-up" id="gb-pwan-tot-up"></span> | <span class="c-down" id="gb-pwan-tot-down"></span></span></div><div class="geek-right-box" style="font-weight: normal; color: #666;" id="gb-wpeak-avg">峰值获取中...</div></div>
                 <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span><span style="font-weight: normal; margin-left: 5px;"><span class="c-up" id="gb-lan-up-bps"></span> | <span class="c-down" id="gb-lan-down-bps"></span></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
                 <div class="geek-row"><span class="geek-label">WAN总计：</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-wan-up-vol" title="高精积分存档"></span><span class="c-down geek-fixed-width" id="gb-wan-down-vol" title="高精积分存档"></span></div><div class="geek-right-box"><span style="font-weight: normal;">总官方：</span><span class="c-up" id="gb-owan-up-vol"></span> | <span class="c-down" id="gb-owan-down-vol"></span></div></div>
-                <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span></div><div class="geek-right-box"></div></div>`;
+                <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span><span id="gb-packet-line" style="font-weight:bold;margin-left:5px;white-space:nowrap;"></span></div><div class="geek-right-box"></div></div>`;
         }
         bd.innerHTML = layoutHtml;
         let pinBtn = bd.querySelector('#gege-pin-btn');
@@ -486,27 +615,30 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
       if (mn && bd.parentNode !== mn.parentNode) mn.parentNode.insertBefore(bd, mn);
     }
   
-    let oDC = Object.create(null);
-    if (!iPO) {
-      const M_RX = /([a-fA-F0-9]{2}[:-]){5}[a-fA-F0-9]{2}/;
-      let aI = aC.querySelectorAll('.config-item');
-      for (let n of aI) {
-        let mN = n.querySelector('.dev-number'),
-          mM = mN ? mN.textContent.match(M_RX) : null;
-        if (mM) {
-          oDC[mM[0].toLowerCase().replace(/-/g, ':')] = n;
+    let 面板状态 = iPO ? '悬浮' : '原生', oDC = S.DOM缓存;
+    if (!oDC || S.DOM已重建 || S.面板状态 !== 面板状态) {
+      oDC = Object.create(null);
+      if (!iPO) {
+        const M_RX = /([a-fA-F0-9]{2}[:-]){5}[a-fA-F0-9]{2}/;
+        let aI = aC.querySelectorAll('.config-item');
+        for (let n of aI) {
+          let mN = n.querySelector('.dev-number'),
+            mM = mN ? mN.textContent.match(M_RX) : null;
+          if (mM) oDC[mM[0].toLowerCase().replace(/-/g, ':')] = n;
         }
       }
-    }
-    else {
-      let gI = aC.querySelectorAll('.gege-list-item');
-      for (let n of gI) {
-        let m = n.getAttribute('data-gege-mac');
-        if (m) oDC[m] = n;
+      else {
+        let gI = aC.querySelectorAll('.gege-list-item');
+        for (let n of gI) {
+          let m = n.getAttribute('data-gege-mac');
+          if (m) oDC[m] = n;
+        }
       }
+      S.DOM缓存 = oDC; S.DOM已重建 = !1; S.面板状态 = 面板状态;
     }
             if (bd.parentNode) {
         const setText = (id, text) => { const el = bd.querySelector(id); if (el) el.textContent = text; };
+        const setHTML = (id, html) => { const el = bd.querySelector(id); if (el) el.innerHTML = html; };
         let aW2U = S.hasW2 ? S.w2U : undefined, aW2D = S.hasW2 ? S.w2D : undefined, aW2TU = S.hasW2 ? S.w2TotUp : undefined, aW2TD = S.hasW2 ? S.w2TotDn : undefined;
         S.wMaxU = Math.max(S.wMaxU || 0, wU);
         S.wMaxD = Math.max(S.wMaxD || 0, wD);
@@ -534,6 +666,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
         setText('#gb-sowan-down-vol', `🔽 ${fV(S.dTD || 0)}`);
         setText('#gb-owan-up-vol', `🔼 ${fV(S.oWU || 0)}`);
         setText('#gb-owan-down-vol', `🔽 ${fV(S.oWD || 0)}`);
+        { let 包线 = bd.querySelector('#gb-packet-line'); if (包线) { 包线.style.display = S.包数据可用 ? 'inline' : 'none'; if (S.包数据可用) 包线.innerHTML = `<span style="color:#666;">本次包数：</span><span style="color:#ff4c00;">↑ ${Math.round(包上总)}包，${包上总 ? fSV(LUp / 包上总) : '0B'}/包</span><span style="color:#666; margin:0 6px;">|</span><span style="color:#0059fa;">↓ ${Math.round(包下总)}包，${包下总 ? fSV(LDn / 包下总) : '0B'}/包</span><span style="color:#4CAF50; margin-left:8px;">${格式化包比(计算包比(包上总, 包下总))}</span>`; } }
+        画总速率图(bd);
         let pb = bd.querySelector('#gb-pwan-bps-container'), pv = bd.querySelector('#gb-pwan-vol-container');
         if (aW2U !== undefined) {
             if (pb) { pb.style.display = 'inline'; setText('#gb-pwan-bps-up', '🔼 ' + fB(aW2U)); setText('#gb-pwan-bps-down', '🔽 ' + fB(aW2D)); }
@@ -556,8 +690,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             for (let m in cI) {
         let it = oDC[m];
         if (!it) continue;
-        const cC = cI[m] || { upRate: 0, dnRate: 0, iface: "", offUp: 0, offDn: 0 },
-              cS = S.cls[m] || { intUp: 0, intDn: 0, onS: 0 };
+        const cC = cI[m] || { upRate: 0, dnRate: 0, iface: "", offUp: 0, offDn: 0, 包上: 0, 包下: 0, 信号: 0 },
+              cS = S.cls[m] || { intUp: 0, intDn: 0, onS: 0, 包上总: 0, 包下总: 0 };
         
         let cache = it._gege || (it._gege = {});
         let hqU = cS.intUp || 0; 
@@ -567,6 +701,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
         
         const dI = cache.devIntro ??= it.querySelector('.dev-intro');
         const inf = cache.info ??= it.querySelector('.info');
+        (cache.logo ??= it.querySelector('.dev-logo')) && (cache.logo.innerHTML = 取设备图标(cC.信号 | 0, !(cC.信号 | 0)));
+        (cache.rssiNode ??= it.querySelector('.gege-rssi')) && (cache.rssiNode.textContent = (cC.信号 | 0) ? `${(cC.信号 | 0) + 92}%, ${cC.信号 | 0}` : '');
 
         if (dI && inf) {
           let rB = cache.rBox ??= dI.querySelector('.gege-ratio-box');
@@ -610,6 +746,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             }
             zBadge.textContent = ((cS.zUC || 0) + (cS.zDC || 0)) < 6 ? "" : `[0估] ${!cS.zEU ? '' : fSV(cS.zEU)}，${!cS.zED ? '' : fSV(cS.zED)}｜${cS.zUC || 0},${cS.zDC || 0}`;
           }
+          let 包行 = cache.包数行 ??= inf.querySelector('.gege-pkt-line');
+          if (包行) { 包行.style.display = S.包数据可用 ? '' : 'none'; if (S.包数据可用) 包行.innerHTML = `<span style="color:#ff4c00;">↑ ${Math.round(cS.包上总 || 0)}包</span><span style="color:#FF9800;">，${包上总 ? ((cS.包上总 || 0) * 100 / 包上总).toFixed(1) : '0.0'}%</span><span style="margin:0 6px;"></span><span style="color:#0059fa;">↓ ${Math.round(cS.包下总 || 0)}包</span><span style="color:#9c27b0;">，${包下总 ? ((cS.包下总 || 0) * 100 / 包下总).toFixed(1) : '0.0'}%</span><span style="color:#4CAF50; margin-left:8px;">${格式化包比(计算包比(cS.包上总 || 0, cS.包下总 || 0))}</span>`; }
           let bx = cache.upBox ??= inf.querySelector('.gege-up-box');
           if (!bx || bx.querySelector('.t-row')) {
             if (bx) bx.remove();
@@ -655,11 +793,10 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
               bU = cache.bU ??= enh.querySelector('.zte-bar-up'),
               bD = cache.bD ??= enh.querySelector('.zte-bar-down');
           
-          const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
           let clU = Math.max(...cS.hU, (S.aWu * 0.1) || 0, 512000);
           let clD = Math.max(...cS.hD, (S.aWd / 8) || 0);
-          (cache.bUSpk ??= bU.querySelector('.v-spark')).textContent = cS.hU.slice(-60).map(v => SPRK[v < 73000 ? 0 : Math.min(7, Math.max(1, Math.floor((v / clU) * 7)))]).join('');
-          (cache.bDSpk ??= bD.querySelector('.v-spark')).textContent = cS.hD.slice(-60).map(v => SPRK[v < 1000000 ? 0 : Math.min(7, Math.max(1, Math.floor((v / clD) * 7)))]).join('');
+          (cache.bUSpk ??= bU.querySelector('.v-spark')).textContent = 取火花线(cS.hU, cS.hIdx, clU, 73000);
+          (cache.bDSpk ??= bD.querySelector('.v-spark')).textContent = 取火花线(cS.hD, cS.hIdx, clD, 1000000);
 
           bU.style.setProperty('--p-up', Math.min(pu, 100) + '%');
           (cache.bUVal ??= bU.querySelector('.v-val')).textContent = `🔼 ${fBy(cC.upRate)}`;
@@ -677,8 +814,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
       let h2 = [], h52 = [], h58 = [], hW = [];
       for (let m in cI) {
         let d = cI[m], tS = fOT(d.onSec), ifc = d.iface;
-        let htm = `<div class="col-md-12 col-xs-12 config-item gege-list-item" data-gege-mac="${m}"><div class="config-item-box" style="display: flex; align-items: stretch;"><div class="col-md-5 col-xs-7 logo" style="width: 33%; display: flex; flex-direction: row; align-items: center;"><div class="dev-logo" style="width: 50px; height: 50px; min-width: 50px; margin-right: 15px; background: url('/jquery/static/img/home/unknown_computer.png') 0% 0% / 50px no-repeat; display: inline-block;"></div><div class="dev-intro" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; min-height: 50px;">
-<div class="dev-name" style="font-weight: bold; color: #333; font-size: 14px;">${escapeHTML(d.name)}</div><div class="gege-online-time" style="color: #999; font-size: 12px; font-family: system-ui, sans-serif; margin-top: 4px;">${tS?'在线：'+tS:''}</div></div></div><div class="col-md-4 col-xs-5 info" style="width: 27%; display: flex; flex-direction: column; padding: 0 10px; border-right: 1px solid #eee;"><div class="dev-ip" style="color: #666; font-family: system-ui, sans-serif;">${escapeHTML(d.ip)}</div><div class="dev-number grey" style="color: #999; font-size: 12px; font-family: system-ui, sans-serif;">MAC：${m}</div></div><div class="col-md-3 col-xs-12 speed" style="width: 40%; display: flex; flex-direction: column; justify-content: center; padding: 0 10px;"></div></div></div>`;
+        let htm = `<div class="col-md-12 col-xs-12 config-item gege-list-item" data-gege-mac="${m}"><div class="config-item-box" style="display: flex; align-items: stretch;"><div class="col-md-5 col-xs-7 logo" style="width: 33%; display: flex; flex-direction: row; align-items: center;"><div class="dev-logo" style="width: 50px; height: 50px; min-width: 50px; margin-right: 15px; display: inline-flex; align-items:center; justify-content:center;"></div><div class="dev-intro" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; min-height: 50px;">
+<div class="dev-title-line"><span class="dev-name-text" style="font-weight: bold; color: #333; font-size: 14px;">${escapeHTML(d.name)}</span><span class="gege-rssi"></span></div><div class="gege-online-time" style="color: #999; font-size: 12px; font-family: system-ui, sans-serif; margin-top: 4px;">${tS?'在线：'+tS:''}</div></div></div><div class="col-md-4 col-xs-5 info" style="width: 27%; display: flex; flex-direction: column; padding: 0 10px; border-right: 1px solid #eee;"><div class="dev-ip" style="color: #666; font-family: system-ui, sans-serif;">${escapeHTML(d.ip)}</div><div class="dev-number grey gege-pkt-line" style="color: #666; font-size: 11.5px; font-family: system-ui, sans-serif;"></div></div><div class="col-md-3 col-xs-12 speed" style="width: 40%; display: flex; flex-direction: column; justify-content: center; padding: 0 10px;"></div></div></div>`;
         if (['wl0', '2.4G'].includes(ifc)) h2.push(htm);
         else if (['wlan5', 'wl1', 'wlan4', '5.2', '5.2G'].includes(ifc)) h52.push(htm);
         else if (ifc === 'wl2' || ifc === 'wlan2' || ifc === '5.8G' || (/w/i.test(ifc) && !/wan/i.test(ifc))) h58.push(htm);
@@ -688,6 +825,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
         ol.innerHTML = `<div style="padding: 20px; width: 96%; margin: 0 auto; min-height: 100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container"><div class="gege-section"><div class="config-title">有线设备${(window.gegeHiddenDevices && Object.keys(window.gegeHiddenDevices).length > 0) ? '<span style="color: #ff4c00; font-size: 13px; font-weight: normal; margin-left: 10px; font-family: system-ui, sans-serif;">(哥哥科技：智能Mesh适配)</span>' : ''}</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.8GHz':'5.2GHz'}）</div>${h52.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.2GHz':'5.8GHz'}）</div>${h58.join('')||'<div class="gege-empty-state">没有连接设备</div>'}
         </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: system-ui, sans-serif, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序基于 GNU Affero GPL v3.0 协议开源，按“原样 (AS IS)”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作任何明示或暗示的担保。<br>根据 AGPL-3.0 第 5(d) 及 7(b) 条规定，基于本程序的任何修改均不得移除或篡改本界面的署名与法律声明。保留此界面是使用本软件代码的合法性的前置条件。
         </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Bro-Stat" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件</a> Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1PtR7B8ECC" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/zh-CN/users/203510" target="_blank" style="color: #666; text-decoration: none;">点此分享</a></div></div></div></div>`;
+        S.DOM已重建 = !0; S.DOM缓存 = null;
       });}
     catch (e) {
       requestAnimationFrame(() => {
@@ -735,13 +873,13 @@ window.gegeTogglePanel = function (fS = null) {
       
       fetch(`/wlan_ap_basic_5g.asp?_=${Date.now()}`)
       .then(r => r.arrayBuffer())
-      .then(b => new TextDecoder('gbk').decode(b))
+      .then(b => GBK.decode(b))
       .then(t => {
         let m = t.match(/var\s+curChannel\s*=\s*(\d+);/);
         if (m && parseInt(m[1]) > 148 && !S.is5G_149) {
           S.is5G_149 = !0;
           let ol = document.getElementById('gege-global-overlay');
-          if (ol && ol.style.display === 'block') bVD(ol, S.cls || Object.create(null));
+          if (ol && ol.style.display === 'block') window.gegeForceUIRedraw = !0;
         }
       }).catch(e => {console.warn("[H3C] 5.8G彩蛋探测异常:", e);});
     }
