@@ -2,7 +2,7 @@
 // @name            华硕路由器增强
 // @name:en         Bro-Stat-ASUS
 // @namespace       ucxn
-// @version         5.9.3
+// @version         5.9.4
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -229,7 +229,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
             upRate: u, dnRate: dn, 
             iface: iN.wl == '1' ? 'wl0' : (iN.wl == '2' ? 'wl1' : 'eth1'),
             offUp: oU, offDn: oD, 
-            onSec: 0, name: iN.n || "华硕设备", ip: iN.ip || "-.-.-.-"
+            onSec: 0, name: iN.n || "华硕设备", ip: iN.ip || "-.-.-.-", rssi: iN.r | 0
         };
         cSU += u; cSD += dn;
       });
@@ -296,7 +296,46 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
       S.lt = n;
       S.wInstUp = cWU; S.wInstDn = cWD;
       rUI(S.dWU, S.dWD, cSU, cSD, cI);
-    } catch (err) {console.warn(err)} finally {window.__gIsF = !1;}
+    } catch (err) {console.warn(err)} finally {window.__gIsF = !1;
+    if (!(window.gegeTickCount = ((window.gegeTickCount || 0) + 1) & 7)) fAsusTopo();}
+  }
+
+  function buildCSV() {
+    return ((sp, now, start) => '\uFEFF' + [
+      `"哥哥科技 硬路由 NPU 增强系列：专用组件 ${(typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号'} 生成"`,
+      `"统计周期：${new Date(start + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} 至 ${new Date(now + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} (UTC${CONFIG.时区补偿 > 0 ? '+' : ''}${CONFIG.时区补偿 / 3600000})${CONFIG.readSaveData === 1 ? ' （含路由器后台读档）' : ''}"`,
+      `"--- [全局统计] ---"`,
+      `"WAN总上传(B)","WAN总下载(B)","高精全局上行(B)","高精全局下行(B)","LAN积分总上行(B)","LAN积分总下行(B)","本次在线总上行(B)","本次在线总下行(B)"`,
+      `"${Math.round(sp.global?.wan_up||0)}","${Math.round(sp.global?.wan_down||0)}","${Math.round(sp.global?.lan_high_up||0)}","${Math.round(sp.global?.lan_high_down||0)}","${Math.round(sp.global?.lan_integral_up||0)}","${Math.round(sp.global?.lan_integral_down||0)}","${Math.round(sp.global?.lan_off_up||0)}","${Math.round(sp.global?.lan_off_down||0)}"`,
+      ``,
+      `"--- [设备明细] ---"`,
+      `"设备名称","MAC地址","IP地址","状态/接口","高精上行","高精下行","积分上行","积分下行","官方上行","官方下行"`,
+      ...Object.entries(sp.devices || {}).map(d => `"${d[1].name}","${d[0]}","${d[1].ip}","${d[1].status}","${Math.round(d[1].up||0)}","${Math.round(d[1].down||0)}","${Math.round(d[1].integral_up||0)}","${Math.round(d[1].integral_down||0)}","${Math.round(d[1].raw_up||0)}","${Math.round(d[1].raw_down||0)}"`),
+      ``,
+      `"Bro-Stat@哥哥科技 https://space.bilibili.com/501430041"`,
+      `"项目主页: https://github.com/ucxn/Bro-Stat"`,
+      `"脚本下载: https://scriptcat.org/users/203510"`
+
+    ].join('\r\n'))(
+      typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot', {}) : {}, 
+      Date.now(), 
+      (CONFIG.readSaveData === 2 && typeof GM_getValue !== 'undefined' ? GM_getValue('gege_reset_ms', null) : null) || performance.timeOrigin || Date.now()
+    );
+  }
+function doSettle(nowMs) {
+    S._RST = !0; // 防重入锁
+    let csv = buildCSV(), b = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    let u = URL.createObjectURL(b), a = document.createElement('a');
+    a.href = u; a.download = `哥哥科技_路由器统计数据导出_${new Date(nowMs + CONFIG.时区补偿).toISOString().slice(2, 19).replace(/[-:]/g, '').replace('T', '_')}_${nowMs}.csv`; a.click(); // 文件
+    let w = window.open('about:blank', '_blank');
+    if (w) w.document.write(`<!DOCTYPE html><html><head><title>流量结算备份</title></head><body style="background:#f3f4f5;font-family:system-ui,sans-serif;padding:40px 20px;color:#333;"><div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.05);max-width:850px;margin:0 auto;"><h2 style="color:#0059fa;margin-top:0;border-bottom:2px solid #f0f0f0;padding-bottom:15px;">本次数据结算周期已结束</h2><p style="font-size:14px;line-height:1.7;color:#555;"><b>哥哥科技提示您：</b>请点击下方下载按钮将 CSV 报表保存到本地。<br>若下载失败，请点击复制按钮，新建文本文档粘贴后将拓展名改为 .csv 即可。</p><button id="dl-btn" style="background:#0059fa;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;margin-right:10px;">📥 再次下载 CSV</button><button id="cp-btn" style="background:#4caf50;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 一键复制内容</button><div style="background:#282c34;color:#abb2bf;padding:15px;border-radius:8px;overflow-x:auto;margin-top:20px;"><pre id="csv-data" style="margin:0;font-size:13px;line-height:1.5;">${csv}</pre></div></div><script>document.getElementById('dl-btn').onclick=function(){let b=new Blob([document.getElementById('csv-data').textContent],{type:'text/csv;charset=utf-8;'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='哥哥科技_路由器统计数据补下_${nowMs}.csv';a.click();};document.getElementById('cp-btn').onclick=function(){let t=document.createElement('textarea');t.value=document.getElementById('csv-data').textContent;document.body.appendChild(t);t.select();try{document.execCommand('copy');alert('复制成功！');}catch(e){alert('复制失败，请手动全选复制');}document.body.removeChild(t);};</script></body></html>`);
+    GM_setValue('gege_reset_ms', nowMs);
+    S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn = 0; // 内存原地清零
+    for (let k in S.cls) { let s = S.cls[k]; s.intUp = s.intDn = 0; s.uB = s.oU = s.lU; s.dB = s.oD = s.lD; s.hU.fill(0); s.hD.fill(0); } // 内存原地清零底表
+    document.getElementById('gb-w-bnr')?.remove(); // 预警横幅
+    S.calcTime(Math.max(nowMs, S.Force_MS - CONFIG.自动导出 * 60000 + 1000) + CONFIG.时区补偿); // 瞬间算出下月/下周新线
+    window.gegeForceUIRedraw = !0; // 重绘 UI
+    setTimeout(() => { S._RST = !1; }, 2000); // 解开安全锁
   }
 
   function buildCSV() {
@@ -358,6 +397,21 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
     return s;
   }
+  const getIconSvg = (r, isW) => {
+    if (isW) return `<svg viewBox="0 0 100 100" width="45" height="45"><rect x="15" y="15" width="70" height="65" rx="5" fill="#cfd8dc" stroke="#90a4ae" stroke-width="4"/><path d="M 25,25 L 75,25 L 75,60 L 60,60 L 60,75 L 40,75 L 40,60 L 25,60 Z" fill="#263238"/><g fill="#ffca28"><rect x="30" y="25" width="2.5" height="18"/><rect x="35" y="25" width="2.5" height="18"/><rect x="40" y="25" width="2.5" height="18"/><rect x="45" y="25" width="2.5" height="18"/><rect x="52.5" y="25" width="2.5" height="18"/><rect x="57.5" y="25" width="2.5" height="18"/><rect x="62.5" y="25" width="2.5" height="18"/><rect x="67.5" y="25" width="2.5" height="18"/></g><circle cx="21" cy="73" r="3.5" fill="#4caf50"/><circle cx="79" cy="73" r="3.5" fill="#ffb300"/></svg>`;
+    let c = r > -24 ? '#4caf50' : r > -35 ? '#9c27b0' : '#0059fa';
+    if (r > -40) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="${c}"/></svg>`;
+    if (r > -46) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="#e0e0e0"/><path d="M 50,85 L 18,45 A 50,50 0 0,1 82,45 Z" fill="${c}"/></svg>`;
+    if (r > -50) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="#e0e0e0"/><path d="M 50,85 L 23,51 A 43,43 0 0,1 77,51 Z" fill="${c}"/></svg>`;
+    if (r > -56) return `<svg viewBox="0 0 100 100" width="45" height="45"><circle cx="50" cy="80" r="9" fill="${c}"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/></svg>`;
+    if (r > -61) return `<svg viewBox="0 0 100 100" width="45" height="45"><circle cx="50" cy="80" r="9" fill="${c}"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="${c}" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></svg>`;
+    if (r > -67) return `<svg viewBox="0 0 100 100" width="45" height="45"><circle cx="50" cy="80" r="9" fill="${c}"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></svg>`;
+    if (r > -72) return `<svg viewBox="0 0 100 100" width="45" height="45"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff9800" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></svg>`;
+    if (r > -76) return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ffb300" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></g><text x="70" y="86" fill="#ffb300" font-weight="900" font-size="48" font-family="sans-serif">!</text></svg>`;
+    if (r > -80) return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff4c00" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></g><text x="70" y="86" fill="#ff4c00" font-weight="900" font-size="48" font-family="sans-serif">!</text></svg>`;
+    if (r > -85) return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff4c00" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></g><text x="65" y="86" fill="#ff4c00" font-weight="900" font-size="44" font-family="sans-serif">?</text></svg>`;
+    return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff4c00" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#ff4c00" stroke-width="7" stroke-linecap="round" opacity="0.3"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#ff4c00" stroke-width="7" stroke-linecap="round" opacity="0.3"/></g><text x="65" y="80" fill="#ff4c00" font-weight="900" font-size="35" font-family="sans-serif">✖</text></svg>`;
+  };
   function rUI(wU, wD, sU, sD, cI) {
     let tOD = 0,
       LUp = 0,
@@ -573,6 +627,9 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
               cS = S.cls[m] || { intUp: 0, intDn: 0, onS: 0 };
         
         let cache = it._gege || (it._gege = {});
+        let rRs = cC.rssi | 0;
+        (cache.logo ??= it.querySelector('.dev-logo')) && (cache.logo.innerHTML = getIconSvg(rRs, !rRs));
+        (cache.rssiNode ??= it.querySelector('.gege-rssi')) && (cache.rssiNode.innerHTML = rRs ? `<span style="color:${((rRs + 75) << 1) < 0 ? '#ff4c00' : 'inherit'}">${(rRs + 75) << 1}%</span>, ${rRs}` : '');
         let hqU = cln[m] ? cln[m].up : 0;
         let hqD = cln[m] ? cln[m].down : 0;
         let tN = cache.timeNode ??= it.querySelector('.gege-online-time');
@@ -687,8 +744,8 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
       let h2 = [], h52 = [], h58 = [], hW = [];
       for (let m in cI) {
         let d = cI[m], tS = fOT(d.onSec), ifc = d.iface;
-        let htm = `<div class="col-md-12 col-xs-12 config-item gege-list-item" data-gege-mac="${m}"><div class="config-item-box" style="display: flex; align-items: stretch;"><div class="col-md-5 col-xs-7 logo" style="width: 33%; display: flex; flex-direction: row; align-items: center;"><div class="dev-logo" style="width: 50px; height: 50px; min-width: 50px; margin-right: 15px; background: url('/jquery/static/img/home/unknown_computer.png') 0% 0% / 50px no-repeat; display: inline-block;"></div><div class="dev-intro" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; min-height: 100px;">
-<div class="dev-name" style="font-weight: bold; color: #333; font-size: 14px;">${escapeHTML(d.name)}</div><div class="gege-online-time" style="color: #999; font-size: 12px; font-family: Consolas; margin-top: 4px;">${tS?'在线：'+tS:''}</div></div></div><div class="col-md-4 col-xs-5 info" style="width: 27%; display: flex; flex-direction: column; padding: 0 10px; border-right: 1px solid #eee;"><div class="dev-ip" style="color: #666; font-family: Consolas;">${escapeHTML(d.ip)}</div><div class="dev-number grey" style="color: #999; font-size: 12px; font-family: Consolas;">MAC：${m}</div></div><div class="col-md-3 col-xs-12 speed" style="width: 40%; display: flex; flex-direction: column; justify-content: center; padding: 0 10px;"></div></div></div>`;
+        let htm = `<div class="col-md-12 col-xs-12 config-item gege-list-item" data-gege-mac="${m}"><div class="config-item-box" style="display: flex; align-items: stretch;"><div class="col-md-5 col-xs-7 logo" style="width: 33%; display: flex; flex-direction: row; align-items: center;"><div class="dev-logo" style="width: 50px; height: 50px; min-width: 50px; margin-right: 15px; display: flex; align-items: center; justify-content: center; flex-direction: column;"></div><div class="dev-intro" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; min-height: 100px;">
+<div class="dev-name" style="font-weight: bold; color: #333; font-size: 14px;">${escapeHTML(d.name)}<span class="gege-rssi" style="font-size: 11px; color: #999; font-family: Consolas; margin-left: 6px;"></span></div><div class="gege-online-time" style="color: #999; font-size: 12px; font-family: Consolas; margin-top: 4px;">${tS?'在线：'+tS:''}</div></div></div><div class="col-md-4 col-xs-5 info" style="width: 27%; display: flex; flex-direction: column; padding: 0 10px; border-right: 1px solid #eee;"><div class="dev-ip" style="color: #666; font-family: Consolas;">${escapeHTML(d.ip)}</div><div class="dev-number grey" style="color: #999; font-size: 12px; font-family: Consolas;">MAC：${m}</div></div><div class="col-md-3 col-xs-12 speed" style="width: 40%; display: flex; flex-direction: column; justify-content: center; padding: 0 10px;"></div></div></div>`;
         if (['wl0', '2.4G'].includes(ifc)) h2.push(htm);
         else if (['wlan5', 'wl1', 'wlan4', '5.2', '5.2G'].includes(ifc)) h52.push(htm);
         else if (ifc === 'wl2' || ifc === 'wlan2' || ifc === '5.8G' || (/w/i.test(ifc) && !/wan/i.test(ifc))) h58.push(htm);
@@ -765,7 +822,7 @@ if (!window.gegeBActivated) {
   window.gegeTickCount = 0;
   window.gegeMasterTimer = null;
  
-  window.__aD = Object.create(null); // 全局零损耗后勤字典
+  window.__aD = Object.create(null); // 全局后勤字典
   async function fAsusTopo() {
     try {
         let r = await fetch(`/update_clients.asp?_=${Date.now()}`);
@@ -775,8 +832,7 @@ if (!window.gegeBActivated) {
             let d = JSON.parse(m[1]);
             for (let k in d) {
                 if (k === 'maclist' || k === 'ClientAPILevel') continue;
-                // 100% 榨干华硕信息：优先级 nickName(备注) > name > 未知
-                window.__aD[nM(k)] = { n: d[k].nickName || d[k].name || "未知设备", ip: d[k].ip || "", wl: d[k].isWL };
+                window.__aD[nM(k)] = { n: d[k].nickName || d[k].name || "未知设备", ip: d[k].ip || "", wl: d[k].isWL, r: d[k].rssi | 0 };
             }
         }
     } catch(e) {console.warn(e)}
@@ -789,8 +845,7 @@ if (!window.gegeBActivated) {
       window.gegeBActivated = !0;
       clearTimeout(window.gegeMasterTimer);
       window.gegeMasterTimer = setInterval(rSD, CONFIG.lanRefreshInterval * 1000);
-      setInterval(fAsusTopo, 10000); // 【双轨解耦】：10 秒一刷户口本，绝不占用路由器主线程！
-      fAsusTopo().then(() => rSD()); // 兵马未动，粮草先行！抢跑点火！
+      fAsusTopo().then(() => rSD());
     }
   };
   if (document.readyState === 'complete') _initUI(); else window.addEventListener('load', _initUI);
