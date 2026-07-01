@@ -710,7 +710,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
           
           let clU = (S.aWu * 0.1) || 0; if (clU < 512000) clU = 512000;
           let clD = (S.aWd * 0.125) || 0;
-          for (let i = 32; i--; ) { if (cS.historyUp[i] > clU) clU = cS.historyUp[i]; if (cS.historyDown[i] > clD) clD = cS.historyDown[i]; }
+          for (let i = 32; i--; ) { if (cS.hU[i] > clU) clU = cS.hU[i]; if (cS.hD[i] > clD) clD = cS.hD[i]; }
           (cache.bUSpk ??= bU.querySelector('.v-spark')).textContent = getSpark(cS.hU, cS.hIdx, clU);
           (cache.bDSpk ??= bD.querySelector('.v-spark')).textContent = getSpark(cS.hD, cS.hIdx, clD);
 
