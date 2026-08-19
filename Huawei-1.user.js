@@ -2,7 +2,7 @@
 // @name            华为路由器增强 HUAWEI-Stat_Max
 // @name:en         Bro-Stat_HUAWEI
 // @namespace       ucxn
-// @version         5.9.8
+// @version         5.9.9
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -69,14 +69,18 @@
     wTotDn: 0,
     cls: {}, isPinned: !0,
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
-    hasW2: !1, is5G_149: null, fI: 0,
-    _domRebuilt: !1, _lastPanelState: null, oDC: null, Warn_MS: 0, Force_MS: 0
+    hasW2: !1, is5G_149: null, fI: 0, RSSI频率修正: undefined,
+    _domRebuilt: !1, _lastPanelState: null, oDC: null, Warn_MS: 0, Force_MS: 0, _RST: !1,
+    aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
+    总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
+    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
   };
   S.calcTime = (L) => {
     S.Force_MS = (CONFIG.周期类型 === 'M' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth() + (L >= Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), CONFIG.周_天设置) ? 1 : 0), CONFIG.周_天设置) : (CONFIG.周期类型 === 'W' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + ((CONFIG.周_天设置 - new Date(L).getUTCDay() <= 0 ? CONFIG.周_天设置 - new Date(L).getUTCDay() + 7 : CONFIG.周_天设置 - new Date(L).getUTCDay()) * 86400000) : (CONFIG.周期类型 === 'D' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + CONFIG.周_天设置 * 86400000 : Infinity))) - CONFIG.时区补偿;
     S.Warn_MS = S.Force_MS + CONFIG.报告时间 * 60000;
     S.Force_MS += CONFIG.自动导出 * 60000;
   };S.calcTime((typeof GM_getValue !== 'undefined' && GM_getValue('gege_reset_ms')) ? (GM_getValue('gege_reset_ms') + CONFIG.时区补偿) : Date.now() + CONFIG.时区补偿);
+  if (typeof GM_getValue !== 'undefined' && GM_getValue('gege_reset_ms') >= Math.min(S.Warn_MS, S.Force_MS)) S.calcTime(S.Force_MS - CONFIG.自动导出 * 60000 + 1000 + CONFIG.时区补偿);
 async function gWT() {
     try {
       let r = await fetch('/api/ntwk/wan?type=active&_=' + Date.now());
@@ -89,7 +93,7 @@ async function gWT() {
     return str ? String(str).replace(/[&<>'"]/g, m => ESC_MAP[m]) : '';
   }
   const Phys = { p: Object.create(null), wU: undefined, wD: undefined, tU: 0, tD: 0, lT: undefined, _pM: null, _wID: null };
-  let isF = !1, lCxt = null;
+  let isF = !1, lCxt = null, lCxtT = null;
   const 版本号 = (typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号';
   function fB(bps) {
         if (bps > 1e9) return `${Math.round(bps * 1e-6)} Mbit/s`;
@@ -151,26 +155,28 @@ function fBy(bps) {
     .zte-bar-wrap{position:relative;width:100%;border-radius:4px;border:1px solid;font-size:13px;font-weight:bold;overflow:hidden;padding:3px 8px;display:flex;justify-content:space-between;align-items:center;z-index:1;box-sizing:border-box;}.zte-bar-wrap span{font-size:inherit;font-weight:inherit;}.zte-bar-up{color:#ff4c00;border-color:rgba(255,76,0,0.3);}.zte-bar-down{color:#0059fa;border-color:rgba(0,89,250,0.3);}.zte-bar-up::before{content:'';position:absolute;left:0;top:0;bottom:0;z-index:-1;background:rgba(255,76,0,0.12);width:var(--p-up,0%);transition:width 0.5s;}.zte-bar-down::before{content:'';position:absolute;left:0;top:0;bottom:0;z-index:-1;background:rgba(0,89,250,0.12);width:var(--p-down,0%);transition:width 0.5s;}#config-list.gege-list-container{contain:content!important;background-color:#ffffff!important;border-radius:8px!important;border:1px solid #e0e0e0!important;padding:20px 30px!important;box-shadow:0 2px 10px rgba(0,0,0,0.02)!important;margin-top:10px!important;}.gege-section{margin-bottom:10px;}
     .gege-section:last-child{margin-bottom:0;}.gege-list-container .config-title{font-size:16px!important;font-weight:bold!important;color:#333!important;margin:15px 0 10px 0!important;padding-bottom:5px!important;}.gege-list-container .gege-section:first-child .config-title{margin-top:0!important;}.gege-empty-state{color:#999!important;font-size:14px!important;padding:0 0 15px 5px!important;border-bottom:1px solid #f0f0f0!important;margin-bottom:5px!important;}.gege-list-item{background-color:transparent!important;border-bottom:1px solid #f0f0f0!important;padding:15px 10px!important;margin-bottom:0!important;border-radius:0!important;}
     .gege-list-item:last-child{border-bottom:none!important;}#zte-geek-board{contain:content;background-color:transparent!important;border-left:4px solid #0059fa!important;border-radius:0!important;padding:5px 0 5px 15px!important;margin:10px 0 15px 0!important;box-shadow:none!important;border-bottom:1px solid #f0f0f0!important;font-size:14px;display:flex;flex-direction:column;gap:6px;padding-bottom:15px!important;}#gege-global-overlay #zte-geek-board.geek-frozen-pane{position:sticky!important;top:0px!important;z-index:100!important;background-color:#f3f4f5!important;margin-top:0!important;padding-top:15px!important;box-shadow:0 10px 15px -3px rgba(0,0,0,0.05)!important;border-radius:0 0 8px 8px!important;}.gege-pin{cursor:pointer;font-size:11px;filter:grayscale(100%);opacity:0.5;transition:transform 0.2s;margin-left:2px;}
-    .gege-pin.active{filter:none;opacity:1;transform:scale(1.1);}#gege-global-overlay{position:fixed;top:7.5%;right:0;bottom:0;background:#f3f4f5;z-index:9999;overflow-y:auto;padding-bottom:50px;left:0!important;border-radius:16px 16px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,0.15);transition:top 0.3s ease;}@media (max-width: 768px){.geek-right-box:has(#gb-wan-zero-up),.geek-right-box:has(#gb-cur-up-vol){display:none!important}.gege-list-item{padding:12px 10px!important}.config-item-box{position:relative!important;flex-direction:column!important;padding-bottom:0!important}.config-item .info,.config-item .logo,.config-item .speed{width:100%!important;border:none!important;padding:0!important;position:static!important}.config-item .dev-intro{min-height:auto!important;justify-content:center!important;padding-right:90px!important}.config-item .logo{padding-bottom:4px!important}.config-item .info{flex-direction:column!important;margin:0 0 6px 0!important;gap:2px!important}.dev-ip{position:absolute!important;top:0!important;right:0!important;font-size:11px!important;background:rgba(0,89,250,0.08);color:#0059fa!important;padding:2px 6px!important;border-radius:4px;font-weight:bold;line-height:1.2;z-index:10;width:auto!important}.dev-number{width:auto!important;margin:0!important;font-size:11px!important}.gege-ratio-box{width:100%!important;margin-top:2px!important;margin-bottom:0!important}.gege-down-box{width:100%!important;margin-top:2px!important}#zte-geek-board{padding:8px!important;gap:0!important;font-size:11.5px!important}.geek-row{height:auto!important;flex-wrap:wrap!important;margin-bottom:4px!important;justify-content:flex-start!important;gap:2px 6px!important;line-height:1.3!important}.geek-label{width:auto!important;min-width:60px!important;font-size:11.5px!important;flex:0 0 auto!important}.geek-val-box{width:auto!important;flex:1 1 0%!important;display:flex!important;flex-wrap:wrap!important;margin-left:0!important;gap:2px 6px!important}.geek-fixed-width{width:auto!important}.geek-right-box{width:100%!important;flex:0 0 100%!important;text-align:left!important;font-size:11.5px!important;margin-top:2px!important;margin-left:0!important}.gege-list-container{padding:8px!important}.zte-enhance-speed{gap:4px!important}}`;
+    .gege-pin.active{filter:none;opacity:1;transform:scale(1.1);}#gege-global-overlay{position:fixed;top:7.5%;right:0;bottom:0;background:#f3f4f5;z-index:9999;overflow-y:auto;padding-bottom:50px;left:0!important;border-radius:16px 16px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,0.15);transition:top 0.3s ease;}#zte-geek-board{position:relative!important;overflow:visible!important;}#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;}#gege-speed-chart canvas{display:block;width:100%;height:100%;}.gege-chart-head,.gege-chart-foot{position:absolute;left:clamp(28px,8%,36px);right:8px;display:flex;align-items:center;pointer-events:none;font:bold clamp(9px,2.1cqw,11px) system-ui,sans-serif;white-space:nowrap;overflow:hidden;}.gege-chart-head{top:2px;color:#111;gap:8px;}.gege-chart-head [data-gc="range"]{color:#666;font-weight:normal;overflow:hidden;text-overflow:ellipsis;margin-left:auto;}.gege-chart-foot{bottom:4px;justify-content:flex-start;gap:clamp(3px,1.1cqw,12px);}.gege-chart-foot span{min-width:0;overflow:hidden;text-overflow:ellipsis;}.gc-up{color:#ff4c00;flex:0 1 auto;}.gc-down{color:#0b5;flex:0 1 auto;}.gc-extra{color:#666;text-align:right;margin-left:auto;flex:1 1 0;min-width:0;}#gege-speed-chart .gege-chart-resize{position:absolute;right:-4px;bottom:-4px;width:13px;height:13px;border-right:3px solid #0059fa;border-bottom:3px solid #0059fa;cursor:nwse-resize;border-radius:2px;}@media (max-width:768px){#gege-speed-chart{left:210px!important;width:calc(100% - 220px)!important;height:96px!important;}}@media (max-width: 768px){.geek-right-box:has(#gb-wan-zero-up),.geek-right-box:has(#gb-cur-up-vol){display:none!important}.gege-list-item{padding:12px 10px!important}.config-item-box{position:relative!important;flex-direction:column!important;padding-bottom:0!important}.config-item .info,.config-item .logo,.config-item .speed{width:100%!important;border:none!important;padding:0!important;position:static!important}.config-item .dev-intro{min-height:auto!important;justify-content:center!important;padding-right:90px!important}.config-item .logo{padding-bottom:4px!important}.config-item .info{flex-direction:column!important;margin:0 0 6px 0!important;gap:2px!important}.dev-ip{position:absolute!important;top:0!important;right:0!important;font-size:11px!important;background:rgba(0,89,250,0.08);color:#0059fa!important;padding:2px 6px!important;border-radius:4px;font-weight:bold;line-height:1.2;z-index:10;width:auto!important}.dev-number{width:auto!important;margin:0!important;font-size:11px!important}.gege-ratio-box{width:100%!important;margin-top:2px!important;margin-bottom:0!important}.gege-down-box{width:100%!important;margin-top:2px!important}#zte-geek-board{padding:8px!important;gap:0!important;font-size:11.5px!important}.geek-row{height:auto!important;flex-wrap:wrap!important;margin-bottom:4px!important;justify-content:flex-start!important;gap:2px 6px!important;line-height:1.3!important}.geek-label{width:auto!important;min-width:60px!important;font-size:11.5px!important;flex:0 0 auto!important}.geek-val-box{width:auto!important;flex:1 1 0%!important;display:flex!important;flex-wrap:wrap!important;margin-left:0!important;gap:2px 6px!important}.geek-fixed-width{width:auto!important}.geek-right-box{width:100%!important;flex:0 0 100%!important;text-align:left!important;font-size:11.5px!important;margin-top:2px!important;margin-left:0!important}.gege-list-container{padding:8px!important}.zte-enhance-speed{gap:4px!important}}`;
   document.
   head.
   appendChild(st);
   window.gegeRenderedMacs = new Set();
-  async function rSD(pWT = null, sT = null) {
+  async function rSD(pWT = null, wST = null, lST = null) {
     if (isF && pWT === null) return;
     isF = !0;
-    let n, wT = "";
+    let wanNow, lanNow, wT = "";
     try {
       if (pWT !== null) {
-        wT = pWT; n = sT || performance.now();
+        wT = pWT; wanNow = wST || performance.now();
       } else {
-        wT = await gWT(); n = performance.now();
+        wT = await gWT(); wanNow = performance.now();
       }
-      window.__gLWT = wT; window.__gLWT_t = n; // 保障解耦模式全局缓存不丢失
+      lanNow = lST ?? lCxtT ?? wanNow;
+      window.__gLWT = wT; window.__gLWT_t = wanNow; // 保障解耦模式全局缓存不丢失
       
       const wI = wT ? (JSON.parse(wT) || {}) : {};
       S.hasW2 = !1; 
       let cWU = (+wI.UpBandwidth || 0) * 8000, cWD = (+wI.DownBandwidth || 0) * 8000, cI = Object.create(null);
+      记总速率图(cWU, cWD);
       let cSU = 0, cSD = 0;
       (lCxt ? (JSON.parse(lCxt) || []) : []).forEach(d => {
         if (d.MACAddress) {
@@ -207,8 +213,10 @@ function fBy(bps) {
       }
       if (iD) {
         for (let m in S.cls) if (!cI[m]) {
-          S.cls[m].intUp += S.cls[m].upR * (n - S.cls[m].lUT) * 0.0005;
-          S.cls[m].intDn += S.cls[m].dnR * (n - S.cls[m].lUT) * 0.0005;
+          let ms = lanNow - S.cls[m].lUT;
+          if (ms > CONFIG.lanRefreshInterval * 1000) ms = CONFIG.lanRefreshInterval * 1000;
+          S.cls[m].intUp += S.cls[m].upR * ms * 0.0005;
+          S.cls[m].intDn += S.cls[m].dnR * ms * 0.0005;
           S.cls[m].upR = S.cls[m].dnR = 0;
         }
       }
@@ -219,21 +227,21 @@ function fBy(bps) {
         window.gegeForceUIRedraw = !1;
       }
       if (S.wLT === undefined) {
-        S.wLT = n;
+        S.wLT = wanNow;
       }
       else if (cWU !== S.wInstUp || cWD !== S.wInstDn) {
-        let wDt = n - S.wLT;
+        let wDt = wanNow - S.wLT;
         if (S.wInstUp > 0) { S.wTotUp += (S.wInstUp + cWU) * wDt * 0.0005; }
         else if (cWU > 0) { let wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
         if (S.wInstDn > 0) { S.wTotDn += (S.wInstDn + cWD) * wDt * 0.0005; }
         else if (cWD > 0) { let wED = cWD * 0.5 * CONFIG.wanRefreshInterval; S.wTotDn += wED; S.wZED = (S.wZED || 0) + wED; S.wZEDC = (S.wZEDC || 0) + 1; }
-        S.wLT = n;
+        S.wLT = wanNow;
       }
-      if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp || {}; if(sp && sp.global) { S.wTotUp = S.wTotUp === 0 ? sp.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? sp.global.wan_down || 0 : S.wTotDn; } } catch(e){console.warn(e)} S.snapLoaded = !0; }
+      if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp && sp.timestamp > (typeof GM_getValue !== 'undefined' ? (GM_getValue('gege_reset_ms', 0) || 0) : 0) ? sp : {}; if(S.snap.global) { S.wTotUp = S.wTotUp === 0 ? S.snap.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? S.snap.global.wan_down || 0 : S.wTotDn; } } catch(e){console.warn(e)} S.snapLoaded = !0; }
       for (const [m, cC] of Object.entries(cI)) {
         let spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
         S.cls[m] ??= {
-          upR: cC.upRate, dnR: cC.dnRate, lUT: n, 
+          upR: cC.upRate, dnR: cC.dnRate, lUT: lanNow, 
           intUp: spD ? (spD.integral_up || 0) : 0, intDn: spD ? (spD.integral_down || 0) : 0,
           uB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offUp - (spD.up || 0) : cC.offUp), 
           dB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offDn - (spD.down || 0) : cC.offDn),
@@ -281,14 +289,14 @@ function fBy(bps) {
           cS.onS = cC.aRec ? Math.max(0, (Date.now() - new Date(cC.aRec.split('#')[0].replace(/-/g, '/')).getTime()) / 1000) : 0;
           
           if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) {
-            let ms = n - cS.lUT;
+            let ms = lanNow - cS.lUT;
             if (cS.upR > 0) { cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
             else if (cC.upRate > 0) { let eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
             if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
             else if (cC.dnRate > 0) { let eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
             cS.upR = cC.upRate;
             cS.dnR = cC.dnRate;
-            cS.lUT = n;
+            cS.lUT = lanNow;
           }
         }
         cS.lU = cC.offUp;
@@ -323,8 +331,8 @@ function fBy(bps) {
       `"脚本下载: https://scriptcat.org/users/203510"`
 
     ].join('\r\n'))(
-      typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot', {}) : {}, 
-      Date.now(), 
+      S.cSnap || {}, 
+      S.cSnap?.timestamp || Date.now(), 
       (typeof GM_getValue !== 'undefined' ? GM_getValue('gege_reset_ms', null) : null) || performance.timeOrigin || Date.now()
     );
   }
@@ -336,6 +344,7 @@ function doSettle(nowMs) {
     let w = window.open('about:blank', '_blank');
     if (w) w.document.write(`<!DOCTYPE html><html><head><title>流量结算备份</title></head><body style="background:#f3f4f5;font-family:system-ui,sans-serif;padding:40px 20px;color:#333;"><div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.05);max-width:850px;margin:0 auto;"><h2 style="color:#0059fa;margin-top:0;border-bottom:2px solid #f0f0f0;padding-bottom:15px;">本次数据结算周期已结束</h2><p style="font-size:14px;line-height:1.7;color:#555;"><b>哥哥科技提示您：</b>请点击下方下载按钮将 CSV 报表保存到本地。<br>若下载失败，请点击复制按钮，新建文本文档粘贴后将拓展名改为 .csv 即可。</p><button id="dl-btn" style="background:#0059fa;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;margin-right:10px;">📥 再次下载 CSV</button><button id="cp-btn" style="background:#4caf50;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 一键复制内容</button><div style="background:#282c34;color:#abb2bf;padding:15px;border-radius:8px;overflow-x:auto;margin-top:20px;"><pre id="csv-data" style="margin:0;font-size:13px;line-height:1.5;">${csv}</pre></div></div><script>document.getElementById('dl-btn').onclick=function(){let b=new Blob([document.getElementById('csv-data').textContent],{type:'text/csv;charset=utf-8;'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='哥哥科技_路由器统计数据补下_${nowMs}.csv';a.click();};document.getElementById('cp-btn').onclick=function(){let t=document.createElement('textarea');t.value=document.getElementById('csv-data').textContent;document.body.appendChild(t);t.select();try{document.execCommand('copy');alert('复制成功！');}catch(e){alert('复制失败，请手动全选复制');}document.body.removeChild(t);};</script></body></html>`);
     GM_setValue('gege_reset_ms', nowMs);
+    GM_setValue('ha_snapshot', { timestamp: nowMs, global: {}, devices: {} }); S.snap = {}; S.cSnap = null;
     S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn = 0; // 内存原地清零
     for (let k in S.cls) { let s = S.cls[k]; s.intUp = s.intDn = 0; s.uB = s.oU = s.lU; s.dB = s.oD = s.lD; s.hU.fill(0); s.hD.fill(0); } // 内存原地清零底表
     document.getElementById('gb-w-bnr')?.remove(); // 预警横幅
@@ -365,6 +374,69 @@ const calcStageRatio = (W, L_int, L_hp) => {
           s += SPRK[v > 0 ? Math.min(7, Math.max(1, ((v / maxVal) * 7) | 0)) : 0];
         }
         return s;
+      }
+      function 记总速率图(u, d) {
+        u = u || 0; d = d || 0;
+        let i = S.总图点数 & 8191;
+        S.总上行图[i] = u; S.总下行图[i] = d; S.总图点数++;
+        if (u > S.wMaxU) S.wMaxU = u; if (d > S.wMaxD) S.wMaxD = d;
+        if (u > 0 && u < S.wMinU) S.wMinU = u; if (d > 0 && d < S.wMinD) S.wMinD = d;
+      }
+      function 初始化总速率图(bd) {
+        let box = bd.querySelector('#gege-speed-chart');
+        if (box) return box;
+        box = document.createElement('div'); box.id = 'gege-speed-chart';
+        box.innerHTML = '<canvas></canvas><div class="gege-chart-head"><b data-gc="meta"></b><span data-gc="range"></span></div><div class="gege-chart-foot"><span class="gc-up" data-gc="up"></span><span class="gc-down" data-gc="down"></span><span class="gc-extra" data-gc="extra"></span></div><div class="gege-chart-resize" title="缩放"></div>';
+        bd.appendChild(box);
+        let bw = bd.clientWidth || 1800, w = Math.max(320, Math.min(650, bw * .30));
+        box.style.left = Math.max(520, bw * .52) + 'px'; box.style.top = '2px'; box.style.width = w + 'px'; box.style.height = '112px';
+        const 起手 = (e, 模式) => { e.preventDefault(); S.图表拖 = { 模式, x: e.clientX, y: e.clientY, l: box.offsetLeft, t: box.offsetTop, w: box.offsetWidth, h: box.offsetHeight }; box.setPointerCapture?.(e.pointerId); };
+        box.addEventListener('pointerdown', e => { if (!e.target.classList.contains('gege-chart-resize')) 起手(e, '拖'); });
+        box.querySelector('.gege-chart-resize').addEventListener('pointerdown', e => 起手(e, '缩'));
+        box.addEventListener('pointermove', e => {
+          let g = S.图表拖; if (!g) return;
+          if (g.模式 === '拖') { box.style.left = Math.max(330, g.l + e.clientX - g.x) + 'px'; box.style.top = Math.max(0, g.t + e.clientY - g.y) + 'px'; }
+          else { box.style.width = Math.max(260, g.w + e.clientX - g.x) + 'px'; box.style.height = Math.max(88, g.h + e.clientY - g.y) + 'px'; }
+          if (!S.图表待画) { S.图表待画 = 1; requestAnimationFrame(() => { S.图表待画 = 0; 画总速率图(bd); }); }
+        });
+        box.addEventListener('pointerup', () => S.图表拖 = null); box.addEventListener('pointercancel', () => S.图表拖 = null); box.addEventListener('lostpointercapture', () => S.图表拖 = null);
+        return box;
+      }
+      function 画总速率图(bd) {
+        let box = 初始化总速率图(bd), cv = box.querySelector('canvas'), W = box.clientWidth | 0, H = box.clientHeight | 0, R = window.devicePixelRatio || 1;
+        if (W < 40 || H < 40) return;
+        if (cv.width !== (W * R | 0) || cv.height !== (H * R | 0)) { cv.width = W * R | 0; cv.height = H * R | 0; cv.style.width = '100%'; cv.style.height = '100%'; }
+        let x = cv.getContext('2d'); x.setTransform(R,0,0,R,0,0); x.clearRect(0,0,W,H);
+        let l = 34, r = 8, t = 20, b = 25, gw = W - l - r, gh = H - t - b, n = Math.min(S.总图点数, 8000), st = S.总图点数 - n, ym = 1, su = 0, sd = 0;
+        for (let k = 0; k < n; k++) { let j = (st + k) & 8191, u = S.总上行图[j], d = S.总下行图[j]; if (u > ym) ym = u; if (d > ym) ym = d; su += u; sd += d; }
+        x.fillStyle = 'rgba(255,255,255,.58)'; x.strokeStyle = 'rgba(0,89,250,.88)'; x.lineWidth = 1.5; x.beginPath(); x.roundRect ? x.roundRect(.5,.5,W-1,H-1,8) : x.rect(.5,.5,W-1,H-1); x.fill(); x.stroke();
+        x.setLineDash([4,4]); x.strokeStyle = 'rgba(0,89,250,.45)'; x.lineWidth = 1;
+        for (let i = 5; i--; ) { let y = t + gh * i / 4; x.beginPath(); x.moveTo(l,y); x.lineTo(W-r,y); x.stroke(); }
+        for (let i = 7; i--; ) { let xx = l + gw * i / 6; x.beginPath(); x.moveTo(xx,t); x.lineTo(xx,H-b); x.stroke(); }
+        x.setLineDash([]);
+        let li = (S.总图点数 - 1) & 8191, au = n ? (n === 8000 ? su * .000125 : su / n) : 0, ad = n ? (n === 8000 ? sd * .000125 : sd / n) : 0;
+        (box._gcMeta ??= box.querySelector('[data-gc="meta"]')).textContent = `采样:${window.gegeBActivated ? CONFIG.wanRefreshInterval : 3}s  点:${S.总图点数}`;
+        let rg = box._gcRange ??= box.querySelector('[data-gc="range"]'), rs = `峰↑${fBy(S.wMaxU)} ↓${fBy(S.wMaxD)}  谷↑${S.wMinU < Infinity ? fBy(S.wMinU) : '--'} ↓${S.wMinD < Infinity ? fBy(S.wMinD) : '--'}`; rg.textContent = rs; rg.title = rs;
+        (box._gcUp ??= box.querySelector('[data-gc="up"]')).textContent = `发 ${n ? fBy(S.总上行图[li]) : fBy(0)}`;
+        (box._gcDown ??= box.querySelector('[data-gc="down"]')).textContent = `收 ${n ? fBy(S.总下行图[li]) : fBy(0)}`;
+        (box._gcExtra ??= box.querySelector('[data-gc="extra"]')).textContent = `均↑${fBy(au)} ↓${fBy(ad)}`;
+        const 画线 = (arr, col) => {
+          if (!n) return;
+          x.strokeStyle = col; x.lineWidth = 2.4; x.beginPath();
+          let bins = Math.max(1, Math.min(n, gw | 0)), first = !0;
+          if (bins === n) {
+            for (let k = 0; k < n; k++) { let xx = l + (n > 1 ? gw * k / (n - 1) : gw), yy = H - b - (arr[(st + k) & 8191] / ym) * gh; first ? (x.moveTo(xx, yy), first = !1) : x.lineTo(xx, yy); }
+          } else {
+            for (let q = 0; q < bins; q++) {
+              let a = q * n / bins | 0, z = (q + 1) * n / bins | 0, mn = Infinity, mx = -Infinity, mi = a, ma = a; if (z <= a) z = a + 1;
+              for (let k = a; k < z; k++) { let v = arr[(st + k) & 8191]; if (v < mn) { mn = v; mi = k; } if (v > mx) { mx = v; ma = k; } }
+              if (mi <= ma) { let xx = l + (n > 1 ? gw * mi / (n - 1) : gw), yy = H - b - (mn / ym) * gh; first ? (x.moveTo(xx, yy), first = !1) : x.lineTo(xx, yy); if (ma !== mi) { xx = l + gw * ma / (n - 1); yy = H - b - (mx / ym) * gh; x.lineTo(xx, yy); } }
+              else { let xx = l + gw * ma / (n - 1), yy = H - b - (mx / ym) * gh; first ? (x.moveTo(xx, yy), first = !1) : x.lineTo(xx, yy); xx = l + gw * mi / (n - 1); yy = H - b - (mn / ym) * gh; x.lineTo(xx, yy); }
+            }
+          }
+          x.stroke();
+        };
+        画线(S.总上行图, '#ff1b00'); 画线(S.总下行图, '#006400');
       }
       const getIconSvg = (r, isW) => {
         if (isW) return `<svg viewBox="0 0 100 100" width="45" height="45"><rect x="15" y="15" width="70" height="65" rx="5" fill="#cfd8dc" stroke="#90a4ae" stroke-width="4"/><path d="M 25,25 L 75,25 L 75,60 L 60,60 L 60,75 L 40,75 L 40,60 L 25,60 Z" fill="#263238"/><g fill="#ffca28"><rect x="30" y="25" width="2.5" height="18"/><rect x="35" y="25" width="2.5" height="18"/><rect x="40" y="25" width="2.5" height="18"/><rect x="45" y="25" width="2.5" height="18"/><rect x="52.5" y="25" width="2.5" height="18"/><rect x="57.5" y="25" width="2.5" height="18"/><rect x="62.5" y="25" width="2.5" height="18"/><rect x="67.5" y="25" width="2.5" height="18"/></g><circle cx="21" cy="73" r="3.5" fill="#4caf50"/><circle cx="79" cy="73" r="3.5" fill="#ffb300"/></svg>`;
@@ -414,40 +486,31 @@ const calcStageRatio = (W, L_int, L_hp) => {
       s.hU[s.hIdx] = cC ? cC.upRate : 0;
       s.hD[s.hIdx] = cC ? cC.dnRate : 0;
     }
+    S.cSnap = {
+      timestamp: Date.now(),
+      global: {
+        wan_up: S.wTotUp, wan_down: S.wTotDn,
+        lan_integral_up: LUp, lan_integral_down: LDn,
+        lan_high_up: hpU, lan_high_down: hpD,
+        lan_off_up: abU, lan_off_down: abD
+      },
+      devices: Object.keys(S.cls).reduce((acc, k) => {
+        let s = S.cls[k], cC = cI[k];
+        acc[k] = {
+          up: Math.max(0, (s.lU || 0) - (s.uB || 0)),
+          down: Math.max(0, (s.lD || 0) - (s.dB || 0)),
+          integral_up: s.intUp || 0, integral_down: s.intDn || 0,
+          status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
+          name: cC?.name || k, ip: cC?.ip || "",
+          raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0
+        };
+        return acc;
+      }, {})
+    };
     if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
       S.haTick = ((S.haTick || 0) + 1) & 31;   
       if (S.haTick === 1) {
-      let cln = {};
-      for (let k in S.cls) {
-            let s = S.cls[k], cC = cI[k];
-            cln[k] = {
-                up: Math.max(0, (s.lU || 0) - (s.uB || 0)),
-                down: Math.max(0, (s.lD || 0) - (s.dB || 0)),
-                integral_up: s.intUp || 0,
-                integral_down: s.intDn || 0,
-                status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
-                name: cC?.name || k,
-                ip: cC?.ip || "",
-                raw_up: cC?.offUp || 0,
-                raw_down: cC?.offDn || 0
-            };}
-      try {
-        GM_setValue('ha_snapshot', {
-          timestamp: Date.now(),
-          global: {
-            wan_up: S.wTotUp,
-            wan_down: S.wTotDn,
-            lan_integral_up: LUp,
-            lan_integral_down: LDn,
-            lan_high_up: hpU,
-            lan_high_down: hpD,
-            lan_off_up: abU,
-            lan_off_down: abD
-          },
-          devices: cln
-        });
-        }
- catch(e) {console.warn(e);}}
+        try { GM_setValue('ha_snapshot', S.cSnap); } catch(e) {console.warn(e)}}
  let nowMs = Date.now();
           if (nowMs >= S.Force_MS && !S._RST) {doSettle(nowMs);
         } else if (nowMs >= S.Warn_MS && !document.getElementById('gb-w-bnr')) {
@@ -462,8 +525,8 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
     S.rTick = ((S.rTick || 0) + 1) & 7;
     if (S.rTick === 1 || !S.cRT) {
-        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 2); S.lwTU = S.wTotUp;
-        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 2); S.lwTD = S.wTotDn;
+        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 3); S.lwTU = S.wTotUp;
+        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 3); S.lwTD = S.wTotDn;
         if (S.hasW2) {
             let rU = S.w2TotUp > 0 ? (S.wTotUp / S.w2TotUp) : (S.wTotUp > 0 ? Infinity : 0), rD = S.w2TotDn > 0 ? (S.wTotDn / S.w2TotDn) : (S.wTotDn > 0 ? Infinity : 0);
             let fR = (r) => r === Infinity ? '∞' : (r > 1 ? r.toFixed(2) + 'x' : (r * 100).toPrecision(3) + '%');
@@ -582,6 +645,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
         } else if (CONFIG.lanPortMode !== 1 || Phys.wU === undefined) {
             if (pb) pb.style.display = 'none'; if (pv) pv.style.display = 'none';
         }
+        画总速率图(bd);
         if (bd.querySelector('#gb-ratio-display')) {
           bd.querySelector('#gb-cur-up-vol').textContent = `🔼 ${fV(curHpU)}`;
           bd.querySelector('#gb-cur-down-vol').textContent = `🔽 ${fV(curHpD)}`;
@@ -621,7 +685,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
         const dI = cache.devIntro ??= it.querySelector('.dev-intro');
         if (dI) {
           let rN = cache.rssiNode ??= dI.querySelector('.gege-rssi');
-          if (rN) rN.innerHTML = cC.rssi ? `<span style="color:${((cC.rssi<<1)-37)<0?'#ff4c00':'inherit'}">${(cC.rssi<<1)-37}%</span>, ${cC.rssi-93}` : escapeHTML(cC.vendor || '');
+          if (rN) { let p = cC.rssi ? Math.round((cC.rssi - (cC.iface === '2.4GHz' || cC.iface.includes('2.4') || cC.iface.includes('SSID1') ? S.RSSI频率修正 || 0 : 0)) * 2 - 37) : 0; rN.innerHTML = cC.rssi ? `<span style="color:${p < 0?'#ff4c00':'inherit'}">${p}%</span>, ${cC.rssi-93}` : escapeHTML(cC.vendor || ''); }
           
           let bx = cache.upBox ??= dI.querySelector('.gege-up-box');
           if (!bx) {
@@ -909,14 +973,14 @@ async function eBET(fW = !0) {
     window.gegeEngineRunning = !0;
     try {
       const ts = Date.now();
-      let wT = "", wST = null;
+      let wT = "", wST = null, lST = null;
       if (fW) {
         wT = await gWT();
         wST = performance.now();
       }
       let lR = await fetch(`/api/system/HostInfo?_=${ts}`);
-      if (lR.ok) lCxt = await lR.text();
-      if (fW) await rSD(wT, wST);
+      if (lR.ok) { lCxt = await lR.text(); lCxtT = lST = performance.now(); }
+      if (fW) await rSD(wT, wST, lST);
     }
     catch (e) {
       console.warn("[哥哥科技] 华为引擎中断(将重试):", e.message);
@@ -926,18 +990,21 @@ async function eBET(fW = !0) {
     }
   }
   async function f5G_Probe() {
+    let 信道24 = 6, 信道5 = 60;
+    for (const type of [1, 3]) {
+      try {
+        const d = await (await fetch(`/api/system/diagnose_wlan_basic?type=${type}&_=${Date.now()}`)).json(), c = +d.Channel;
+        if (c >= 1 && c <= 13) { 信道24 = c; break; }
+      } catch {}
+    }
     try {
-      const res = await fetch(`/api/system/diagnose_wlan_basic?type=2&_=${Date.now()}`);
-      if (res.ok) {
-        const d = await res.json();
-        if (d && d.Channel) {
-          S.is5G_149 = parseInt(d.Channel) > 148;
-          // [解耦重绘] 如果探针拿到了新数据且面板开着，立刻刷新一次表头
-          let ol = document.getElementById('gege-global-overlay');
-          if (ol && ol.style.display === 'block') bVD(ol, S.oDC ? Object.create(null) : {}); 
-        }
-      }
-    } catch(e) { console.warn("[哥哥科技] 5.8G彩蛋探测异常:", e); }
+      const d = await (await fetch(`/api/system/diagnose_wlan_basic?type=2&_=${Date.now()}`)).json(), c = +d.Channel;
+      if (c >= 32 && c <= 177) 信道5 = c;
+    } catch {}
+    S.RSSI频率修正 = 20 * Math.log10((5000 + 5 * 信道5) / (2407 + 5 * 信道24));
+    S.is5G_149 = 信道5 > 148;
+    let ol = document.getElementById('gege-global-overlay');
+    if (ol && ol.style.display === 'block') { window.gegeForceUIRedraw = !0; eBET(); }
   }
   const tKA = () => {
     let i = document.createElement('iframe');
