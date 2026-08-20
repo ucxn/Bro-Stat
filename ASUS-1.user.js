@@ -2,7 +2,7 @@
 // @name            华硕路由器增强
 // @name:en         Bro-Stat-ASUS
 // @namespace       ucxn
-// @version         5.9.5
+// @version         5.9.6
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -48,8 +48,10 @@
     报告时间: -600, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: 1, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
+    '2.4G信道': 6, // RSSI 百分比频率补偿：默认与下方 5G 信道组合约等于原 7.2dB
+    '5.2|8G信道': 116, // 华硕固件分支繁多，暂由用户按实际工作信道自由复写
     portMap: {
-      "eth1": "网口 ",
+      "eth1": "网口 1",
       "eth2": "网口 2",
       "eth3": "网口 3",
       "eth4": "网口 4",
@@ -101,6 +103,7 @@
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
     hasW2: !1, is5G_149: !1, oWU:0, Warn_MS: 0, Force_MS: 0, _RST: !1,
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
+    DOM缓存: null, DOM容器: null, 有线统一PHY: 0, 主节点MAC: '', 端口请求中: !1,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
   };
@@ -168,6 +171,12 @@
   function nM(m) {
     return m ? m.toLowerCase().replace(/-/g, ':').replace(/\s/g, '') : '';
   }
+  function 信道频率(ch, is5) {
+    ch = +ch || 0;
+    if (is5) return 5000 + ch * 5;
+    return ch === 14 ? 2484 : 2407 + ch * 5;
+  }
+  const RSSI频率补偿 = 20 * Math.log10(信道频率(CONFIG['5.2|8G信道'], !0) / 信道频率(CONFIG['2.4G信道'], !1));
   const st = document.createElement('style');
   st.innerHTML = `.config-item{
         clear:both;}.config-item-box{display:flex!important;
@@ -178,7 +187,7 @@
     .zte-bar-wrap{position:relative;width:100%;border-radius:4px;border:1px solid;font-size:13px;font-weight:bold;overflow:hidden;padding:3px 8px;display:flex;justify-content:space-between;align-items:center;z-index:1;box-sizing:border-box;}.zte-bar-wrap span{font-size:inherit;font-weight:inherit;}.zte-bar-up{color:#ff4c00;border-color:rgba(255,76,0,0.3);}.zte-bar-down{color:#0059fa;border-color:rgba(0,89,250,0.3);}.zte-bar-up::before{content:'';position:absolute;left:0;top:0;bottom:0;z-index:-1;background:rgba(255,76,0,0.12);width:var(--p-up,0%);transition:width 0.5s;}.zte-bar-down::before{content:'';position:absolute;left:0;top:0;bottom:0;z-index:-1;background:rgba(0,89,250,0.12);width:var(--p-down,0%);transition:width 0.5s;}#config-list.gege-list-container{contain:content!important;background-color:#ffffff!important;border-radius:8px!important;border:1px solid #e0e0e0!important;padding:20px 30px!important;box-shadow:0 2px 10px rgba(0,0,0,0.02)!important;margin-top:10px!important;}.gege-section{margin-bottom:10px;}
     .gege-section:last-child{margin-bottom:0;}.gege-list-container .config-title{font-size:16px!important;font-weight:bold!important;color:#333!important;margin:15px 0 10px 0!important;padding-bottom:5px!important;}.gege-list-container .gege-section:first-child .config-title{margin-top:0!important;}.gege-empty-state{color:#999!important;font-size:14px!important;padding:0 0 15px 5px!important;border-bottom:1px solid #f0f0f0!important;margin-bottom:5px!important;}.gege-list-item{background-color:transparent!important;border-bottom:1px solid #f0f0f0!important;padding:15px 10px!important;margin-bottom:0!important;border-radius:0!important;}
     .gege-list-item:last-child{border-bottom:none!important;}#zte-geek-board{contain:content;background-color:transparent!important;border-left:4px solid #0059fa!important;border-radius:0!important;padding:5px 0 5px 15px!important;margin:10px 0 15px 0!important;box-shadow:none!important;border-bottom:1px solid #f0f0f0!important;font-size:14px;display:flex;flex-direction:column;gap:6px;padding-bottom:15px!important;transition:color 0s cubic-bezier(0.21733,0.21733,0.31185,0.25216);}#gege-global-overlay #zte-geek-board.geek-frozen-pane{position:sticky!important;top:0px!important;z-index:100!important;background-color:#f3f4f5!important;margin-top:0!important;padding-top:15px!important;box-shadow:0 10px 15px -3px rgba(0,0,0,0.05)!important;border-radius:0 0 8px 8px!important;}.gege-pin{cursor:pointer;font-size:11px;filter:grayscale(100%);opacity:0.5;transition:transform 0.2s;margin-left:2px;}
-    .gege-pin.active{filter:none;opacity:1;transform:scale(1.1);}#gege-global-overlay{position:fixed;top:7.5%;right:0;bottom:0;background:#f3f4f5;z-index:9999;overflow-y:auto;padding-bottom:50px;left:0!important;border-radius:16px 16px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,0.15);transition:top 0.3s ease;}@media (max-width: 768px){.geek-right-box:has(#gb-wan-zero-up),.geek-right-box:has(#gb-cur-up-vol){display:none!important}.gege-list-item{padding:12px 10px!important}.config-item-box{position:relative!important;flex-direction:column!important;padding-bottom:0!important}.config-item .info,.config-item .logo,.config-item .speed{width:100%!important;border:none!important;padding:0!important;position:static!important}.config-item .dev-intro{min-height:auto!important;justify-content:center!important;padding-right:90px!important}.config-item .logo{padding-bottom:4px!important}.config-item .info{flex-direction:column!important;margin:0 0 6px 0!important;gap:2px!important}.dev-ip{position:absolute!important;top:0!important;right:0!important;font-size:11px!important;background:rgba(0,89,250,0.08);color:#0059fa!important;padding:2px 6px!important;border-radius:4px;font-weight:bold;line-height:1.2;z-index:10;width:auto!important}.dev-number{width:auto!important;margin:0!important;font-size:11px!important}.gege-ratio-box{width:100%!important;margin-top:2px!important;margin-bottom:0!important}.gege-down-box{width:100%!important;margin-top:2px!important}#zte-geek-board{padding:8px!important;gap:0!important;font-size:11.5px!important}.geek-row{height:auto!important;flex-wrap:wrap!important;margin-bottom:4px!important;justify-content:flex-start!important;gap:2px 6px!important;line-height:1.3!important}.geek-label{width:auto!important;min-width:60px!important;font-size:11.5px!important;flex:0 0 auto!important}.geek-val-box{width:auto!important;flex:1 1 0%!important;display:flex!important;flex-wrap:wrap!important;margin-left:0!important;gap:2px 6px!important}.geek-fixed-width{width:auto!important}.geek-right-box{width:100%!important;flex:0 0 100%!important;text-align:left!important;font-size:11.5px!important;margin-top:2px!important;margin-left:0!important}.gege-list-container{padding:8px!important}.zte-enhance-speed{gap:4px!important}}#zte-geek-board{position:relative!important;overflow:visible!important;}#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;}#gege-speed-chart canvas{display:block;width:100%;height:100%;}.gege-chart-head,.gege-chart-foot{position:absolute;left:clamp(28px,8%,36px);right:8px;display:flex;align-items:center;pointer-events:none;font:bold clamp(9px,2.1cqw,11px) system-ui,sans-serif;white-space:nowrap;overflow:hidden;}.gege-chart-head{top:2px;color:#111;gap:8px;}.gege-chart-head [data-gc="range"]{color:#666;font-weight:normal;overflow:hidden;text-overflow:ellipsis;margin-left:auto;}.gege-chart-foot{bottom:4px;justify-content:flex-start;gap:clamp(3px,1.1cqw,12px);}.gege-chart-foot span{min-width:0;overflow:hidden;text-overflow:ellipsis;}.gc-up{color:#ff4c00;flex:0 1 auto;}.gc-down{color:#0b5;flex:0 1 auto;}.gc-extra{color:#666;text-align:right;margin-left:auto;flex:1 1 0;min-width:0;}#gege-speed-chart .gege-chart-resize{position:absolute;right:-4px;bottom:-4px;width:13px;height:13px;border-right:3px solid #0059fa;border-bottom:3px solid #0059fa;cursor:nwse-resize;border-radius:2px;}@media (max-width:768px){#gege-speed-chart{left:210px!important;width:calc(100% - 220px)!important;height:96px!important;}}`;
+    .gege-pin.active{filter:none;opacity:1;transform:scale(1.1);}#gege-global-overlay{position:fixed;top:7.5%;right:0;bottom:0;background:#f3f4f5;z-index:9999;overflow-y:auto;padding-bottom:50px;left:0!important;border-radius:16px 16px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,0.15);transition:top 0.3s ease;}@media (max-width: 768px){.geek-right-box:has(#gb-wan-zero-up),.geek-right-box:has(#gb-cur-up-vol){display:none!important}.gege-list-item{padding:12px 10px!important}.config-item-box{position:relative!important;flex-direction:column!important;padding-bottom:0!important}.config-item .info,.config-item .logo,.config-item .speed{width:100%!important;border:none!important;padding:0!important;position:static!important}.config-item .dev-intro{min-height:auto!important;justify-content:center!important;padding-right:90px!important}.config-item .logo{padding-bottom:4px!important}.config-item .info{flex-direction:column!important;margin:0 0 6px 0!important;gap:2px!important}.dev-ip{position:absolute!important;top:0!important;right:0!important;font-size:11px!important;background:rgba(0,89,250,0.08);color:#0059fa!important;padding:2px 6px!important;border-radius:4px;font-weight:bold;line-height:1.2;z-index:10;width:auto!important}.dev-number{width:auto!important;margin:0!important;font-size:11px!important}.gege-ratio-box{width:100%!important;margin-top:2px!important;margin-bottom:0!important}.gege-down-box{width:100%!important;margin-top:2px!important}#zte-geek-board{padding:8px!important;gap:0!important;font-size:11.5px!important}.geek-row{height:auto!important;flex-wrap:wrap!important;margin-bottom:4px!important;justify-content:flex-start!important;gap:2px 6px!important;line-height:1.3!important}.geek-label{width:auto!important;min-width:60px!important;font-size:11.5px!important;flex:0 0 auto!important}.geek-val-box{width:auto!important;flex:1 1 0%!important;display:flex!important;flex-wrap:wrap!important;margin-left:0!important;gap:2px 6px!important}.geek-fixed-width{width:auto!important}.geek-right-box{width:100%!important;flex:0 0 100%!important;text-align:left!important;font-size:11.5px!important;margin-top:2px!important;margin-left:0!important}.gege-list-container{padding:8px!important}.zte-enhance-speed{gap:4px!important}}#zte-geek-board{position:relative!important;overflow:visible!important;}#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;}#gege-speed-chart canvas{display:block;width:100%;height:100%;}.gege-chart-head,.gege-chart-foot{position:absolute;left:clamp(28px,8%,36px);right:8px;display:flex;align-items:center;pointer-events:none;font:bold clamp(9px,2.1cqw,11px) system-ui,sans-serif;white-space:nowrap;overflow:hidden;}.gege-chart-head{top:2px;color:#111;gap:8px;}.gege-chart-head [data-gc="range"]{color:#666;font-weight:normal;overflow:hidden;text-overflow:ellipsis;margin-left:auto;}.gege-chart-foot{bottom:4px;justify-content:flex-start;gap:clamp(3px,1.1cqw,12px);}.gege-chart-foot span{min-width:0;overflow:hidden;text-overflow:ellipsis;}.gc-up{color:#ff4c00;flex:0 1 auto;}.gc-down{color:#0b5;flex:0 1 auto;}.gc-extra{color:#666;text-align:right;margin-left:auto;flex:1 1 0;min-width:0;}#gege-speed-chart .gege-chart-resize{position:absolute;right:-4px;bottom:-4px;width:13px;height:13px;border-right:3px solid #0059fa;border-bottom:3px solid #0059fa;cursor:nwse-resize;border-radius:2px;}.gege-phy-rate{font:10px/1.08 Consolas,monospace;color:#777;text-align:center;white-space:nowrap;margin-top:-1px;}.gege-phy-rate .phy-up{color:#ff4c00}.gege-phy-rate .phy-down{color:#0059fa}@media (max-width:768px){#gege-speed-chart{left:210px!important;width:calc(100% - 220px)!important;height:96px!important}.gege-phy-rate{line-height:1}}`;
   document.
   head.
   appendChild(st);
@@ -234,7 +243,8 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
             upRate: u, dnRate: dn, 
             iface: iN.wl == '1' ? 'wl0' : (iN.wl == '2' ? 'wl1' : 'eth1'),
             offUp: oU, offDn: oD, 
-            onSec: 0, name: iN.n || "华硕设备", ip: iN.ip || "-.-.-.-", rssi: iN.r | 0
+            onSec: 0, name: iN.n || "华硕设备", ip: iN.ip || "-.-.-.-", rssi: iN.r | 0,
+            phyUp: iN.rx, phyDn: iN.tx
         };
         cSU += u; cSD += dn;
       });
@@ -258,6 +268,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         }
       }
       if (ol && ol.style.display === 'block' && (iD || !ol.querySelector('.gege-list-item'))) {
+        S.DOM缓存 = null; S.DOM容器 = null;
         bVD(ol, cI);
         window.gegeRenderedMacs = new Set(cM);
         window.gegeForceUIRedraw = !1;
@@ -296,14 +307,13 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         if (cS.lOS !== cC.onSec) { cS.onS = cC.onSec; cS.lOS = cC.onSec; }
         else { cS.onS = (cS.onS || cC.onSec || 0) + gDt; }
         
-        if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) {
-          let ms = n - cS.lUT;
-          if (cS.upR > 0) { cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
-          else if (cC.upRate > 0) { let eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
-          if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
-          else if (cC.dnRate > 0) { let eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
-          cS.upR = cC.upRate; cS.dnR = cC.dnRate; cS.lUT = n;
-        }
+        // 华硕 getTraffic 是整包快照：每一包都代表一次真实采样，即使连续两轮速率数值恰好相同也推进积分时间
+        let ms = n - cS.lUT;
+        if (cS.upR > 0) { cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
+        else if (cC.upRate > 0) { let eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
+        if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
+        else if (cC.dnRate > 0) { let eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
+        cS.upR = cC.upRate; cS.dnR = cC.dnRate; cS.lUT = n;
         cS.lU = cC.offUp; cS.lD = cC.offDn; cS.lT = n;
       }
       S.lt = n;
@@ -373,8 +383,14 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
     return s;
   }
-  const getIconSvg = (r, isW) => {
-    if (isW) return `<svg viewBox="0 0 100 100" width="45" height="45"><rect x="15" y="15" width="70" height="65" rx="5" fill="#cfd8dc" stroke="#90a4ae" stroke-width="4"/><path d="M 25,25 L 75,25 L 75,60 L 60,60 L 60,75 L 40,75 L 40,60 L 25,60 Z" fill="#263238"/><g fill="#ffca28"><rect x="30" y="25" width="2.5" height="18"/><rect x="35" y="25" width="2.5" height="18"/><rect x="40" y="25" width="2.5" height="18"/><rect x="45" y="25" width="2.5" height="18"/><rect x="52.5" y="25" width="2.5" height="18"/><rect x="57.5" y="25" width="2.5" height="18"/><rect x="62.5" y="25" width="2.5" height="18"/><rect x="67.5" y="25" width="2.5" height="18"/></g><circle cx="21" cy="73" r="3.5" fill="#4caf50"/><circle cx="79" cy="73" r="3.5" fill="#ffb300"/></svg>`;
+  function 取网口图标(速率 = 0) {
+    let s = +速率 || 0;
+    if (!s || s >= 2500) return `<svg viewBox="0 0 100 100" width="45" height="45"><rect x="15" y="15" width="70" height="65" rx="5" fill="#cfd8dc" stroke="#90a4ae" stroke-width="4"/><path d="M 25,25 L 75,25 L 75,60 L 60,60 L 60,75 L 40,75 L 40,60 L 25,60 Z" fill="#263238"/><g fill="#ffca28"><rect x="30" y="25" width="2.5" height="18"/><rect x="35" y="25" width="2.5" height="18"/><rect x="40" y="25" width="2.5" height="18"/><rect x="45" y="25" width="2.5" height="18"/><rect x="52.5" y="25" width="2.5" height="18"/><rect x="57.5" y="25" width="2.5" height="18"/><rect x="62.5" y="25" width="2.5" height="18"/><rect x="67.5" y="25" width="2.5" height="18"/></g><circle cx="21" cy="73" r="3.5" fill="#4caf50"/><circle cx="79" cy="73" r="3.5" fill="#ffb300"/></svg>`;
+    let c = s >= 1000 ? '#4CAF50' : s >= 100 ? '#5394CC' : '#E7B05C';
+    return `<svg viewBox="0 0 100 100" width="45" height="45" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(180 50 50)"><path d="M18 82V36Q18 32 22 32H28V24Q28 20 32 20H38V14Q38 10 42 10H58Q62 10 62 14V20H68Q72 20 72 24V32H78Q82 32 82 36V82Q82 86 78 86H22Q18 86 18 82Z" fill="${c}" fill-opacity=".10" stroke="${c}" stroke-width="4" stroke-linejoin="round"/><g stroke="${c}" stroke-width="3.2" stroke-linecap="round"><path d="M31 54V76"/><path d="M36.5 54V76"/><path d="M42 54V76"/><path d="M47.5 54V76"/><path d="M53 54V76"/><path d="M58.5 54V76"/><path d="M64 54V76"/><path d="M69.5 54V76"/></g></g></svg>`;
+  }
+  const getIconSvg = (r, isW, phy = 0) => {
+    if (isW) return 取网口图标(phy);
     let c = r > -24 ? '#4caf50' : r > -35 ? '#9c27b0' : '#0059fa';
     if (r > -40) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="${c}"/></svg>`;
     if (r > -46) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="#e0e0e0"/><path d="M 50,85 L 18,45 A 50,50 0 0,1 82,45 Z" fill="${c}"/></svg>`;
@@ -602,24 +618,25 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
       let mn = document.querySelector('.el-table') || document.querySelector('.config-item')?.closest('div') || document.querySelector('.main-content');
       if (mn && bd.parentNode !== mn.parentNode) mn.parentNode.insertBefore(bd, mn);
     }
-    let oDC = Object.create(null);
-    if (!iPO) {
-      const M_RX = /([a-fA-F0-9]{2}[:-]){5}[a-fA-F0-9]{2}/;
-      let aI = aC.querySelectorAll('.config-item');
-      for (let n of aI) {
-        let mN = n.querySelector('.dev-number'),
-          mM = mN ? mN.textContent.match(M_RX) : null;
-        if (mM) {
-          oDC[mM[0].toLowerCase().replace(/-/g, ':')] = n;
+    let oDC = S.DOM缓存;
+    if (!oDC || S.DOM容器 !== aC) {
+      oDC = Object.create(null);
+      if (!iPO) {
+        const M_RX = /([a-fA-F0-9]{2}[:-]){5}[a-fA-F0-9]{2}/;
+        let aI = aC.querySelectorAll('.config-item');
+        for (let n of aI) {
+          let mN = n.querySelector('.dev-number'),
+            mM = mN ? mN.textContent.match(M_RX) : null;
+          if (mM) oDC[mM[0].toLowerCase().replace(/-/g, ':')] = n;
+        }
+      } else {
+        let gI = aC.querySelectorAll('.gege-list-item');
+        for (let n of gI) {
+          let m = n.getAttribute('data-gege-mac');
+          if (m) oDC[m] = n;
         }
       }
-    }
-    else {
-      let gI = aC.querySelectorAll('.gege-list-item');
-      for (let n of gI) {
-        let m = n.getAttribute('data-gege-mac');
-        if (m) oDC[m] = n;
-      }
+      S.DOM缓存 = oDC; S.DOM容器 = aC;
     }
       if (bd.parentNode) {
         let aW2U = S.hasW2 ? S.w2U : undefined, aW2D = S.hasW2 ? S.w2D : undefined, aW2TU = S.hasW2 ? S.w2TotUp : undefined, aW2TD = S.hasW2 ? S.w2TotDn : undefined;
@@ -673,9 +690,16 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
               cS = S.cls[m] || { intUp: 0, intDn: 0, onS: 0 };
         
         let cache = it._gege || (it._gege = {});
-        let rRs = cC.rssi | 0, pRs = Math.round((rRs - (cC.iface === 'wl0' ? 7.2 : 0)) * 1.6666666666666667 + 133.33333333333333);
-        (cache.logo ??= it.querySelector('.dev-logo')) && (cache.logo.innerHTML = getIconSvg(rRs, !rRs));
-        (cache.rssiNode ??= it.querySelector('.gege-rssi')) && (cache.rssiNode.innerHTML = rRs ? `<span style="color:${pRs < 0 ? '#ff4c00' : 'inherit'}">${pRs}%</span>, ${rRs}` : '');
+        let rRs = cC.rssi | 0, 有线 = !/^wl/i.test(cC.iface || ''),
+            pRs = Math.round((rRs - (cC.iface === 'wl0' ? RSSI频率补偿 : 0)) * 1.6666666666666667 + 133.33333333333333),
+            图标RSSI = cC.iface === 'wl0' ? rRs - 5 : rRs;
+        let logo = cache.logo ??= it.querySelector('.dev-logo');
+        if (logo) {
+          let pr = (!有线 && (cC.phyUp != null || cC.phyDn != null))
+            ? `<div class="gege-phy-rate"><div><span class="phy-up">上</span> ${cC.phyUp == null ? '--' : cC.phyUp}</div><div><span class="phy-down">下</span> ${cC.phyDn == null ? '--' : cC.phyDn}</div></div>` : '';
+          logo.innerHTML = getIconSvg(图标RSSI, 有线 || !rRs, 有线 ? S.有线统一PHY : 0) + pr;
+        }
+        (cache.rssiNode ??= it.querySelector('.gege-rssi')) && (cache.rssiNode.innerHTML = !有线 && rRs ? `<span style="color:${pRs < 0 ? '#ff4c00' : 'inherit'}">${pRs}%</span>, ${rRs}` : '');
         let hqU = cln[m] ? cln[m].up : 0;
         let hqD = cln[m] ? cln[m].down : 0;
         let tN = cache.timeNode ??= it.querySelector('.gege-online-time');
@@ -790,7 +814,7 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
       let h2 = [], h52 = [], h58 = [], hW = [];
       for (let m in cI) {
         let d = cI[m], tS = fOT(d.onSec), ifc = d.iface;
-        let htm = `<div class="col-md-12 col-xs-12 config-item gege-list-item" data-gege-mac="${m}"><div class="config-item-box" style="display: flex; align-items: stretch;"><div class="col-md-5 col-xs-7 logo" style="width: 33%; display: flex; flex-direction: row; align-items: center;"><div class="dev-logo" style="width: 50px; height: 50px; min-width: 50px; margin-right: 15px; display: flex; align-items: center; justify-content: center; flex-direction: column;"></div><div class="dev-intro" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; min-height: 100px;">
+        let htm = `<div class="col-md-12 col-xs-12 config-item gege-list-item" data-gege-mac="${m}"><div class="config-item-box" style="display: flex; align-items: stretch;"><div class="col-md-5 col-xs-7 logo" style="width: 33%; display: flex; flex-direction: row; align-items: center;"><div class="dev-logo" style="width: 50px; min-height: 50px; min-width: 50px; margin-right: 15px; display: flex; align-items: center; justify-content: center; flex-direction: column;"></div><div class="dev-intro" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; min-height: 100px;">
 <div class="dev-name" style="font-weight: bold; color: #333; font-size: 14px;">${escapeHTML(d.name)}<span class="gege-rssi" style="font-size: 11px; color: #999; font-family: Consolas; margin-left: 6px;"></span></div><div class="gege-online-time" style="color: #999; font-size: 12px; font-family: Consolas; margin-top: 4px;">${tS?'在线：'+tS:''}</div></div></div><div class="col-md-4 col-xs-5 info" style="width: 27%; display: flex; flex-direction: column; padding: 0 10px; border-right: 1px solid #eee;"><div class="dev-ip" style="color: #666; font-family: Consolas;">${escapeHTML(d.ip)}</div><div class="dev-number grey" style="color: #999; font-size: 12px; font-family: Consolas;">MAC：${m}</div></div><div class="col-md-3 col-xs-12 speed" style="width: 40%; display: flex; flex-direction: column; justify-content: center; padding: 0 10px;"></div></div></div>`;
         if (['wl0', '2.4G'].includes(ifc)) h2.push(htm);
         else if (['wlan5', 'wl1', 'wlan4', '5.2', '5.2G'].includes(ifc)) h52.push(htm);
@@ -801,8 +825,9 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
         ol.innerHTML = `<div style="padding: 20px; width: 96%; max-width: 1600px; margin: 0 auto; min-height: 100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container"><div class="gege-section"><div class="config-title">有线设备${(window.gegeHiddenDevices && Object.keys(window.gegeHiddenDevices).length > 0) ? '<span style="color: #ff4c00; font-size: 13px; font-weight: normal; margin-left: 10px; font-family: Consolas;">(哥哥科技：智能Mesh适配)</span>' : ''}</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.8GHz':'5.2GHz'}）</div>${h52.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.2GHz':'5.8GHz'}）</div>${h58.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}
                 </div>
         </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序属于“哥哥软件”系列；需持续遵守署名条款方可获得使用权，二开或发行请参阅许可证；按“原样且免费”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作担保；个人分享请直接转载官方链接。<br>基于本程序的任何修改、使用任意部分代码、再发布或相关衍生版本的合法性的前置条件是：在提供最终用户界面时，均应显著保留所有“哥哥科技”与法律声明，不得删除、隐藏或降低其可见性。
-        </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Bro-Stat" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat系列 增强组件</a><span title="构建日期：2026-07.01 3时&#10;架构设计：哥哥科技 BroTech&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px;">${(typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号'} Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1LZ6yBXESq" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/script-show-page/6675" target="_blank" style="color: #666; text-decoration: none;">点此分享</a>
+        </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Bro-Stat" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat系列 增强组件</a><span title="构建日期：2026-08.20 23时&#10;架构设计：哥哥科技 BroTech&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px;">${(typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号'} Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1LZ6yBXESq" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/script-show-page/6675" target="_blank" style="color: #666; text-decoration: none;">点此分享</a>
         </div></div></div></div>`;
+        S.DOM缓存 = null; S.DOM容器 = null;
       });}
     catch (e) {
       requestAnimationFrame(() => {
@@ -869,17 +894,47 @@ if (!window.gegeBActivated) {
   window.gegeMasterTimer = null;
  
   window.__aD = Object.create(null); // 全局后勤字典
+  async function fAsusPorts(nodeMac = '') {
+    if (S.端口请求中) return;
+    S.端口请求中 = !0;
+    try {
+      let q = nodeMac ? `?node_mac=${encodeURIComponent(nodeMac)}&_=${Date.now()}` : `?_=${Date.now()}`;
+      let r = await fetch(`/get_port_status.cgi${q}`);
+      if (!r.ok) return;
+      let j = await r.json(), pi = j?.port_info || {}, ports = (nodeMac && (pi[nodeMac] || pi[nodeMac.toUpperCase()] || pi[nodeMac.toLowerCase()])) || Object.values(pi)[0] || {};
+      let rates = [];
+      for (const [k, v] of Object.entries(ports)) {
+        if (!/^L\d+$/i.test(k) && !/^lan\d+$/i.test(v?.ifname || '')) continue;
+        let rate = +(v?.link_rate || 0);
+        if (rate > 0 && (v?.is_on == null || String(v.is_on) === '1')) rates.push(rate);
+      }
+      S.有线统一PHY = rates.length && rates.every(x => x === rates[0]) ? rates[0] : 0;
+    } catch(e) { console.warn(e); }
+    finally { S.端口请求中 = !1; }
+  }
   async function fAsusTopo() {
     try {
         let r = await fetch(`/update_clients.asp?_=${Date.now()}`);
         if (!r.ok) return;
         let m = (await r.text()).match(/fromNetworkmapd\s*:\s*\[(\{[\s\S]*?\})\]/);
         if (m) {
-            let d = JSON.parse(m[1]);
+            let d = JSON.parse(m[1]), 新字典 = Object.create(null), 要重绘 = !1, parents = [], keys = new Set();
+            for (let k in d) if (k !== 'maclist' && k !== 'ClientAPILevel') keys.add(nM(k));
             for (let k in d) {
                 if (k === 'maclist' || k === 'ClientAPILevel') continue;
-                window.__aD[nM(k)] = { n: d[k].nickName || d[k].name || "未知设备", ip: d[k].ip || "", wl: d[k].isWL, r: d[k].rssi | 0 };
+                let mac = nM(k), rawTx = String(d[k].curTx ?? '').trim(), rawRx = String(d[k].curRx ?? '').trim(), parent = nM(d[k].amesh_papMac || '');
+                if (parent) parents.push(parent);
+                新字典[mac] = {
+                  n: d[k].nickName || d[k].name || "未知设备", ip: d[k].ip || "", wl: d[k].isWL, r: d[k].rssi | 0,
+                  tx: rawTx === '' ? null : (+rawTx || 0), rx: rawRx === '' ? null : (+rawRx || 0)
+                };
+                if (!window.__aD[mac] || window.__aD[mac].wl != 新字典[mac].wl) 要重绘 = !0;
             }
+            window.__aD = 新字典;
+            let root = parents.find(x => !keys.has(x)) || parents[0] || '';
+            if (root) S.主节点MAC = root;
+            if (要重绘) { window.gegeForceUIRedraw = !0; S.DOM缓存 = null; S.DOM容器 = null; }
+            await fAsusPorts(S.主节点MAC);
         }
     } catch(e) {console.warn(e)}
   }

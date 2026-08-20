@@ -2,7 +2,7 @@
 // @name            新华三路由器增强
 // @name:en         Bro-Stat-H3C
 // @namespace       ucxn
-// @version         5.9.4
+// @version         5.9.5
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Mi-Stat_Max
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -77,7 +77,7 @@ let _saved = null;
     cls: {}, isPinned: !0,
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
     hasW2: !1, is5G_149: !1,
-    无线缓存: Object.create(null), 无线请求中: !1, DOM缓存: null, DOM已重建: !1, 面板状态: null, HA小齿轮: 0, 包数据可用: !1, RSSI频率修正: undefined,
+    无线缓存: Object.create(null), 无线请求中: !1, 端口状态: Object.create(null), 端口请求中: !1, 端口已取: !1, 端口小齿轮: 0, 半双工色轮: 0, DOM缓存: null, DOM已重建: !1, 面板状态: null, HA小齿轮: 0, 包数据可用: !1, RSSI频率修正: undefined,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
   };
@@ -166,7 +166,11 @@ let _saved = null;
   }
   function H3C接口(x) {
     x = (x || '').toUpperCase();
-    return x.includes('WLAN6') ? 'wl1' : x.includes('WLAN') ? 'wl0' : x.includes('LAN') ? 'eth1' : '';
+    if (x.includes('WLAN6')) return 'wl1';
+    if (x.includes('WLAN')) return 'wl0';
+    let m = x.match(/(?:LAN|ETH(?:ERNET)?)[^0-9]*([1-9]\d*)/);
+    if (m) return 'eth' + m[1];
+    return /(?:LAN|ETH(?:ERNET)?)/.test(x) ? 'eth1' : '';
   }
   function 写设备名(d, mac, 名, 覆盖 = 0) {
     名 = 净设备名(名);
@@ -178,8 +182,14 @@ let _saved = null;
   function 短数(n) { return (+(n || 0).toPrecision(3)).toString(); }
   function 计算包比(u, d) { return d > 0 ? u / d : (u > 0 ? Infinity : 0); }
   function 格式化包比(r) { return r === Infinity ? '∞' : (!r || r < 0 ? '0%' : (r < 1e-3 ? `${短数(r * 1e4)}/万` : (r < 10 ? `${短数(r * 100)}%` : `${短数(r)}倍`))); }
-  function 取设备图标(信号, 有线) {
-    if (有线) return `<svg viewBox="0 0 64 64" width="50" height="50" aria-hidden="true"><rect x="16" y="20" width="32" height="24" rx="4" fill="#f3f6fb" stroke="#7b8aa0" stroke-width="3"/><path d="M24 44v7h16v-7M20 51h24" stroke="#7b8aa0" stroke-width="3" stroke-linecap="round"/><path d="M24 28h16M24 35h16" stroke="#0059fa" stroke-width="3" stroke-linecap="round"/></svg>`;
+  function 取网口图标(速率) {
+    let s = +速率 || 0;
+    if (s >= 2500) return `<svg viewBox="0 0 100 100" width="45" height="45"><rect x="15" y="15" width="70" height="65" rx="5" fill="#cfd8dc" stroke="#90a4ae" stroke-width="4"/><path d="M 25,25 L 75,25 L 75,60 L 60,60 L 60,75 L 40,75 L 40,60 L 25,60 Z" fill="#263238"/><g fill="#ffca28"><rect x="30" y="25" width="2.5" height="18"/><rect x="35" y="25" width="2.5" height="18"/><rect x="40" y="25" width="2.5" height="18"/><rect x="45" y="25" width="2.5" height="18"/><rect x="52.5" y="25" width="2.5" height="18"/><rect x="57.5" y="25" width="2.5" height="18"/><rect x="62.5" y="25" width="2.5" height="18"/><rect x="67.5" y="25" width="2.5" height="18"/></g><circle cx="21" cy="73" r="3.5" fill="#4caf50"/><circle cx="79" cy="73" r="3.5" fill="#ffb300"/></svg>`;
+    let c = s >= 1000 ? '#4CAF50' : s >= 100 ? '#5394CC' : s > 0 ? '#E7B05C' : '#7b8aa0';
+    return `<svg viewBox="0 0 100 100" width="45" height="45" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(180 50 50)"><path d="M18 82V36Q18 32 22 32H28V24Q28 20 32 20H38V14Q38 10 42 10H58Q62 10 62 14V20H68Q72 20 72 24V32H78Q82 32 82 36V82Q82 86 78 86H22Q18 86 18 82Z" fill="${c}" fill-opacity=".10" stroke="${c}" stroke-width="4" stroke-linejoin="round"/><g stroke="${c}" stroke-width="3.2" stroke-linecap="round"><path d="M31 54V76"/><path d="M36.5 54V76"/><path d="M42 54V76"/><path d="M47.5 54V76"/><path d="M53 54V76"/><path d="M58.5 54V76"/><path d="M64 54V76"/><path d="M69.5 54V76"/></g></g></svg>`;
+  }
+  function 取设备图标(信号, 有线, 速率 = 0) {
+    if (有线) return 取网口图标(速率);
     let r = 信号 | 0, c = r > -24 ? '#4caf50' : r > -35 ? '#9c27b0' : '#0059fa';
     if (r > -40) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="${c}"/></svg>`;
     if (r > -46) return `<svg viewBox="0 0 100 100" width="45" height="45"><path d="M 50,85 L 10,35 A 65,65 0 0,1 90,35 Z" fill="#e0e0e0"/><path d="M 50,85 L 18,45 A 50,50 0 0,1 82,45 Z" fill="${c}"/></svg>`;
@@ -223,6 +233,26 @@ let _saved = null;
       if (要重绘) { window.gegeForceUIRedraw = !0; S.DOM缓存 = null; }
     } catch(e) { console.warn(e); }
     finally { S.无线请求中 = !1; }
+  }
+
+  async function 刷端口信息(ts = Date.now()) {
+    if (S.端口请求中) return;
+    S.端口请求中 = !0;
+    try {
+      let r = await fetch(`/maintain_basic.asp?basicTab=1&_=${ts}`);
+      if (!r.ok) return;
+      let t = GBK.decode(await r.arrayBuffer()), 新状态 = Object.create(null), re = /cur_port_status\[\d+\]\s*=\s*\[\s*['"]([^'"]+)['"]\s*,\s*['"]([^'"]+)['"]\s*\]/g, m;
+      while ((m = re.exec(t))) {
+        let 接口 = H3C接口(m[1]);
+        if (!/^eth\d+$/i.test(接口)) continue;
+        let 状态 = m[2], sm = 状态.match(/([\d.]+)\s*([GMK])/i), rate = 0;
+        if (sm) { rate = +sm[1] || 0; let u = sm[2].toUpperCase(); if (u === 'G') rate *= 1000; else if (u === 'K') rate *= 0.001; }
+        新状态[接口] = { rate, half: /半双工|HALF/i.test(状态) };
+      }
+      if (Object.keys(新状态).length) S.端口状态 = 新状态;
+      S.端口已取 = !0;
+    } catch(e) { console.warn(e); }
+    finally { S.端口请求中 = !1; }
   }
 
 
@@ -533,6 +563,9 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
   };
   function rUI(wU, wD, sU, sD, cI) {
+    S.端口小齿轮 = ((S.端口小齿轮 || 0) + 1) & 3;
+    if (S.端口小齿轮 === 1 || !S.端口已取) 刷端口信息(Date.now());
+    S.半双工色轮 = ((S.半双工色轮 || 0) + 1) & 7;
     let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0, 包上总 = 0, 包下总 = 0;
     for (let k in S.cls) {
       let s = S.cls[k];
@@ -721,7 +754,10 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
         
         const dI = cache.devIntro ??= it.querySelector('.dev-intro');
         const inf = cache.info ??= it.querySelector('.info');
-        (cache.logo ??= it.querySelector('.dev-logo')) && (cache.logo.innerHTML = 取设备图标(cC.信号 | 0, !(cC.信号 | 0)));
+        let 有线 = /^eth\d+$/i.test(cC.iface || ''), 端口 = 有线 ? S.端口状态[cC.iface] : null, 连接速率 = 有线 ? (端口?.rate || 0) : (cC.协商 || 0), 半双工 = !!(有线 && 端口?.half);
+        let 半双工颜色 = ['#ff4c00', '#ff9800', '#f4c20d', '#4caf50', '#00bcd4', '#0059fa', '#9c27b0', '#000'][S.半双工色轮 & 7];
+        let rate标记 = 连接速率 ? `<div style="font-size:10.5px;color:${连接速率===2500?'#000':连接速率===100?'#ff4c00':连接速率===10?'#4caf50':'#999'};font-family:Consolas;margin-top:2px;font-weight:${连接速率===2500||连接速率===100?'bold':'normal'};">rate:${连接速率}${半双工 ? `<span style="color:${半双工颜色};">.H</span>` : ''}</div>` : '';
+        (cache.logo ??= it.querySelector('.dev-logo')) && (cache.logo.innerHTML = 取设备图标(cC.信号 | 0, 有线, 连接速率) + rate标记);
         let rssiNode = cache.rssiNode ??= it.querySelector('.gege-rssi');
         if (rssiNode) {
           if (cC.信号 | 0) { let p = Math.round((cC.信号 | 0) + 92 - (cC.iface === 'wl0' ? (S.RSSI频率修正 ?? 0) : 0)); rssiNode.innerHTML = `<span style="color:${p < 0 ? '#ff4c00' : 'inherit'}">${p}%</span>, ${cC.信号 | 0}`; }

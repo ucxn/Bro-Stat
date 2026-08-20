@@ -2,7 +2,7 @@
 // @name            TP路由器增强
 // @name:en         Bro-Stat-TP
 // @namespace       ucxn
-// @version         5.9.8
+// @version         5.9.8f
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -21,9 +21,6 @@
 // @grant           GM_getValue
 // @storageName     GBNPA_Storage
 // @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享）
-// @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/TP-L1.user.js
-// @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/TP-L1.user.js
-
 // ==/UserScript==
 
 (function () {
@@ -176,6 +173,13 @@ const F_ARR_8 = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/
     return m ? m.toLowerCase().replace(/-/g, ':').replace(/\s/g, '') : '';
   }
 
+  function dN(s) {
+    if (!s) return '';
+    s = String(s);
+    if (!/%[0-9a-fA-F]{2}/.test(s)) return s;
+    try { return decodeURIComponent(s); } catch (_) { return s; }
+  }
+
   const st = document.createElement('style');
   st.innerHTML = `.config-item{
         clear:both;}.config-item-box{display:flex!important;
@@ -246,7 +250,7 @@ async function rSD() {
             iface: i.type === '0' ? 'eth1' : (i.phy_mode === '7' ? 'wl1' : 'wl0'),
             offUp: 0, offDn: 0, 
             onSec: +(i.online_time || 0),
-            name: i.hostname || "未知设备",
+            name: dN(i.hostname) || "未知设备",
             ip: i.ip || ""
           };
           cSU += u; cSD += dn;
