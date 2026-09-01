@@ -2,7 +2,7 @@
 // @name            TP路由器增强
 // @name:en         Bro-Stat-TP
 // @namespace       ucxn
-// @version         5.9.8f
+// @version         5.9.9.lab
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -195,6 +195,32 @@ const F_ARR_8 = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/
   head.
   appendChild(st);
   window.gegeRenderedMacs = new Set();
+  const TP_WAN_REQUEST = { network: { name: ["wan_status", "wan_status_2"] }, method: "get" };
+  const TP_HOST_REQUEST = { hosts_info: { table: "online_host" }, method: "get" };
+  const TP_COMBINED_REQUEST = { network: { name: ["wan_status", "wan_status_2"] }, hosts_info: { table: "online_host" }, method: "get" };
+  async function tpDsPost(apiUrl, body) {
+    const r = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    return r.ok ? r.json() : null;
+  }
+  let readTpStats = async function (apiUrl) {
+    try {
+      const both = await tpDsPost(apiUrl, TP_COMBINED_REQUEST);
+      if (both?.error_code === 0 && both.network?.wan_status && Array.isArray(both.hosts_info?.online_host)) {
+        readTpStats = async url => {
+          const data = await tpDsPost(url, TP_COMBINED_REQUEST);
+          return [data, data];
+        };
+        return [both, both];
+      }
+    } catch (e) { console.warn("[TP] 混合包探测失败，退回双包", e); }
+    readTpStats = async url => {
+      let wan = null, hosts = null;
+      try { wan = await tpDsPost(url, TP_WAN_REQUEST); } catch (e) { console.warn("[TP] WAN口拉取失败", e); }
+      try { hosts = await tpDsPost(url, TP_HOST_REQUEST); } catch (e) { console.warn("[TP] 设备列表拉取失败", e); }
+      return [wan, hosts];
+    };
+    return readTpStats(apiUrl);
+  };
 async function rSD() {
     if (window.__gIsF) return;
     window.__gIsF = !0;
@@ -206,30 +232,23 @@ async function rSD() {
       }
       let apiUrl = `/stok=${stk}/ds`;
       let dW = null, dL = null, wanNow, lanNow;
-      
-      try {
-        const resW = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ network: { name: ["wan_status","wan_status_2"] }, method: "get" }) });
-        if (resW.ok) dW = await resW.json();
-      } catch(e) { console.warn("[TP] WAN口拉取失败", e); }
+      [dW, dL] = await readTpStats(apiUrl);
       wanNow = performance.now();
-      
-      try {
-        const resL = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ hosts_info: { table: "online_host" }, method: "get" }) });
-        if (resL.ok) dL = await resL.json();
-      } catch(e) { console.warn("[TP] 设备列表拉取失败", e); }
       lanNow = performance.now();
       
-      if (!dL || dL.error_code !== 0) { window.__gIsF = !1; return; } // 设备列表是必须的
+      let wanValid = dW?.error_code === 0 && !!dW.network?.wan_status;
+      let lanValid = dL?.error_code === 0 && Array.isArray(dL.hosts_info?.online_host);
+      let cWU = S.wInstUp, cWD = S.wInstDn;
+      if (wanValid) {
+        let curW = dW.network.wan_status;
+        cWU = (+curW.up_speed || 0) * 8000; // TP 的主、副 WAN 都是 KBps，转成 bps 需要 * 8000
+        cWD = (+curW.down_speed || 0) * 8000;
+        记总速率图(cWU, cWD);
+      }
       
-      // WAN口容错：拉不到就用0
-      let curW = (dW && dW.network && dW.network.wan_status) ? dW.network.wan_status : {};
-      let cWU = (+curW.up_speed || 0) * 8000; // TP 的 up_speed 单位是 KBps，转成 bps 需要 * 8000
-      let cWD = (+curW.down_speed || 0) * 8000;
-      记总速率图(cWU, cWD);
-      
-      S.hasW2 = !!(dW?.network?.wan_status_2?.ipaddr && dW.network.wan_status_2.ipaddr !== "0.0.0.0");
-      if (S.hasW2) {
-        let u2 = (+dW.network.wan_status_2.up_speed || 0) * 8, d2 = (+dW.network.wan_status_2.down_speed || 0) * 8;
+      if (wanValid) S.hasW2 = !!(dW.network.wan_status_2?.ipaddr && dW.network.wan_status_2.ipaddr !== "0.0.0.0");
+      if (wanValid && S.hasW2) {
+        let u2 = (+dW.network.wan_status_2.up_speed || 0) * 8000, d2 = (+dW.network.wan_status_2.down_speed || 0) * 8000;
         if (S.w2LT === undefined) S.w2LT = wanNow;
         else if (S.w2U !== u2 || S.w2D !== d2) {
           let dt = wanNow - S.w2LT;
@@ -241,7 +260,7 @@ async function rSD() {
       }
 
       let cSU = 0, cSD = 0, cI = Object.create(null);
-      (dL.hosts_info?.online_host || []).forEach(obj => {
+      (lanValid ? dL.hosts_info.online_host : []).forEach(obj => {
         let i = obj[Object.keys(obj)[0]]; 
         if (i && i.mac) {
           let m = nM(i.mac), u = (+i.up_speed || 0) * 8, dn = (+i.down_speed || 0) * 8;
@@ -257,7 +276,12 @@ async function rSD() {
         }
       });
 
-      let ol = document.getElementById('gege-global-overlay'), cM = Object.keys(cI), iD = window.gegeForceUIRedraw || (cM.length !== window.gegeRenderedMacs.size);
+      if (lanValid) S.lastCI = cI;
+      else {
+        cI = S.lastCI || Object.create(null);
+        for (const d of Object.values(cI)) { cSU += d.upRate || 0; cSD += d.dnRate || 0; }
+      }
+      let ol = document.getElementById('gege-global-overlay'), cM = Object.keys(cI), iD = lanValid && (window.gegeForceUIRedraw || (cM.length !== window.gegeRenderedMacs.size));
       if (!iD && cM.length > 0) { for (let i = 0; i < cM.length; i++) { if (!window.gegeRenderedMacs.has(cM[i])) { iD = !0; break; } } }
       if (iD) {
         for (let m in S.cls) if (!cI[m]) {
@@ -271,10 +295,10 @@ async function rSD() {
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
       }
       let gDt = (S.lt !== 0) ? (lanNow - S.lt) * 0.001 : 0;
-      if (S.wLT === undefined) {
+      if (wanValid && S.wLT === undefined) {
         S.wLT = wanNow;
       }
-      else if (cWU !== S.wInstUp || cWD !== S.wInstDn) {
+      else if (wanValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
         let wDt = wanNow - S.wLT;
         if (S.wInstUp > 0) { S.wTotUp += (S.wInstUp + cWU) * wDt * 0.0005; }
         else if (cWU > 0) { let wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
@@ -290,7 +314,7 @@ async function rSD() {
             upR: cC.upRate, dnR: cC.dnRate, lUT: lanNow, aR: 0,
             intUp: _saved?.devices?.[m]?.integral_up || 0,
             intDn: _saved?.devices?.[m]?.integral_down || 0,
-            onS: cC.onSec, lOS: cC.onSec, hU: new Float64Array(128), hD: new Float64Array(128), hIdx: 0, ifc: cC.iface
+            onS: cC.onSec, lOS: cC.onSec, name: _saved?.devices?.[m]?.name || cC.name || m, hU: new Float64Array(128), hD: new Float64Array(128), hIdx: 0, ifc: cC.iface
           };
         } else {
           let dU = cC.offUp - cS.lU, dD = cC.offDn - cS.lD;
@@ -333,6 +357,7 @@ async function rSD() {
           if (cS.lOS !== cC.onSec) { cS.onS = cC.onSec; cS.lOS = cC.onSec; }
           else { cS.onS = (cS.onS || cC.onSec || 0) + gDt; }
         }
+        if (cC.name && cC.name !== '未知设备') cS.name = cC.name;
         cS.lU = cC.offUp;
         cS.lD = cC.offDn;
       }
@@ -350,8 +375,7 @@ async function rSD() {
         }
       }
       S.lt = lanNow;
-      S.wInstUp = cWU;
-      S.wInstDn = cWD;
+      if (wanValid) { S.wInstUp = cWU; S.wInstDn = cWD; }
       rUI(cWU, cWD, cSU, cSD, cI);
     }
     catch (e) {
@@ -519,8 +543,8 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
           down: s.intDn || 0,
           integral_up: s.intUp || 0,
           integral_down: s.intDn || 0,
-          status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
-          name: cC?.name || k,
+          status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off",
+          name: cC?.name || s.name || k,
           ip: cC?.ip || "",
           raw_up: cC?.offUp || 0,
           raw_down: cC?.offDn || 0
@@ -852,37 +876,8 @@ if (!window.gegeBActivated) {
   };
 
   window.gegeBActivated = !1;
-  window.gegeEngineRunning = !1;
-  window.gegeLastDevCount = -1;
-  window.gegeLastMeshDevCount = -1;
   window.gegeHiddenDevices = {};
-  window.gegeTimerStarted = !1;
-  window.gegeSyncAnchor = 0;
-  window.gegeTickCount = 0;
   window.gegeMasterTimer = null;
-  
-  window.startGegePrecisionEngine = function () {
-    if (window.gegeTimerStarted || window.gegeBActivated) return;
-    window.gegeTimerStarted = !0;
-    window.gegeSyncAnchor = performance.now();
-    window.gegeTickCount = 0;
-    window.scheduleNextGegeTick();
-  };
-  window.scheduleNextGegeTick = function () {
-    if (window.gegeBActivated) return;
-    window.gegeTickCount++;
-    let dl = (window.gegeSyncAnchor + window.gegeTickCount * 3000) - performance.now();
-    if (dl < 0) {
-      window.gegeSyncAnchor = performance.now();
-      window.gegeTickCount = 0;
-      dl = 3000;
-    }
-    window.gegeMasterTimer = setTimeout(() => {
-      rSD().finally(() => {
-        window.scheduleNextGegeTick();
-      });
-    }, dl);
-  };
   const tKA = () => {
     let i = document.createElement('iframe');
     i.id = 'gege-keepalive-iframe';

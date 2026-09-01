@@ -250,7 +250,7 @@ let _saved = null;
         新状态[接口] = { rate, half: /半双工|HALF/i.test(状态) };
       }
       if (Object.keys(新状态).length) S.端口状态 = 新状态;
-      S.端口已取 = !0;
+      S.端口已取 = Object.keys(新状态).length > 0;
     } catch(e) { console.warn(e); }
     finally { S.端口请求中 = !1; }
   }
@@ -349,31 +349,32 @@ const ts = Date.now();
 
       let wB_m = tW.match(/wan_bytes\[0\]\s*=\s*\[(\d+),\s*(\d+)\]/);
       let wM_m = tW.match(/wan_ms\[0\]\s*=\s*\[(\d+),\s*(\d+)\]/);
-      let wB = wB_m ? [wB_m[1], wB_m[2]] : [0, 0];
-      let wM = wM_m ? [wM_m[1], wM_m[2]] : [0, 0];
-      
-      let cWU = (+wM[0] || 0) * 8;
-      let cWD = (+wM[1] || 0) * 8;
-      记总速率图(cWU, cWD);
-      
-      S.oWU = (+wB[0] || 0) * 8; S.oWD = (+wB[1] || 0) * 8; 
-      if (S.bWU === undefined) { S.bWU = S.oWU; S.wTotUp_Base = S.wTotUp; }
-      if (S.bWD === undefined) { S.bWD = S.oWD; S.wTotDn_Base = S.wTotDn; }
-      if (S.oWU < S.lRU) { S.bWU = S.lRU = S.oWU; S.wTotUp_Base = S.wTotUp; }
-      if (S.oWD < S.lRD) { S.bWD = S.lRD = S.oWD; S.wTotDn_Base = S.wTotDn; }
-      S.lRU = S.oWU; S.lRD = S.oWD;
-      
-      S.dTU = Math.max(0, S.oWU - S.bWU);
-      S.dTD = Math.max(0, S.oWD - S.bWD);
-      S.wTotUp = S.dTU + S.wTotUp_Base;
-      S.wTotDn = S.dTD + S.wTotDn_Base;
+      let hasWanBytes = !!wB_m, hasWanRate = !!wM_m;
+      let cWU = S.wInstUp, cWD = S.wInstDn;
+      if (hasWanRate) {
+        cWU = (+wM_m[1] || 0) * 8;
+        cWD = (+wM_m[2] || 0) * 8;
+        记总速率图(cWU, cWD);
+      }
+
+      // 官方累计与高精积分响应无效处理
+      if (hasWanBytes) {
+        S.oWU = (+wB_m[1] || 0) * 8; S.oWD = (+wB_m[2] || 0) * 8;
+        if (S.bWU === undefined) S.bWU = S.oWU;
+        if (S.bWD === undefined) S.bWD = S.oWD;
+        if (S.oWU < S.lRU) S.bWU = S.lRU = S.oWU;
+        if (S.oWD < S.lRD) S.bWD = S.lRD = S.oWD;
+        S.lRU = S.oWU; S.lRD = S.oWD;
+        S.dTU = Math.max(0, S.oWU - S.bWU);
+        S.dTD = Math.max(0, S.oWD - S.bWD);
+      }
 
       S.hasW2 = !1; 
 
       let cSU = 0, cSD = 0, cI = Object.create(null);
       
 // 1. 轻量级快车道：每次必跑，提取 ARP 映射，并生成当前全网 MAC 哈希
-      let aL_m = tL.match(/var\s+arp_list\s*=\s*new\s+Array\(([\s\S]*?)\);/);
+      let aL_m = tL.match(/var\s+arp_list\s*=\s*new\s+Array\(([\s\S]*?)\);/), lanValid = !!aL_m;
       let arp = {}, curMacs = [];
       if (aL_m) {
           aL_m[1].split(',').forEach(s => {
@@ -446,7 +447,9 @@ const ts = Date.now();
           }
       }
 
-      let ol = document.getElementById('gege-global-overlay'), cM = Object.keys(cI), iD = window.gegeForceUIRedraw || (cM.length !== window.gegeRenderedMacs.size);
+      if (lanValid) S.lastCI = cI;
+      else cI = S.lastCI || Object.create(null);
+      let ol = document.getElementById('gege-global-overlay'), cM = Object.keys(cI), iD = lanValid && (window.gegeForceUIRedraw || (cM.length !== window.gegeRenderedMacs.size));
       if (!iD && cM.length > 0) { for (let i = 0; i < cM.length; i++) { if (!window.gegeRenderedMacs.has(cM[i])) { iD = !0; break; } } }
       if (iD) for (let m in S.cls) if (!cI[m]) {
         let cS = S.cls[m], ms = Math.min(lanNow - cS.lUT, CONFIG.lanRefreshInterval * 1000);
@@ -460,10 +463,10 @@ const ts = Date.now();
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
       }
       let gDt = (S.lt !== 0) ? (lanNow - S.lt) * 0.001 : 0;
-      if (S.wLT === undefined) {
+      if (hasWanRate && S.wLT === undefined) {
         S.wLT = wanNow;
       }
-      else if (cWU !== S.wInstUp || cWD !== S.wInstDn) {
+      else if (hasWanRate && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
         let wDt = wanNow - S.wLT;
         if (S.wInstUp > 0) { S.wTotUp += (S.wInstUp + cWU) * wDt * 0.0005; }
         else if (cWU > 0) { let wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
@@ -479,11 +482,12 @@ const ts = Date.now();
           intUp: _saved?.devices?.[m]?.integral_up || 0,
           intDn: _saved?.devices?.[m]?.integral_down || 0,
           包上总: _saved?.devices?.[m]?.packet_up || 0, 包下总: _saved?.devices?.[m]?.packet_down || 0, 上次包上: cC.包上, 上次包下: cC.包下,
-          onS: cC.onSec, lOS: cC.onSec, hU: new Float64Array(32), hD: new Float64Array(32), hIdx: 0
+          onS: cC.onSec, lOS: cC.onSec, name: _saved?.devices?.[m]?.name || cC.name || m, hU: new Float64Array(32), hD: new Float64Array(32), hIdx: 0
         };
         let cS = S.cls[m],
           dU = cC.offUp - cS.lU,
           dD = cC.offDn - cS.lD;
+        if (cC.name && cC.name !== '未知设备') cS.name = cC.name;
         if (dU < 0 || dD < 0) {
           if (dU < 0) {
             cS.uB += dU;
@@ -538,8 +542,7 @@ const ts = Date.now();
         cS.hD[cS.hIdx] = cC.dnRate;
       }
       S.lt = lanNow;
-      S.wInstUp = cWU;
-      S.wInstDn = cWD;
+      if (hasWanRate) { S.wInstUp = cWU; S.wInstDn = cWD; }
       rUI(cWU, cWD, cSU, cSD, cI);
     }
     catch (e) {
@@ -563,7 +566,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
   };
   function rUI(wU, wD, sU, sD, cI) {
-    S.端口小齿轮 = ((S.端口小齿轮 || 0) + 1) & 3;
+    S.端口小齿轮 = ((S.端口小齿轮 || 0) + 1) & 63;
     if (S.端口小齿轮 === 1 || !S.端口已取) 刷端口信息(Date.now());
     S.半双工色轮 = ((S.半双工色轮 || 0) + 1) & 7;
     let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0, 包上总 = 0, 包下总 = 0;
@@ -588,7 +591,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
     if (typeof GM_setValue !== 'undefined' && !((S.HA小齿轮 = ((S.HA小齿轮 || 0) + 1) & 1023))) {
       try {
         let cln = {};
-        for (let k in S.cls) { let s = S.cls[k], cC = cI[k]; cln[k] = { up: s.intUp || 0, down: s.intDn || 0, integral_up: s.intUp || 0, integral_down: s.intDn || 0, packet_up: s.包上总 || 0, packet_down: s.包下总 || 0, status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"), name: cC?.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 }; }
+        for (let k in S.cls) { let s = S.cls[k], cC = cI[k]; cln[k] = { up: s.intUp || 0, down: s.intDn || 0, integral_up: s.intUp || 0, integral_down: s.intDn || 0, packet_up: s.包上总 || 0, packet_down: s.包下总 || 0, status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off", name: cC?.name || s.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 }; }
         GM_setValue('ha_snapshot', {
           timestamp: Date.now(),
           global: {
@@ -605,11 +608,11 @@ const calcStageRatio = (W, L_int, L_hp) => {
         });
       } catch(e) {console.warn(e);}
     }
-     S.rTick = ((S.rTick || 0) + 1) & 15;
+     S.rTick = ((S.rTick || 0) + 1) & 7;
     if (S.rTick === 1 || !S.cRT) {
         刷无线信息(Date.now());
-        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 4); S.lwTU = S.wTotUp;
-        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 4); S.lwTD = S.wTotDn;
+        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 3); S.lwTU = S.wTotUp;
+        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 3); S.lwTD = S.wTotDn;
         if (S.hasW2) {
             let rU = S.w2TotUp > 0 ? (S.wTotUp / S.w2TotUp) : (S.wTotUp > 0 ? Infinity : 0), rD = S.w2TotDn > 0 ? (S.wTotDn / S.w2TotDn) : (S.wTotDn > 0 ? Infinity : 0);
             let fR = (r) => r === Infinity ? '∞' : (r > 1 ? r.toFixed(2) + 'x' : (r * 100).toPrecision(3) + '%');
@@ -697,8 +700,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
         let aW2U = S.hasW2 ? S.w2U : undefined, aW2D = S.hasW2 ? S.w2D : undefined, aW2TU = S.hasW2 ? S.w2TotUp : undefined, aW2TD = S.hasW2 ? S.w2TotDn : undefined;
         if (!S.runT) S.runT = performance.now();
         let dtR = (performance.now() - S.runT) / 1000;
-        let aWU = dtR > 0 ? (S.dTU * 8 / dtR) : 0;
-        let aWD = dtR > 0 ? (S.dTD * 8 / dtR) : 0;
+        let aWU = dtR > 0 ? (S.dTU / dtR) : 0;
+        let aWD = dtR > 0 ? (S.dTD / dtR) : 0;
 
         setText('#gb-wan-up-bytes', `🔼 ${fBy(wU + (aW2U||0))}`);
         setText('#gb-wan-down-bytes', `🔽 ${fBy(wD + (aW2D||0))}`);
@@ -948,37 +951,8 @@ window.gegeTogglePanel = function (fS = null) {
   };
 
   window.gegeBActivated = !1;
-  window.gegeEngineRunning = !1;
-  window.gegeLastDevCount = -1;
-  window.gegeLastMeshDevCount = -1;
   window.gegeHiddenDevices = {};
-  window.gegeTimerStarted = !1;
-  window.gegeSyncAnchor = 0;
-  window.gegeTickCount = 0;
   window.gegeMasterTimer = null;
-  
-  window.startGegePrecisionEngine = function () {
-    if (window.gegeTimerStarted || window.gegeBActivated) return;
-    window.gegeTimerStarted = !0;
-    window.gegeSyncAnchor = performance.now();
-    window.gegeTickCount = 0;
-    window.scheduleNextGegeTick();
-  };
-  window.scheduleNextGegeTick = function () {
-    if (window.gegeBActivated) return;
-    window.gegeTickCount++;
-    let dl = (window.gegeSyncAnchor + window.gegeTickCount * 3000) - performance.now();
-    if (dl < 0) {
-      window.gegeSyncAnchor = performance.now();
-      window.gegeTickCount = 0;
-      dl = 3000;
-    }
-    window.gegeMasterTimer = setTimeout(() => {
-      rSD().finally(() => {
-        window.scheduleNextGegeTick();
-      });
-    }, dl);
-  };
   const tKA = () => {
     let i = document.createElement('iframe');
     i.id = 'gege-keepalive-iframe';
