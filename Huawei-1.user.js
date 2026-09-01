@@ -2,7 +2,7 @@
 // @name            华为路由器增强 HUAWEI-Stat_Max
 // @name:en         Bro-Stat_HUAWEI
 // @namespace       ucxn
-// @version         5.9.9.T
+// @version         5.9.9.U
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -69,7 +69,7 @@
     wTotDn: 0,
     cls: {}, isPinned: !0,
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
-    hasW2: !1, is5G_149: null, fI: 0, RSSI频率修正: undefined,
+    hasW2: !1, is5G_149: null, 信道24: undefined, 信道5: undefined, fI: 0, RSSI频率修正: undefined,
     _domRebuilt: !1, _lastPanelState: null, oDC: null, Warn_MS: 0, Force_MS: 0, _RST: !1,
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
@@ -86,7 +86,7 @@ async function gWT() {
       let r = await fetch('/api/ntwk/wan?type=active&_=' + Date.now());
       if (r.ok) return await r.text();
     } catch(e) {console.warn(e)}
-    return "";
+    return null;
   }
   const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
   function escapeHTML(str) {
@@ -170,15 +170,28 @@ function fBy(bps) {
       } else {
         wT = await gWT(); wanNow = performance.now();
       }
-      lanNow = lST ?? lCxtT ?? wanNow;
+      lanNow = lST ?? wanNow;
       window.__gLWT = wT; window.__gLWT_t = wanNow; // 保障解耦模式全局缓存不丢失
       
-      const wI = wT ? (JSON.parse(wT) || {}) : {};
-      S.hasW2 = !1; 
-      let cWU = (+wI.UpBandwidth || 0) * 8000, cWD = (+wI.DownBandwidth || 0) * 8000, cI = Object.create(null);
-      记总速率图(cWU, cWD);
+      let wI = null, wanValid = !1;
+      try {
+        wI = wT ? JSON.parse(wT) : null;
+        wanValid = !!wI && Object.prototype.hasOwnProperty.call(wI, 'UpBandwidth') && Object.prototype.hasOwnProperty.call(wI, 'DownBandwidth');
+      } catch (e) { console.warn('[Huawei] WAN 响应无效，保持上次真值', e); }
+      let cWU = S.wInstUp, cWD = S.wInstDn, cI = Object.create(null);
+      if (wanValid) {
+        S.hasW2 = !1;
+        cWU = (+wI.UpBandwidth || 0) * 8000;
+        cWD = (+wI.DownBandwidth || 0) * 8000;
+        记总速率图(cWU, cWD);
+      }
       let cSU = 0, cSD = 0;
-      (lCxt ? (JSON.parse(lCxt) || []) : []).forEach(d => {
+      let hostList = null, lanValid = lST !== null;
+      if (lanValid) {
+        try { hostList = JSON.parse(lCxt); lanValid = Array.isArray(hostList); }
+        catch (e) { lanValid = !1; console.warn('[Huawei] HostInfo 响应无效，保持上次真值', e); }
+      }
+      (lanValid ? hostList : []).forEach(d => {
         if (d.MACAddress) {
           if (!d.Active) return; // 华为特性：防死设备
           let m = nM(d.MACAddress),
@@ -198,10 +211,15 @@ function fBy(bps) {
           cSU += u; cSD += dn;
         }
       });
+      if (lanValid) S.lastCI = cI;
+      else {
+        cI = S.lastCI || Object.create(null);
+        for (const d of Object.values(cI)) { cSU += d.upRate || 0; cSD += d.dnRate || 0; }
+      }
       let ol = document.getElementById('gege-global-overlay'),
         cM = Object.keys(
           cI),
-        iD = window.gegeForceUIRedraw || (cM.length !== window.gegeRenderedMacs.size);
+        iD = lanValid && (window.gegeForceUIRedraw || (cM.length !== window.gegeRenderedMacs.size));
       if (!iD && cM.length > 0) {
         for (let i = 0; i <
           cM.length; i++) {
@@ -226,10 +244,10 @@ function fBy(bps) {
           cM);
         window.gegeForceUIRedraw = !1;
       }
-      if (S.wLT === undefined) {
+      if (wanValid && S.wLT === undefined) {
         S.wLT = wanNow;
       }
-      else if (cWU !== S.wInstUp || cWD !== S.wInstDn) {
+      else if (wanValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
         let wDt = wanNow - S.wLT;
         if (S.wInstUp > 0) { S.wTotUp += (S.wInstUp + cWU) * wDt * 0.0005; }
         else if (cWU > 0) { let wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
@@ -245,7 +263,7 @@ function fBy(bps) {
           intUp: spD ? (spD.integral_up || 0) : 0, intDn: spD ? (spD.integral_down || 0) : 0,
           uB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offUp - (spD.up || 0) : cC.offUp), 
           dB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offDn - (spD.down || 0) : cC.offDn),
-          oU: cC.offUp, oD: cC.offDn, hU: new Float64Array(32), hD: new Float64Array(32), hIdx: 0, ifc: cC.iface
+          oU: cC.offUp, oD: cC.offDn, name: spD?.name || cC.name || m, hU: new Float64Array(32), hD: new Float64Array(32), hIdx: 0, ifc: cC.iface
         };
         let cS = S.cls[m],
           dU = cC.offUp - cS.lU,
@@ -299,11 +317,11 @@ function fBy(bps) {
             cS.lUT = lanNow;
           }
         }
+        if (cC.name && cC.name !== '未知设备') cS.name = cC.name;
         cS.lU = cC.offUp;
         cS.lD = cC.offDn;
       }
-      S.wInstUp = cWU;
-      S.wInstDn = cWD;
+      if (wanValid) { S.wInstUp = cWU; S.wInstDn = cWD; }
       rUI(cWU, cWD, cSU, cSD, cI);
     }
     catch (e) {
@@ -505,8 +523,8 @@ const calcStageRatio = (W, L_int, L_hp) => {
           up: Math.max(0, (s.lU || 0) - (s.uB || 0)),
           down: Math.max(0, (s.lD || 0) - (s.dB || 0)),
           integral_up: s.intUp || 0, integral_down: s.intDn || 0,
-          status: s.aR ? "off" : (CONFIG.portMap[cC?.iface] || cC?.iface || "未知接口"),
-          name: cC?.name || k, ip: cC?.ip || "",
+          status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off",
+          name: cC?.name || s.name || k, ip: cC?.ip || "",
           raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0
         };
         return acc;
@@ -948,31 +966,10 @@ if (!window.gegeBActivated) {
       }
     }, !0);
   }
-  window.gegePortTimer = null;
   window.gegeBActivated = !1;
   window.gegeEngineRunning = !1;
-  window.gegeLastDevCount = -1;
-  window.gegeLastMeshDevCount = -1;
   window.gegeHiddenDevices = {};
-  window.gegeTimerStarted = !1;
-  window.gegeSyncAnchor = 0;
-  window.gegeTickCount = 0;
   window.gegeMasterTimer = null;
-  window.scheduleNextGegeTick = function () {
-    if (window.gegeBActivated) return;
-    window.gegeTickCount++;
-    let dl = (window.gegeSyncAnchor + window.gegeTickCount * 3000) - performance.now();
-    if (dl < 0) {
-      window.gegeSyncAnchor = performance.now();
-      window.gegeTickCount = 0;
-      dl = 3000;
-    }
-    window.gegeMasterTimer = setTimeout(() => {
-      rSD().finally(() => {
-        window.scheduleNextGegeTick();
-      });
-    }, dl);
-  };
 async function eBET(fW = !0) {
     if (window.gegeEngineRunning) return;
     window.gegeEngineRunning = !0;
@@ -984,7 +981,12 @@ async function eBET(fW = !0) {
         wST = performance.now();
       }
       let lR = await fetch(`/api/system/HostInfo?_=${ts}`);
-      if (lR.ok) { lCxt = await lR.text(); lCxtT = lST = performance.now(); }
+      if (lR.ok) {
+        const hostText = await lR.text();
+        try {
+          if (Array.isArray(JSON.parse(hostText))) { lCxt = hostText; lCxtT = lST = performance.now(); }
+        } catch (e) { console.warn('[Huawei] HostInfo 响应无效，保持上次真值', e); }
+      }
       if (fW) await rSD(wT, wST, lST);
     }
     catch (e) {
@@ -995,21 +997,25 @@ async function eBET(fW = !0) {
     }
   }
   async function f5G_Probe() {
-    let 信道24 = 6, 信道5 = 60;
+    let 信道24 = S.信道24 ?? 6, 信道5 = S.信道5 ?? 60, 读到24 = !1, 读到5 = !1;
     for (const type of [1, 3]) {
       try {
         const d = await (await fetch(`/api/system/diagnose_wlan_basic?type=${type}&_=${Date.now()}`)).json(), c = +d.Channel;
-        if (c >= 1 && c <= 13) { 信道24 = c; break; }
+        if (c >= 1 && c <= 13) { 信道24 = c; 读到24 = !0; break; }
       } catch {}
     }
     try {
       const d = await (await fetch(`/api/system/diagnose_wlan_basic?type=2&_=${Date.now()}`)).json(), c = +d.Channel;
-      if (c >= 32 && c <= 177) 信道5 = c;
+      if (c >= 32 && c <= 177) { 信道5 = c; 读到5 = !0; }
     } catch {}
-    S.RSSI频率修正 = 20 * Math.log10((5000 + 5 * 信道5) / (2407 + 5 * 信道24));
-    S.is5G_149 = 信道5 > 148;
+    if (读到24) S.信道24 = 信道24;
+    if (读到5) S.信道5 = 信道5;
+    if (读到24 || 读到5 || S.RSSI频率修正 === undefined) {
+      S.RSSI频率修正 = 20 * Math.log10((5000 + 5 * 信道5) / (2407 + 5 * 信道24));
+      S.is5G_149 = 信道5 > 148;
+    }
     let ol = document.getElementById('gege-global-overlay');
-    if (ol && ol.style.display === 'block') { window.gegeForceUIRedraw = !0; eBET(); }
+    if (ol && ol.style.display === 'block') window.gegeForceUIRedraw = !0;
   }
   const tKA = () => {
     let i = document.createElement('iframe');
@@ -1030,9 +1036,6 @@ async function eBET(fW = !0) {
   setTimeout(tKA, 2000);
   setInterval(tKA, 216000);
   window.addEventListener('load', () => {
-    setTimeout(() => {
-      if (!window.gegeTimerStarted && window.startGegePrecisionEngine) window.startGegePrecisionEngine();
-    }, 60000);
     if (CONFIG.injectMode === 3 || (CONFIG.injectMode === 1 && +(window.location.hostname.slice(window.location.hostname.lastIndexOf('.') + 1)) < 6)) {
       if (window.createGegeFloatingBtn) window.createGegeFloatingBtn();
     }
