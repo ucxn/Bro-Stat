@@ -123,7 +123,7 @@ let _saved = null;
             ? ((bps * 0.001 | 0) === bps * 0.001
                 ? `${['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/8]', '[1]'][bps * 0.001]} KB/s`
                 : `${(bps * 0.000125).toFixed(2)} KB/s`)
-            : `${(bps / 8192).toFixed(1)} KB/s`;
+            : `${(bps / 8192).toFixed(1)} KiB/s`;
     }
   function fV(bits) {
         if (bits > 83886080000) return `${(bits / 8589934592).toFixed(4)} GB`;

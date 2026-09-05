@@ -116,7 +116,7 @@ function fBy(bps) {
             ? ((bps * 0.002 | 0) === bps * 0.002 && bps < 8001
                 ? `${F_ARR[bps * 0.002]} KB/s`
                 : `${(bps * 0.000125).toFixed(2)} KB/s`)
-            : `${(bps * 0.0001220703125).toFixed(1)} KB/s`;
+            : `${(bps * 0.0001220703125).toFixed(1)} K/s`;
     }
 
   function fV(bits) {

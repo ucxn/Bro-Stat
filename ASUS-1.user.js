@@ -124,7 +124,7 @@
             ? ((bps * 0.002 | 0) === bps * 0.002 && bps < 8001
                 ? `${F_ARR_16[bps * 0.002]} KB/s`
                 : `${(bps * 0.000125).toFixed(2)} KB/s`)
-            : `${(bps / 8192).toFixed(1)} KB/s`;
+            : `${(bps / 8192).toFixed(1)} KiB/s`;
     }
 
   function fV(bits) {
