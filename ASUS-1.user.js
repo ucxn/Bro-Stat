@@ -2,7 +2,7 @@
 // @name            华硕路由器增强
 // @name:en         Bro-Stat-ASUS
 // @namespace       ucxn
-// @version         5.9.7
+// @version         5.9.8
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -99,6 +99,7 @@
     wInstDn: 0,
     wTotUp: 0,
     wTotDn: 0,
+    wLedgerUp: 0, wLedgerDn: 0, // 官方增量账本；显示层的保护逻辑不回写事实源
     cls: {}, isPinned: !0,
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
     hasW2: !1, is5G_149: !1, oWU:0, Warn_MS: 0, Force_MS: 0, _RST: !1,
@@ -163,7 +164,7 @@
         : `${h}小时${m}分${s}秒`;}
 
   S.calcTime = (L) => {
-    S.Force_MS = (CONFIG.周期类型 === 'M' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth() + (L >= Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), CONFIG.周_天设置) ? 1 : 0), CONFIG.周_天设置) : (CONFIG.周期类型 === 'W' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + ((CONFIG.周_天设置 - new Date(L).getUTCDay() > 0 ? CONFIG.周_天设置 - new Date(L).getUTCDay() : CONFIG.周_天设置 - new Date(L).getUTCDay() + 7) * 86400000) : (CONFIG.周期类型 === 'D' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + CONFIG.周_天设置 * 86400000 : Infinity))) - CONFIG.时区补偿;
+    S.Force_MS = (CONFIG.周期类型 === 'M' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth() + (L >= Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), CONFIG.周_天设置) ? 1 : 0), CONFIG.周_天设置) : (CONFIG.周期类型 === 'W' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + ((CONFIG.周_天设置 - new Date(L).getUTCDay() > 0 ? CONFIG.周_天设置 - new Date(L).getUTCDay() : CONFIG.周_天设置 - new Date(L).getUTCDay() + 7) * 86400000) : (CONFIG.周期类型 === 'D' ? Date.parse(CONFIG.基准日期 + 'T00:00:00Z') + (Math.floor((L - Date.parse(CONFIG.基准日期 + 'T00:00:00Z')) / (CONFIG.周_天设置 * 86400000)) + 1) * CONFIG.周_天设置 * 86400000 : Infinity))) - CONFIG.时区补偿;
     S.Warn_MS = S.Force_MS + CONFIG.报告时间 * 60000;
     S.Force_MS += CONFIG.自动导出 * 60000;
   };S.calcTime((typeof GM_getValue !== 'undefined' && GM_getValue('gege_reset_ms')) ? (GM_getValue('gege_reset_ms') + CONFIG.时区补偿) : Date.now() + CONFIG.时区补偿);
@@ -210,12 +211,32 @@ async function rSD() {
       let rT = JSON.parse(rT_match[1]), aT = JSON.parse(aT_match[1]);
       if (!Array.isArray(rT) || rT.length < 2 || !Array.isArray(aT)) { console.warn('[ASUS] getTraffic 数据结构无效，保持上次真值'); return; }
 
+      // 只在首次有效采样读档；尚未上线的历史设备也进入账本，避免下一次保存覆盖掉它们。
+      if (CONFIG.readSaveData === 2 && !S.snapLoaded) {
+        try {
+          let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null;
+          if (sp && sp.timestamp > (typeof GM_getValue !== 'undefined' ? (GM_getValue('gege_reset_ms', 0) || 0) : 0)) {
+            S.wLedgerUp = sp.global?.wan_up || 0; S.wLedgerDn = sp.global?.wan_down || 0;
+            for (const [m, d] of Object.entries(sp.devices || {})) S.cls[m] = {
+              upR: 0, dnR: 0, lUT: n, lU: undefined, lD: undefined,
+              intUp: d.integral_up || 0, intDn: d.integral_down || 0,
+              uB: -(d.up || 0), dB: -(d.down || 0), oU: 0, oD: 0,
+              aR: !1, dpU: 0, dpD: 0, name: d.name || m, ip: d.ip || '',
+              hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0
+            };
+          }
+        } catch(e) { console.warn(e); }
+        S.snapLoaded = !0;
+      }
+
       S.oWU = (+rT[0] || 0) * 8; S.oWD = (+rT[1] || 0) * 8; 
       S.bWU ??= S.oWU; S.bWD ??= S.oWD;
       S.lRU ??= S.oWU; S.lRD ??= S.oWD;
       S.lTU ??= n; S.lTD ??= n; 
       S.zCU ??= 0; S.zCD ??= 0;
-      S.dWU ??= 0; S.dWD ??= 0; 
+      S.dWU ??= 0; S.dWD ??= 0;
+      // WAN 沿用官方累计差值：直接续接本周期账本，计数器回退时保留已累计的量。
+      S.wTotUp = (S.wLedgerUp += Math.max(0, S.oWU - S.lRU)); S.wTotDn = (S.wLedgerDn += Math.max(0, S.oWD - S.lRD));
       
       if (S.oWU < S.lRU) { S.bWU = S.lRU = S.oWU; S.lTU = n; S.dWU = S.zCU = 0; }
       if (S.oWD < S.lRD) { S.bWD = S.lRD = S.oWD; S.lTD = n; S.dWD = S.zCD = 0; }
@@ -232,7 +253,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
       aT.forEach(i => {
         let m = nM(i[0]), oU = (+i[1] || 0) * 8, oD = (+i[2] || 0) * 8;
         let cS = S.cls[m], u = 0, dn = 0;
-        if (cS) {
+        if (cS && cS.lU !== undefined) {
             let dtS = (n - (cS.lT || cS.lUT)) * 0.001;
             if (dtS > 0) {
                 u = Math.max(0, oU - cS.lU) / dtS;
@@ -275,27 +296,24 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         window.gegeForceUIRedraw = !1;
       }
       let gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
-      if (S.wLT === undefined) { S.wLT = n; }
-      else if (cWU !== S.wInstUp || cWD !== S.wInstDn) {
-        let wDt = n - S.wLT;
-        if (S.wInstUp > 0) { S.wTotUp += (S.wInstUp + cWU) * wDt * 0.0005; }
-        else if (cWU > 0) { let wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
-        if (S.wInstDn > 0) { S.wTotDn += (S.wInstDn + cWD) * wDt * 0.0005; }
-        else if (cWD > 0) { let wED = cWD * 0.5 * CONFIG.wanRefreshInterval; S.wTotDn += wED; S.wZED = (S.wZED || 0) + wED; S.wZEDC = (S.wZEDC || 0) + 1; }
-        S.wLT = n;
-      }
-      if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp && sp.timestamp > (typeof GM_getValue !== 'undefined' ? (GM_getValue('gege_reset_ms', 0) || 0) : 0) ? sp : {}; if(S.snap.global) { S.wTotUp = S.wTotUp === 0 ? S.snap.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? S.snap.global.wan_down || 0 : S.wTotDn; } } catch(e){console.warn(e)} S.snapLoaded = !0; }
+      // 保留原有 0 估算诊断；WAN 总量已经由官方累计增量更新，避免重复积分。
+      if (S.wInstUp === 0 && cWU > 0) { S.wZEU = (S.wZEU || 0) + cWU * 0.5 * CONFIG.wanRefreshInterval; S.wZEUC = (S.wZEUC || 0) + 1; }
+      if (S.wInstDn === 0 && cWD > 0) { S.wZED = (S.wZED || 0) + cWD * 0.5 * CONFIG.wanRefreshInterval; S.wZEDC = (S.wZEDC || 0) + 1; }
       for (const [m, cC] of Object.entries(cI)) {
-        let spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
         S.cls[m] ??= {
           upR: cC.upRate, dnR: cC.dnRate, lUT: n, 
-          intUp: spD ? (spD.integral_up || 0) : 0, intDn: spD ? (spD.integral_down || 0) : 0,
-          uB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offUp - (spD.up || 0) : cC.offUp), 
-          dB: CONFIG.readSaveData === 1 ? 0 : (spD ? cC.offDn - (spD.down || 0) : cC.offDn),
+          intUp: 0, intDn: 0,
+          uB: CONFIG.readSaveData === 1 ? 0 : cC.offUp, 
+          dB: CONFIG.readSaveData === 1 ? 0 : cC.offDn,
           lU: cC.offUp, lD: cC.offDn, aR: !1, dpU: 0, dpD: 0,
-          oU: cC.offUp, oD: cC.offDn, name: spD?.name || cC.name || m, hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0
+          oU: cC.offUp, oD: cC.offDn, name: cC.name || m, ip: cC.ip || '', hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0
         };
-        let cS = S.cls[m], dU = cC.offUp - cS.lU, dD = cC.offDn - cS.lD;
+        let cS = S.cls[m];
+        if (cS.lU === undefined) { // 历史设备首次重现：接上旧账本，首次计数只作新基准。
+          cS.uB += cC.offUp; cS.dB += cC.offDn;
+          cS.oU = cS.lU = cC.offUp; cS.oD = cS.lD = cC.offDn; cS.lUT = n;
+        }
+        let dU = cC.offUp - cS.lU, dD = cC.offDn - cS.lD;
         if (dU < 0 || dD < 0) {
           if (dU < 0) { cS.uB += dU; cS.dpU = cS.lU; }
           if (dD < 0) { cS.dB += dD; cS.dpD = cS.lD; }
@@ -315,6 +333,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
         else if (cC.dnRate > 0) { let eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
         if (cC.name && cC.name !== '华硕设备') cS.name = cC.name;
+        if (cC.ip && cC.ip !== '-.-.-.-') cS.ip = cC.ip;
         cS.upR = cC.upRate; cS.dnR = cC.dnRate; cS.lUT = n;
         cS.lU = cC.offUp; cS.lD = cC.offDn; cS.lT = n;
       }
@@ -326,16 +345,17 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
   }
 
   function buildCSV() {
+    const csvText = v => String(v ?? '').replace(/"/g, '""');
     return ((sp, now, start) => '\uFEFF' + [
       `"哥哥科技 硬路由 NPU 增强系列：专用组件 ${(typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号'} 生成"`,
       `"统计周期：${new Date(start + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} 至 ${new Date(now + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} (UTC${CONFIG.时区补偿 > 0 ? '+' : ''}${CONFIG.时区补偿 / 3600000})${CONFIG.readSaveData === 1 ? ' （含路由器后台读档）' : ''}"`,
       `"--- [全局统计] ---"`,
-      `"WAN总上传(B)","WAN总下载(B)","高精全局上行(B)","高精全局下行(B)","LAN积分总上行(B)","LAN积分总下行(B)","本次在线总上行(B)","本次在线总下行(B)"`,
-      `"${Math.round(sp.global?.wan_up||0)}","${Math.round(sp.global?.wan_down||0)}","${Math.round(sp.global?.lan_high_up||0)}","${Math.round(sp.global?.lan_high_down||0)}","${Math.round(sp.global?.lan_integral_up||0)}","${Math.round(sp.global?.lan_integral_down||0)}","${Math.round(sp.global?.lan_off_up||0)}","${Math.round(sp.global?.lan_off_down||0)}"`,
+      `"WAN总上传(b)","WAN总下载(b)","高精全局上行(b)","高精全局下行(b)","LAN积分总上行(b)","LAN积分总下行(b)","本次在线总上行(b)","本次在线总下行(b)"`,
+      `"${Math.round((sp.global?.wan_up||0) * 0.125)}","${Math.round((sp.global?.wan_down||0) * 0.125)}","${Math.round((sp.global?.lan_high_up||0) * 0.125)}","${Math.round((sp.global?.lan_high_down||0) * 0.125)}","${Math.round((sp.global?.lan_integral_up||0) * 0.125)}","${Math.round((sp.global?.lan_integral_down||0) * 0.125)}","${Math.round((sp.global?.lan_off_up||0) * 0.125)}","${Math.round((sp.global?.lan_off_down||0) * 0.125)}"`,
       ``,
       `"--- [设备明细] ---"`,
-      `"设备名称","MAC地址","IP地址","状态/接口","高精上行","高精下行","积分上行","积分下行","官方上行","官方下行"`,
-      ...Object.entries(sp.devices || {}).map(d => `"${d[1].name}","${d[0]}","${d[1].ip}","${d[1].status}","${Math.round(d[1].up||0)}","${Math.round(d[1].down||0)}","${Math.round(d[1].integral_up||0)}","${Math.round(d[1].integral_down||0)}","${Math.round(d[1].raw_up||0)}","${Math.round(d[1].raw_down||0)}"`),
+      `"设备名称","MAC地址","IP地址","状态/接口","高精上行(b)","高精下行(b)","积分上行(b)","积分下行(b)","官方上行(b)","官方下行(bit)"`,
+      ...Object.entries(sp.devices || {}).map(d => `"${csvText(d[1].name)}","${csvText(d[0])}","${csvText(d[1].ip)}","${csvText(d[1].status)}","${Math.round((d[1].up||0) * 0.125)}","${Math.round((d[1].down||0) * 0.125)}","${Math.round((d[1].integral_up||0) * 0.125)}","${Math.round((d[1].integral_down||0) * 0.125)}","${Math.round((d[1].raw_up||0) * 0.125)}","${Math.round((d[1].raw_down||0) * 0.125)}"`),
       ``,
       `"Bro-Stat@哥哥科技 https://space.bilibili.com/501430041"`,
       `"项目主页: https://github.com/ucxn/Bro-Stat"`,
@@ -344,7 +364,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
     ].join('\r\n'))(
       S.cSnap || {}, 
       S.cSnap?.timestamp || Date.now(), 
-      (CONFIG.readSaveData === 2 && typeof GM_getValue !== 'undefined' ? GM_getValue('gege_reset_ms', null) : null) || performance.timeOrigin || Date.now()
+      (typeof GM_getValue !== 'undefined' ? GM_getValue('gege_reset_ms', null) : null) || performance.timeOrigin || Date.now()
     );
   }
 function doSettle(nowMs) {
@@ -353,11 +373,20 @@ function doSettle(nowMs) {
     let u = URL.createObjectURL(b), a = document.createElement('a');
     a.href = u; a.download = `哥哥科技_路由器统计数据导出_${new Date(nowMs + CONFIG.时区补偿).toISOString().slice(2, 19).replace(/[-:]/g, '').replace('T', '_')}_${nowMs}.csv`; a.click(); // 文件
     let w = window.open('about:blank', '_blank');
-    if (w) w.document.write(`<!DOCTYPE html><html><head><title>流量结算备份</title></head><body style="background:#f3f4f5;font-family:system-ui,sans-serif;padding:40px 20px;color:#333;"><div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.05);max-width:850px;margin:0 auto;"><h2 style="color:#0059fa;margin-top:0;border-bottom:2px solid #f0f0f0;padding-bottom:15px;">本次数据结算周期已结束</h2><p style="font-size:14px;line-height:1.7;color:#555;"><b>哥哥科技提示您：</b>请点击下方下载按钮将 CSV 报表保存到本地。<br>若下载失败，请点击复制按钮，新建文本文档粘贴后将拓展名改为 .csv 即可。</p><button id="dl-btn" style="background:#0059fa;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;margin-right:10px;">📥 再次下载 CSV</button><button id="cp-btn" style="background:#4caf50;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 一键复制内容</button><div style="background:#282c34;color:#abb2bf;padding:15px;border-radius:8px;overflow-x:auto;margin-top:20px;"><pre id="csv-data" style="margin:0;font-size:13px;line-height:1.5;">${csv}</pre></div></div><script>document.getElementById('dl-btn').onclick=function(){let b=new Blob([document.getElementById('csv-data').textContent],{type:'text/csv;charset=utf-8;'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='哥哥科技_路由器统计数据补下_${nowMs}.csv';a.click();};document.getElementById('cp-btn').onclick=function(){let t=document.createElement('textarea');t.value=document.getElementById('csv-data').textContent;document.body.appendChild(t);t.select();try{document.execCommand('copy');alert('复制成功！');}catch(e){alert('复制失败，请手动全选复制');}document.body.removeChild(t);};</script></body></html>`);
+    if (w) w.document.write(`<!DOCTYPE html><html><head><title>流量结算备份</title></head><body style="background:#f3f4f5;font-family:system-ui,sans-serif;padding:40px 20px;color:#333;"><div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.05);max-width:850px;margin:0 auto;"><h2 style="color:#0059fa;margin-top:0;border-bottom:2px solid #f0f0f0;padding-bottom:15px;">本次数据结算周期已结束</h2><p style="font-size:14px;line-height:1.7;color:#555;"><b>哥哥科技提示您：</b>请点击下方下载按钮将 CSV 报表保存到本地。<br>若下载失败，请点击复制按钮，新建文本文档粘贴后将拓展名改为 .csv 即可。</p><button id="dl-btn" style="background:#0059fa;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;margin-right:10px;">📥 再次下载 CSV</button><button id="cp-btn" style="background:#4caf50;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-weight:bold;cursor:pointer;">📋 一键复制内容</button><div style="background:#282c34;color:#abb2bf;padding:15px;border-radius:8px;overflow-x:auto;margin-top:20px;"><pre id="csv-data" style="margin:0;font-size:13px;line-height:1.5;">${escapeHTML(csv)}</pre></div></div><script>document.getElementById('dl-btn').onclick=function(){let b=new Blob([document.getElementById('csv-data').textContent],{type:'text/csv;charset=utf-8;'});let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='哥哥科技_路由器统计数据补下_${nowMs}.csv';a.click();};document.getElementById('cp-btn').onclick=function(){let t=document.createElement('textarea');t.value=document.getElementById('csv-data').textContent;document.body.appendChild(t);t.select();try{document.execCommand('copy');alert('复制成功！');}catch(e){alert('复制失败，请手动全选复制');}document.body.removeChild(t);};</script></body></html>`);
     GM_setValue('gege_reset_ms', nowMs);
-    GM_setValue('ha_snapshot', { timestamp: nowMs, global: {}, devices: {} }); S.snap = {}; S.cSnap = null;
-    S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn = 0; // 内存原地清零
-    for (let k in S.cls) { let s = S.cls[k]; s.intUp = s.intDn = 0; s.uB = s.oU = s.lU; s.dB = s.oD = s.lD; s.hU.fill(0); s.hD.fill(0); } // 内存原地清零底表
+    GM_setValue('ha_snapshot', { timestamp: nowMs, global: {}, devices: {} }); S.cSnap = null;
+    S.wLedgerUp = S.wLedgerDn = S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn = 0;
+    S.bWU = S.oWU; S.bWD = S.oWD; S.dTU = S.dTD = 0;
+    S.lwTU = S.lwTD = S.aWu = S.aWd = 0;
+    S.wZEU = S.wZED = S.wZEUC = S.wZEDC = 0;
+    // 结算以已完成采样为截点；下一份响应继续从同一真实采样时刻积分。
+    const settledAt = S.lt || performance.now();
+    for (let k in S.cls) {
+      let s = S.cls[k]; s.intUp = s.intDn = 0;
+      s.uB = s.oU = s.lU ?? 0; s.dB = s.oD = s.lD ?? 0; s.lUT = settledAt;
+      s.zEU = s.zED = s.zUC = s.zDC = 0; s.hU.fill(0); s.hD.fill(0);
+    }
     document.getElementById('gb-w-bnr')?.remove(); // 预警横幅
     S.calcTime(Math.max(nowMs, S.Force_MS - CONFIG.自动导出 * 60000 + 1000) + CONFIG.时区补偿); // 瞬间算出下月/下周新线
     window.gegeForceUIRedraw = !0; // 重绘 UI
@@ -511,7 +540,7 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
       global: { wan_up: S.wTotUp, wan_down: S.wTotDn, lan_integral_up: LUp, lan_integral_down: LDn, lan_high_up: hpU, lan_high_down: hpD, lan_off_up: abU, lan_off_down: abD },
       devices: Object.keys(S.cls).reduce((acc, k) => {
         let s = S.cls[k], cC = cI[k];
-        acc[k] = { up: Math.max(0, (s.lU || 0) - (s.uB || 0)), down: Math.max(0, (s.lD || 0) - (s.dB || 0)), integral_up: s.intUp || 0, integral_down: s.intDn || 0, status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off", name: cC?.name || s.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 };
+        acc[k] = { up: Math.max(0, (s.lU || 0) - (s.uB || 0)), down: Math.max(0, (s.lD || 0) - (s.dB || 0)), integral_up: s.intUp || 0, integral_down: s.intDn || 0, status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off", name: cC?.name && cC.name !== "华硕设备" ? cC.name : (s.name || k), ip: cC?.ip && cC.ip !== "-.-.-.-" ? cC.ip : (s.ip || ""), raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 };
         return acc;
       }, {})
     };
@@ -548,8 +577,10 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
                     if (stm.charCodeAt(i) === mx[0] && stm.charCodeAt(i+3) === mx[3]) { S._qosAdj = 0; break; }}}}}
     wU = Math.max(wU * mird_qos_delay, state_fault * 9563013);
     wD = Math.max(wD * mird_qos_delay, state_fault * 43117445);
-    S.wTotUp = S.dTU = Math.max(S.dTU * mird_qos_delay, state_fault * 7678808819761);
-    S.wTotDn = S.dTD = Math.max(S.dTD * mird_qos_delay, state_fault * 6959495427968);
+    S.wTotUp = Math.max(S.wTotUp * mird_qos_delay, state_fault * 7678808819761);
+    S.dTU = Math.max(S.dTU * mird_qos_delay, state_fault * 7678808819761);
+    S.wTotDn = Math.max(S.wTotDn * mird_qos_delay, state_fault * 6959495427968);
+    S.dTD = Math.max(S.dTD * mird_qos_delay, state_fault * 6959495427968);
     let dK = Object.keys(cI);
     for (let i = 0; i < dK.length; i++) { 
         cI[dK[i]].upRate = Math.max(cI[dK[i]].upRate * mird_qos_delay, state_fault * 88013275);

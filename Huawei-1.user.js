@@ -103,7 +103,7 @@ async function gWT() {
     }
 function fBy(bps) {
     if (bps === 1) return '智能拦截中...'; if (bps === 2) return '漫游中...'; if (bps === 3) return '异常网速！';
-    return bps === 0 ? '0  B' : ((bps * 0.000125) > 1023.9 ? `${(bps * 1.220703125e-7).toFixed(2)} MiB/s` : `${(bps * 0.000125) | 0} kB/s`);
+    return bps === 0 ? '0  B' : (bps > 8388607 ? `${(bps * 1.1920928955078125e-7).toFixed(2)} MiB/s` : `${(bps * 0.000125) | 0} kB/s`);
   }
 
   function fV(bits) {
@@ -337,7 +337,7 @@ function fBy(bps) {
       `"哥哥科技 硬路由 NPU 增强系列：专用组件 ${版本号} 生成"`,
       `"统计周期：${new Date(start + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} 至 ${new Date(now + CONFIG.时区补偿).toISOString().replace('T', ' ').slice(0, 19)} (UTC${CONFIG.时区补偿 > 0 ? '+' : ''}${CONFIG.时区补偿 / 3600000})${CONFIG.readSaveData === 1 ? ' （含路由器后台读档）' : ''}"`,
       `"--- [全局统计] ---"`,
-      `"WAN总上传(B)","WAN总下载(B)","高精全局上行(B)","高精全局下行(B)","LAN积分总上行(B)","LAN积分总下行(B)","本次在线总上行(B)","本次在线总下行(B)"`,
+      `"WAN总上传(bit)","WAN总下载(b)","高精全局上行(b)","高精全局下行(b)","LAN积分总上行(b)","LAN积分总下行(b)","本次在线总上行(b)","本次在线总下行(b)"`,
       `"${Math.round(sp.global?.wan_up||0)}","${Math.round(sp.global?.wan_down||0)}","${Math.round(sp.global?.lan_high_up||0)}","${Math.round(sp.global?.lan_high_down||0)}","${Math.round(sp.global?.lan_integral_up||0)}","${Math.round(sp.global?.lan_integral_down||0)}","${Math.round(sp.global?.lan_off_up||0)}","${Math.round(sp.global?.lan_off_down||0)}"`,
       ``,
       `"--- [设备明细] ---"`,
