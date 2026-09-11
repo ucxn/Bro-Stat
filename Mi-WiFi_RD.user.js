@@ -18,7 +18,7 @@
 // @grant           GM_getValue
 // @storageName     GBNPA_Storage
 // @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享）
-// @updateURL       https://github.com/ucxn/Mi-Stat_Max/raw/refs/heads/main/new.user.js
+// @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/Mi-WiFi_RD.user.js
 // @downloadURL     https://github.com/ucxn/Mi-Stat_Max/raw/refs/heads/main/new.user.js
 
 // ==/UserScript==
@@ -105,7 +105,7 @@ const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&q
   function fB(bps) {
 		if (bps > 1e9) return `${(bps * 1e-6).toFixed(1)} Mbit/s`;
         if (bps > 1e6) return `${(bps * 1e-6).toFixed(2)} Mbps`;
-        if (bps > 1e3) return `${(bps * 1e-3).toFixed(1)} Kbps`;
+        if (bps > 1e3) return `${(bps * 1e-3).toFixed(1)} kbps`;
         return `${Math.round(bps)} bps`;
     }
 const F_ARR = ['0', '[1/16]', '[2/16]', '[3/16]', '[1/4]', '[5/16]', '[6/16]', '[7/16]', '[4/8]', '[9/16]', '[10/16]', '[11/16]', '[3/4]', '[13/16]', '[14/16]', '[15/16]', '[1]'];
@@ -114,8 +114,8 @@ function fBy(bps) {
         if (bps > 8388608) return `${(bps * 1.1920928955078125e-7).toFixed(2)} MiB/s`;
         return bps < 8602
             ? ((bps * 0.002 | 0) === bps * 0.002 && bps < 8001
-                ? `${F_ARR[bps * 0.002]} KB/s`
-                : `${(bps * 0.000125).toFixed(2)} KB/s`)
+                ? `${F_ARR[bps * 0.002]} kB/s`
+                : `${(bps * 0.000125).toFixed(2)} kB/s`)
             : `${(bps * 0.0001220703125).toFixed(1)} K/s`;
     }
 

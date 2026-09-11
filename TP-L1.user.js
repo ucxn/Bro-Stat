@@ -126,7 +126,7 @@ let _saved = null;
   function fB(bps) {
 		if (bps > 1e9) return `${(bps * 1e-6).toFixed(1)} Mbit/s`;
         if (bps > 1e6) return `${(bps * 1e-6).toFixed(2)} Mbps`;
-        if (bps > 1e3) return `${(bps * 1e-3).toFixed(1)} Kbps`;
+        if (bps > 1e3) return `${(bps * 1e-3).toFixed(1)} kbps`;
         return `${Math.round(bps)} bps`;
     }
 
@@ -137,23 +137,23 @@ const F_ARR_8 = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/
         if (bps === 1) return `拦截中…`;
         return bps < 8602
             ? ((bps * 0.001 | 0) === bps * 0.001
-                ? `${F_ARR_8[bps * 0.001]} KB/s`
-                : `${(bps * 0.000125).toFixed(2)} KB/s`)
-            : `${(bps / 8192).toFixed(1)} KB/s`;
+                ? `${F_ARR_8[bps * 0.001]} kB/s`
+                : `${(bps * 0.000125).toFixed(2)} kB/s`)
+            : `${(bps / 8192).toFixed(1)} K/s`;
     }
   function fV(bits) {
-        if (bits > 83886080000) return `${(bits / 8589934592).toFixed(4)} GB`;
-		if (bits > 8388608000) return `${(bits / 8388608).toFixed(1)} MB`;
-        if (bits > 8388608) return `${(bits / 8388608).toFixed(4)} MB`;
-        if (bits > 8192) return `${(bits / 8192).toFixed(3)} KB`;
+        if (bits > 83886080000) return `${(bits / 8589934592).toFixed(4)} G`;
+		if (bits > 8388608000) return `${(bits / 8388608).toFixed(1)} M`;
+        if (bits > 8388608) return `${(bits / 8388608).toFixed(4)} M`;
+        if (bits > 8192) return `${(bits / 8192).toFixed(3)} K`;
         return `${Math.round(bits / 8)} B`;
     }
 
   function fSV(bits) {
-    if (bits >= 84607500288) return `${(bits / 8589934592).toPrecision(4)}GB`;
-    if (bits > 8388608000) return `${Math.round(bits / 8388608)}MB`;
-    if (bits > 8388608) return `${(bits / 8388608).toFixed(2)}MB`;
-    if (bits >= 8192) return `${(bits / 8192).toFixed(1)}KB`;
+    if (bits >= 84607500288) return `${(bits / 8589934592).toPrecision(4)}G`;
+    if (bits > 8388608000) return `${Math.round(bits / 8388608)}M`;
+    if (bits > 8388608) return `${(bits / 8388608).toFixed(2)}M`;
+    if (bits >= 8192) return `${(bits / 8192).toFixed(1)}K`;
     return `${Math.round(bits / 8)}B`;}
 
   function fOT(totalSec) {
@@ -241,7 +241,7 @@ async function rSD() {
       let cWU = S.wInstUp, cWD = S.wInstDn;
       if (wanValid) {
         let curW = dW.network.wan_status;
-        cWU = (+curW.up_speed || 0) * 8000; // TP 的主、副 WAN 都是 KBps，转成 bps 需要 * 8000
+        cWU = (+curW.up_speed || 0) * 8000; // TP 的主、副 WAN 都是 kByte/s，转成 bps 需要 * 8000
         cWD = (+curW.down_speed || 0) * 8000;
         记总速率图(cWU, cWD);
       }

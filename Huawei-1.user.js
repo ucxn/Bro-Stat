@@ -98,12 +98,12 @@ async function gWT() {
   function fB(bps) {
         if (bps > 1e9) return `${Math.round(bps * 1e-6)} Mbit/s`;
         if (bps > 1e6) return `${(bps * 1e-6).toFixed(2)} Mbps`;
-        if (bps > 1e3) return `${Math.round(bps * 1e-3)} Kbps`;
+        if (bps > 1e3) return `${Math.round(bps * 1e-3)} kbps`;
         return `${Math.round(bps)} bps`;
     }
 function fBy(bps) {
     if (bps === 1) return '智能拦截中...'; if (bps === 2) return '漫游中...'; if (bps === 3) return '异常网速！';
-    return bps === 0 ? '0  B' : ((bps * 0.000125) > 1023.9 ? `${(bps * 1.220703125e-7).toFixed(2)} MiB/s` : `${(bps * 0.000125) | 0} KB/s`);
+    return bps === 0 ? '0  B' : ((bps * 0.000125) > 1023.9 ? `${(bps * 1.220703125e-7).toFixed(2)} MiB/s` : `${(bps * 0.000125) | 0} kB/s`);
   }
 
   function fV(bits) {

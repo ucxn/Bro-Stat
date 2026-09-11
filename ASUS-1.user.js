@@ -112,7 +112,7 @@
   function fB(bps) {
 		if (bps > 1e9) return `${(bps * 1e-6).toFixed(1)} Mbit/s`;
         if (bps > 1e6) return `${(bps * 1e-6).toFixed(2)} Mbps`;
-        if (bps > 1e3) return `${(bps * 1e-3).toFixed(1)} Kbps`;
+        if (bps > 1e3) return `${(bps * 1e-3).toFixed(1)} kbps`;
         return `${Math.round(bps)} bps`;
     }
 
@@ -122,8 +122,8 @@
         if (bps > 8388608) return `${(bps / 8388608).toFixed(2)} MiB/s`;
         return bps < 8601.6
             ? ((bps * 0.002 | 0) === bps * 0.002 && bps < 8001
-                ? `${F_ARR_16[bps * 0.002]} KB/s`
-                : `${(bps * 0.000125).toFixed(2)} KB/s`)
+                ? `${F_ARR_16[bps * 0.002]} kB/s`
+                : `${(bps * 0.000125).toFixed(2)} kB/s`)
             : `${(bps / 8192).toFixed(1)} KiB/s`;
     }
 
