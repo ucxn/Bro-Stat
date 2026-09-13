@@ -7,8 +7,8 @@
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
 // @noframes
-// @icon            https://scriptcat.org/api/v2/resource/image/duygQktL5QjWtkLc
 // @tag             路由器 腾达 网络 监控 统计 数据 可视化 极客 增强 Tenda HA 智能 定时 后台
+// @icon            https://scriptcat.org/api/v2/resource/image/duygQktL5QjWtkLc
 // @include         http://10.*.*.*
 // @include         http://192.168.*.*
 // @include         http://172.16.*
@@ -33,15 +33,7 @@
   'use strict';
   console.log("🚀 哥哥科技 V5.9.9 引擎已装载...");
 
-  if (location.href.toLowerCase().includes('index') &&
-      !location.href.toLowerCase().includes('login') &&
-      location.hash !== '#/advance/advance/dmz' &&
-      sessionStorage.getItem('stok_id') &&
-      sessionStorage.getItem('gege_tenda_dmz_stok') !== sessionStorage.getItem('stok_id')) {
-    sessionStorage.setItem('gege_tenda_dmz_stok', sessionStorage.getItem('stok_id'));
-    location.replace(`${location.origin}/index.html?${Math.random()}#/advance/advance/dmz`);
-    return;
-  }
+  if (location.href.toLowerCase().includes('login')) sessionStorage.removeItem('gege_open_after_jump');
 
   // ======== [0] 用户极客环境变量配置区 ========
   const CONFIG = {
@@ -53,8 +45,8 @@
     ratioWarnUp: 0.07, // 重度上传警告阈值 (> 7%)
     ratioExtremeDown: 0.01, // 极端下载判定阈值 (< 1%)
     ratioThreshold: 7, // (仅calcMode=0时有效) 上传占比报警阈值(%)
-    lanRefreshInterval: 3, // LAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
-    wanRefreshInterval: 3, // WAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
+    lanRefreshInterval: 3, // LAN设备速率有效刷新周期(秒)，可独立配置；建议大于wanRefreshInterval
+    wanRefreshInterval: 1, // WAN刷新周期(秒)，主调度时钟；只要快于LAN即可任意配置
     宽带最大外网上行速率: 3e8,
     宽带最大外网下行速率: 24e8, // 配置外网最大上传|下载比特(bit/bps)速率，请略微大于真实值；500兆为5e8，一千兆1e9
     周期类型: 'M', // 'M'(每月), 'W'(每周), 其它任意字符：不开启周期重置+自动导出功能
@@ -89,7 +81,8 @@ let _saved = null;
     Warn_MS: 0, Force_MS: 0, _RST: !1,
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
-    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
+    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
+    wDue: 0, lDue: 0, haDue: 0
   };
 
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
@@ -169,11 +162,11 @@ let _saved = null;
       CONFIG.portMap['5G'] = S.is5G_149 ? '5.8G' : '5.2G';
     }).catch(e => console.warn("[哥哥科技] 无线信道彩蛋探测异常:", e));
   }
-async function rSD() {
-    if (window.__gIsF) return;
+async function rSD(wantWan = !0, wantLan = !0) {
+    if (window.__gIsF || !wantWan && !wantLan) return;
     window.__gIsF = !0;
     try {
-      const d = await gTD({modules:"wanStatus,deviceList",timerRefresh:1});
+      const d = await gTD({modules:wantWan?(wantLan?"wanStatus,deviceList":"wanStatus"):"deviceList",timerRefresh:1});
       if (!d) return;
       const now = performance.now(), wanValid = !!d.wanStatus, lanValid = Array.isArray(d.deviceList);
       let cWU = S.wInstUp, cWD = S.wInstDn, cSU = 0, cSD = 0, cI = Object.create(null);
@@ -257,12 +250,29 @@ async function rSD() {
       }
       S.lt = now;
       if (wanValid) { S.wInstUp = cWU; S.wInstDn = cWD; }
-      rUI(cWU, cWD, cSU, cSD, cI);
+      rUI(cWU, cWD, cSU, cSD, cI, wanValid);
     } catch (e) {
       console.error("[哥哥科技/Tenda] 周期采样中断:", e);
     } finally {
       window.__gIsF = !1;
     }
+  }
+
+  async function gegePollLoop() {
+    if (!window.gegeBActivated) return;
+    const now = performance.now(), wStep = CONFIG.wanRefreshInterval * 1000, lStep = CONFIG.lanRefreshInterval * 1000, w = now + 1 >= S.wDue, l = now + 1 >= S.lDue;
+    if (w) do S.wDue += wStep; while (S.wDue <= now);
+    if (l) do S.lDue += lStep; while (S.lDue <= now);
+    if (w || l) await rSD(w, l);
+    const after = performance.now();
+    window.gegeMasterTimer = setTimeout(gegePollLoop, Math.max(1, Math.min(S.wDue, S.lDue) - after));
+  }
+  function gegeStartPoll() {
+    clearTimeout(window.gegeMasterTimer);
+    const now = performance.now();
+    S.wDue = now + CONFIG.wanRefreshInterval * 1000;
+    S.lDue = now + CONFIG.lanRefreshInterval * 1000;
+    window.gegeMasterTimer = setTimeout(gegePollLoop, Math.max(1, Math.min(S.wDue, S.lDue) - now));
   }
 
   function buildCSV() {
@@ -354,7 +364,7 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
         for (let i = 7; i--; ) { let xx = l + gw * i / 6; x.beginPath(); x.moveTo(xx,t); x.lineTo(xx,H-b); x.stroke(); }
         x.setLineDash([]);
         let li = (S.总图点数 - 1) & 8191, au = n ? (n === 8000 ? su * .000125 : su / n) : 0, ad = n ? (n === 8000 ? sd * .000125 : sd / n) : 0;
-        (box._gcMeta ??= box.querySelector('[data-gc="meta"]')).textContent = `采样:${window.gegeBActivated ? CONFIG.lanRefreshInterval : 3}s  点:${S.总图点数}`;
+        (box._gcMeta ??= box.querySelector('[data-gc="meta"]')).textContent = `采样:${window.gegeBActivated ? CONFIG.wanRefreshInterval : 3}s  点:${S.总图点数}`;
         let rg = box._gcRange ??= box.querySelector('[data-gc="range"]'), rs = `峰↑${fBy(S.wMaxU)} ↓${fBy(S.wMaxD)}  谷↑${S.wMinU < Infinity ? fBy(S.wMinU) : '--'} ↓${S.wMinD < Infinity ? fBy(S.wMinD) : '--'}`; rg.textContent = rs; rg.title = rs;
         (box._gcUp ??= box.querySelector('[data-gc="up"]')).textContent = `发 ${n ? fBy(S.总上行图[li]) : fBy(0)}`;
         (box._gcDown ??= box.querySelector('[data-gc="down"]')).textContent = `收 ${n ? fBy(S.总下行图[li]) : fBy(0)}`;
@@ -398,7 +408,7 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
         return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff4c00" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#ff4c00" stroke-width="7" stroke-linecap="round" opacity="0.3"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#ff4c00" stroke-width="7" stroke-linecap="round" opacity="0.3"/></g><text x="65" y="80" fill="#ff4c00" font-weight="900" font-size="35" font-family="sans-serif">✖</text></svg>`;
       };
 
-  function rUI(wU, wD, sU, sD, cI) {
+  function rUI(wU, wD, sU, sD, cI, wanTick) {
     let LUp = 0, LDn = 0;
     for (let k in S.cls) {
       LUp += S.cls[k].intUp || 0;
@@ -430,37 +440,39 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
         return acc;
       }, {})
     };
-    S.rTick = ((S.rTick || 0) + 1) & 3;
-    if (S.rTick === 1 || !S.cRT) {
-      for (let k in S.cls) {
-        let s = S.cls[k], cC = cI[k];
-        s.hIdx = (s.hIdx + 1) & 127;
-        s.hU[s.hIdx] = cC ? cC.upRate : 0;
-        s.hD[s.hIdx] = cC ? cC.dnRate : 0;
-      }
-      if (typeof GM_setValue !== 'undefined') {
-        S.haTick = ((S.haTick || 0) + 1) & 63;
-        if (S.haTick === 1) {
-          try { GM_setValue('ha_snapshot', S.cSnap); } catch (e) { console.warn(e); }
-          Promise.resolve(gTD({modules:"ethPortStatus",timerRefresh:1})).then(d => { if (d?.ethPortStatus) S.pI = d.ethPortStatus; }).catch(e => console.warn("[哥哥科技/Tenda] 物理网口探测异常:", e));
+    if (wanTick) {
+      S.rTick = ((S.rTick || 0) + 1) & 3;
+      if (S.rTick === 1 || !S.cRT) {
+        for (let k in S.cls) {
+          let s = S.cls[k], cC = cI[k];
+          s.hIdx = (s.hIdx + 1) & 127;
+          s.hU[s.hIdx] = cC ? cC.upRate : 0;
+          s.hD[s.hIdx] = cC ? cC.dnRate : 0;
         }
-        let nowMs = Date.now();
-        if (nowMs >= S.Force_MS && !S._RST) {doSettle(nowMs);
-        } else if (nowMs >= S.Warn_MS && !document.getElementById('gb-w-bnr')) {
-          let bd = document.getElementById('zte-geek-board');
-          if (bd) {
-            let bn = document.createElement('div'); bn.id = 'gb-w-bnr';
-            bn.style.cssText = 'background:#fff3cd;color:#856404;padding:10px 15px;margin-bottom:10px;border-radius:6px;border-left:5px solid #ffc107;font-weight:bold;font-size:13px;display:flex;justify-content:space-between;align-items:center;width:100%;box-sizing:border-box;';
-            bn.innerHTML = `<span> 统计周期即将结束，流量将在跨越边界时自动清零备份。</span><button id="gb-f-btn" style="background:#ffc107;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:bold;color:#333;">立即导出并清零</button>`;
-            bd.insertBefore(bn, bd.firstChild);
-            document.getElementById('gb-f-btn').onclick = () => doSettle(Date.now());}
+        if (typeof GM_setValue !== 'undefined') {
+          let nowMs = Date.now();
+          if (!S.haDue || nowMs >= S.haDue) {
+            S.haDue = nowMs + 768000;
+            try { GM_setValue('ha_snapshot', S.cSnap); } catch (e) { console.warn(e); }
+            Promise.resolve(gTD({modules:"ethPortStatus",timerRefresh:1})).then(d => { if (d?.ethPortStatus) S.pI = d.ethPortStatus; }).catch(e => console.warn("[哥哥科技/Tenda] 物理网口探测异常:", e));
           }
+          if (nowMs >= S.Force_MS && !S._RST) {doSettle(nowMs);
+          } else if (nowMs >= S.Warn_MS && !document.getElementById('gb-w-bnr')) {
+            let bd = document.getElementById('zte-geek-board');
+            if (bd) {
+              let bn = document.createElement('div'); bn.id = 'gb-w-bnr';
+              bn.style.cssText = 'background:#fff3cd;color:#856404;padding:10px 15px;margin-bottom:10px;border-radius:6px;border-left:5px solid #ffc107;font-weight:bold;font-size:13px;display:flex;justify-content:space-between;align-items:center;width:100%;box-sizing:border-box;';
+              bn.innerHTML = `<span> 统计周期即将结束，流量将在跨越边界时自动清零备份。</span><button id="gb-f-btn" style="background:#ffc107;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:bold;color:#333;">立即导出并清零</button>`;
+              bd.insertBefore(bn, bd.firstChild);
+              document.getElementById('gb-f-btn').onclick = () => doSettle(Date.now());}
+            }
+        }
+        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval * 4); S.lwTU = S.wTotUp;
+        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval * 4); S.lwTD = S.wTotDn;
+        const rUp = S.wTotUp ? LUp / S.wTotUp : 1, rDn = S.wTotDn ? LDn / S.wTotDn : 1;
+        S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#ff4c00' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#ff4c00' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
+        if (document.getElementById('gb-ratio-display')) document.getElementById('gb-ratio-display').innerHTML = S.cRT;
       }
-      S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 2); S.lwTU = S.wTotUp;
-      S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 2); S.lwTD = S.wTotDn;
-      const rUp = S.wTotUp ? LUp / S.wTotUp : 1, rDn = S.wTotDn ? LDn / S.wTotDn : 1;
-      S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#ff4c00' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#ff4c00' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
-      if (document.getElementById('gb-ratio-display')) document.getElementById('gb-ratio-display').innerHTML = S.cRT;
     }
     let bd = document.getElementById('zte-geek-board');
     if (!bd) {
@@ -740,6 +752,18 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
       if (o) o.style.display = 'none';
       return;
     }
+
+    if (location.href.toLowerCase().includes('login')) {
+      sessionStorage.removeItem('gege_open_after_jump');
+      return;
+    }
+    if (location.pathname.includes('/phone/')) {
+      sessionStorage.setItem('gege_open_after_jump', '1');
+      location.replace(`${location.origin}/`);
+      return;
+    }
+    if (location.pathname !== '/index.html') return;
+    if (location.hash !== '#/advance/advance/dmz') location.hash = '#/advance/advance/dmz';
     
     if (!o) {
       o = document.createElement('div');
@@ -749,10 +773,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
     o.style.display = 'block';
 if (!window.gegeBActivated) {
       window.gegeBActivated = !0;
-      clearInterval(window.gegeMasterTimer);
-      window.gegeMasterTimer = setInterval(rSD, CONFIG.lanRefreshInterval * 1000);
-    }
-    fCH().then(() => { window.gegeForceUIRedraw = !0; rSD(); });
+      fCH().then(() => { window.gegeForceUIRedraw = !0; return rSD(!0, !0); }).finally(gegeStartPoll);
+    } else fCH().then(() => { window.gegeForceUIRedraw = !0; rSD(!0, !0); });
   };
 
   window.gegeBActivated = !1;
@@ -760,6 +782,10 @@ if (!window.gegeBActivated) {
   const _initUI = () => {
     if (CONFIG.injectMode === 3 || (CONFIG.injectMode === 1 && +(window.location.hostname.slice(window.location.hostname.lastIndexOf('.') + 1)) < 6)) {
       if (window.createGegeFloatingBtn) window.createGegeFloatingBtn();
+    }
+    if (location.pathname === '/index.html' && sessionStorage.getItem('gege_open_after_jump')) {
+      sessionStorage.removeItem('gege_open_after_jump');
+      window.gegeTogglePanel(true);
     }
   };
 
