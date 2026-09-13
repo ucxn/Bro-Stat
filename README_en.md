@@ -5,10 +5,11 @@
 ![Preview](./华为预览图.png)
 **Bro-Stat** is a browser-based extension designed to improve the native web management experience of consumer and prosumer routers across multiple brands.
 
-Built using professional measurement and control principles and crafted with the meticulous attention to detail characteristic of BroTech.
+Built using professional measurement and control principles and crafted with the meticulous attention to detail characteristic of BroTech.It supports a wide range of commercially available home router brands, and its architecture is theoretically compatible with nearly all specifications: all consumer-grade gateways that provide data via a web interface.
+
 For a description of the project and its design philosophy, see [my personal homepage](https://github.com/UCXN/BroTech). I strongly recommend reading the architecture design; of course, I’d be even happier if you audited the source code directly—you’ll usually find far more surprises there than you’d expect from just reading the introduction. This isn’t just a simple UI enhancement plugin; it’s a complete set of processing algorithms tailored for chaotic and discrete data sources, embodying the true spirit of a geek. 
 
-The current universal edition primarily supports and enhances routers from **TP-Link, Xiaomi (MiWiFi), ASUS/ROG，HUAWEI**, and other mainstream vendors.
+The current universal edition primarily supports and enhances routers from **TP-Link, Xiaomi (MiWiFi), ASUS/ROG，HUAWEI, H3C(ISP), Tenda, ZTE**, and other mainstream vendors.
 
 Developed by **BroTech**, Bro-Stat provides a lightweight network telemetry and multi-end data forwarding solution for modern home and enthusiast networks. Output to CSV File Regularly is supported.
 

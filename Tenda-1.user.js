@@ -2,7 +2,7 @@
 // @name            腾达路由器增强 by 哥哥科技
 // @name:en         Bro-Stat-Tenda
 // @namespace       ucxn
-// @version         5.9.8
+// @version         5.9.9
 // @description     哥哥科技 QQ群 680464365
 // @description:en  https://github.com/ucxn/Bro-Stat
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -16,8 +16,8 @@
 // @include         https://192.168.*.*
 // @match           *://tendawifi.com/*
 // @match           *://www.tendawifi.com/*
-// @match           *://re.tenda.cn/*
 // @match           *://*.tenda.cn/*
+// @match           *://re.tenda.cn/*
 // @include         https://172.16.*
 // @run-at          document-start
 // @grant           GM_setValue
@@ -32,8 +32,6 @@
 (function () {
   'use strict';
   console.log("🚀 哥哥科技 V5.9.9 引擎已装载...");
-
-  if (location.href.toLowerCase().includes('login')) sessionStorage.removeItem('gege_open_after_jump');
 
   // ======== [0] 用户极客环境变量配置区 ========
   const CONFIG = {
@@ -754,12 +752,24 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
     }
 
     if (location.href.toLowerCase().includes('login')) {
-      sessionStorage.removeItem('gege_open_after_jump');
+      GM_setValue('gege_open_after_jump', 0);
       return;
     }
     if (location.pathname.includes('/phone/')) {
-      sessionStorage.setItem('gege_open_after_jump', '1');
-      location.replace(`${location.origin}/`);
+      GM_setValue('gege_open_after_jump', Date.now());
+      const p = _w.document.querySelector('#app')?.__vue_app__?._context?.provides, g = p?.$getData, m = p?.$postModule;
+      if (!g || !m) {
+        GM_setValue('gege_open_after_jump', 0);
+        console.warn('[哥哥科技/Tenda] 未找到手机版官方切换接口');
+        return;
+      }
+      Promise.resolve(g({modules:'localhost'})).then(d => {
+        if (!d?.localhost?.ip) throw new Error('localhost.ip unavailable');
+        return m({VisitWebVersion:{visitWebEn:!0,visitIp:d.localhost.ip}}, !1);
+      }).then(() => { _w.location.href = '//' + _w.location.host; }).catch(e => {
+        GM_setValue('gege_open_after_jump', 0);
+        console.warn('[哥哥科技/Tenda] 手机版切换电脑版失败:', e);
+      });
       return;
     }
     if (location.pathname !== '/index.html') return;
@@ -783,10 +793,27 @@ if (!window.gegeBActivated) {
     if (CONFIG.injectMode === 3 || (CONFIG.injectMode === 1 && +(window.location.hostname.slice(window.location.hostname.lastIndexOf('.') + 1)) < 6)) {
       if (window.createGegeFloatingBtn) window.createGegeFloatingBtn();
     }
-    if (location.pathname === '/index.html' && sessionStorage.getItem('gege_open_after_jump')) {
-      sessionStorage.removeItem('gege_open_after_jump');
-      window.gegeTogglePanel(true);
-    }
+(j => {
+  if (location.pathname !== '/index.html' || !j) return;
+  function f() {
+    clearTimeout(f.t);
+    f.t = setTimeout(() => {
+      if (Date.now() - j >= 120000) {
+        GM_setValue('gege_open_after_jump', 0);
+        window.removeEventListener('hashchange', f);
+        return;
+      }
+      Promise.resolve(gTD({modules:'wanStatus',timerRefresh:1})).then(d => {
+        if (!d?.wanStatus) return f();
+        window.removeEventListener('hashchange', f);
+        GM_setValue('gege_open_after_jump', 0);
+        window.gegeTogglePanel(true);
+      }, f);
+    }, 200);
+  }
+  window.addEventListener('hashchange', f);
+  f();
+})(GM_getValue('gege_open_after_jump', 0));
   };
 
   if (document.readyState === 'complete') _initUI(); else window.addEventListener('load', _initUI);
