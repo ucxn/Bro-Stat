@@ -18,7 +18,6 @@
 // @run-at          document-start
 // @grant           GM_setValue
 // @storageName     GBNPA_Storage
-// @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享）
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/ASUS-1.user.js
 // @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/ASUS-1.user.js
 
