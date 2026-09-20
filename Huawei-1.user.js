@@ -104,7 +104,7 @@ async function gWT() {
         return `${Math.round(bps)} bps`;
     }
 function fBy(bps) {
-    if (bps === 1) return '智能拦截中...'; if (bps === 2) return '漫游中...'; if (bps === 3) return '异常网速！';
+    if (bps === 0.1) return '智能拦截中...'; if (bps === 0.2) return '漫游中...'; if (bps === 0.3) return '异常网速！'; // 必须大于0的数字，否则数据异常会影响积分计算和数值类型
     return bps === 0 ? '0  B' : (bps > 8388607 ? `${(bps * 1.1920928955078125e-7).toFixed(2)} MiB/s` : `${(bps * 0.000125) | 0} kB/s`);
   }
 
@@ -298,12 +298,12 @@ function fBy(bps) {
        else if (cS.aR > 0) { cS.aR--; }
        cS.ifc = cC.iface;
 
-      if (cC.upRate > 6e8) { cSU -= cC.upRate; cC.upRate = 3; }
-        else if (cS.aR === 2) { cSU -= cC.upRate; cC.upRate = 2; }
-        else if (cS.aR === 1 && cC.upRate > CONFIG.宽带最大外网上行速率 * 1.2 && cC.upRate > 32e7) { cSU -= cC.upRate; cC.upRate = 1; }
-        if (cC.dnRate > 24e8) { cSD -= cC.dnRate; cC.dnRate = 3; }
-        else if (cS.aR === 2) { cSD -= cC.dnRate; cC.dnRate = 2; }
-        else if (cS.aR === 1 && (cC.dnRate > CONFIG.宽带最大外网下行速率 || cC.dnRate > 36e7)) { cSD -= cC.dnRate; cC.dnRate = 1; }
+      if (cC.upRate > 6e8) { cSU -= cC.upRate; cC.upRate = 0.3; }
+        else if (cS.aR === 2) { cSU -= cC.upRate; cC.upRate = 0.2; }
+        else if (cS.aR === 1 && cC.upRate > CONFIG.宽带最大外网上行速率 * 1.2 && cC.upRate > 32e7) { cSU -= cC.upRate; cC.upRate = 0.1; }
+        if (cC.dnRate > 24e8) { cSD -= cC.dnRate; cC.dnRate = 0.3; }
+        else if (cS.aR === 2) { cSD -= cC.dnRate; cC.dnRate = 0.2; }
+        else if (cS.aR === 1 && (cC.dnRate > CONFIG.宽带最大外网下行速率 || cC.dnRate > 36e7)) { cSD -= cC.dnRate; cC.dnRate = 0.1; }
 
         if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cC.offUp !== cS.lU || cC.offDn !== cS.lD) {
           cS.onS = cC.aRec ? Math.max(0, (Date.now() - new Date(cC.aRec.split('#')[0].replace(/-/g, '/')).getTime()) / 1000) : 0;
@@ -841,7 +841,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
       }
       requestAnimationFrame(() => {
         ol.innerHTML = `<div style="padding: 20px; max-width: 1580px; margin: 0 auto; min-height: 100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container"><div class="gege-section"><div class="config-title">有线设备${(window.gegeHiddenDevices && Object.keys(window.gegeHiddenDevices).length > 0) ? '<span style="color: #ff4c00; font-size: 13px; font-weight: normal; margin-left: 10px; font-family: Consolas;">(哥哥科技：智能Mesh适配)</span>' : ''}</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.8GHz':'5.2GHz'}）</div>${h52.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">${h58.length>0?(S.is5G_149===null?'MLO 设备（2.4+单 5G）':(S.is5G_149?'MLO 设备（2.4+5.8G）':'MLO 设备（2.4+5.2G）')):`无线设备（${S.is5G_149?'5.2GHz':'5.8GHz'}）`}</div>${h58.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}
-        </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序属于“哥哥软件”系列；需持续遵守署名条款方可获得使用权，二开或发行请参阅许可证；按“原样且免费”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作担保；个人分享请直接转载官方链接。<br>基于本程序的任何修改、使用任意部分代码、再发布或相关衍生版本的合法性的前置条件是：在提供最终用户界面时，均应显著保留所有“哥哥科技”与法律声明，不得删除、隐藏或降低其可见性。
+        </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序基于 Delayed Open Source Attribution License 1.0 开源，按“原样 (AS IS)”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作任何明示或暗示的担保。<br>根据 DOSA-1.0 第 2 条规定，基于本程序的任何修改均不得移除、隐藏或或篡改本界面的署名与法律声明。保留此界面GUI的完整性是使用本软件代码的合法性的前置条件。<a href="https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/%E6%B3%95%E5%BE%8B%E5%A3%B0%E6%98%8E%EF%BC%9A%E5%93%81%E7%89%8C%E4%BD%BF%E7%94%A8%E6%94%BF%E7%AD%96.md" target="_blank" style="color: #777; text-decoration: underline;">许可证</a>
         </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Bro-Stat/blob/main/Huawei-1.user.js" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件</a> <span title="构建时间：2026-08.20 21.5时&#10;架构设计：哥哥科技 BroTech&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px; font-family: Consolas;">华为版 ${版本号}</span> | Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1PtR7B8ECC" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/script-show-page/6803" target="_blank" style="color: #666; text-decoration: none;">点击分享</a></div></div></div></div>`;
       S._domRebuilt = true;});}
     catch (e) {
