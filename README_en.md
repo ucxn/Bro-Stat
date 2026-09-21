@@ -137,6 +137,6 @@ You may also pin the panel to the top of the page using the 📌 icon for perman
 
 This software is Source-Available and is provided **"AS IS"**, without any express or implied warranties regarding suitability, stability, accuracy, fitness for a particular purpose, or compliance with any commercial use case.
 
-Out of respect for open-source contributors, any modification, redistribution, or derivative work based on this project must preserve the attribution and legal notice section displayed at the bottom of the interface.
+Out of respect for Developer-friendly contributors, any modification, redistribution, or derivative work based on this project must preserve the attribution and legal notice section displayed at the bottom of the interface.
 
 Maintaining the visibility of these notices is a prerequisite for lawful use of the source code provided by this project.
