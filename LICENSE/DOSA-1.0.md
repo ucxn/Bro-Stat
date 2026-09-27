@@ -1,7 +1,3 @@
-### License Scope Notice
-
-The following license does not automatically apply to the entire repository. It applies on a file-by-file basis only to files that expressly state that they are licensed under this license. The presence of this license text in the repository does not, by itself, grant any rights under this license to files that do not contain such a declaration.
-
 <h1><img width="100" src="https://github.com/ChildMindInstitute/DOSA-license/blob/main/DOSA_logo.png" class="img-responsive img-centered" alt="DOSA logo">
 Delayed Open Source Attribution License 1.0 (DOSA-1.0)</h1>
 
@@ -110,7 +106,7 @@ Capitalized terms in the following exhibits refer to the corresponding terms as 
 ### EXHIBIT A. Common Public Attribution License Version 1.0.
 
 "The contents of this file are subject to the Common Public Attribution License Version 1.0 (the "License"); 
-you may not use this file except in compliance with the License. You may obtain a copy of the License at [ucxn/Bro-Stat/CPAL-1.0.md](https://github.com/ucxn/Bro-Stat/blob/main/CPAL-1.0.md). 
+you may not use this file except in compliance with the License. You may obtain a copy of the License at [ucxn/Bro-Stat/CPAL-1.0.md](https://github.com/ucxn/Bro-Stat/blob/main/LICENSE/CPAL-1.0.md). 
 The License is based on the Mozilla Public License Version 1.1 but Sections 14 and 15 have been added to cover use of software 
 over a computer network and provide for limited attribution for the Original Developer. In addition, Exhibit A has been modified 
 to be consistent with Exhibit B.
@@ -130,7 +126,7 @@ Contributor 1-Reality.
 
 ### EXHIBIT B. Attribution Information.
 
-Attribution copyright notice: Copyright © 2026 哥哥科技 (BroTech) |  [点此分享](https://scriptcat.org/zh-CN/users/203510)
+Attribution copyright notice: Copyright © 2026 哥哥科技 (BroTech)
 
 Attribution phrase: 自由的网络是每个人的基本权利
 

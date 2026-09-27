@@ -16,6 +16,7 @@
 // @include         https://172.16.*
 // @exclude         *://*/cgi-bin/luci*
 // @grant           GM_setValue
+// @license         All Rights Reserved
 // @grant           GM_getValue
 // @storageName     GBNPA_Storage
 // @run-at          document-start

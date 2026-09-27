@@ -22,7 +22,7 @@
 // @storageName     GBNPA_Storage
 // @source          https://github.com/ucxn/Bro-Stat
 // @supportURL      https://www.bilibili.com/video/BV1LZ6yBXESq
-// @license         LicenseRef-scancode-dosa-1.0
+// @license         LicenseRef-BroTech-Additional-Terms AND LicenseRef-scancode-dosa-1.0
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/ASUS-1.user.js
 // @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/ASUS-1.user.js
 
@@ -63,33 +63,6 @@
       "wl2": "访客"
     }
   };
-
-    if (location.pathname.includes('main.html')) {
-    const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
-    const jumpToPc = (stok) => {
-      if (!window.__gegeJumped && location.hash.includes('#/home')) {
-        window.__gegeJumped = !0;
-        document.body.innerHTML = '<div style="display:flex; height:100vh; width:100vw; background:#f3f4f5; align-items:center; justify-content:center; color:#0059fa; font-weight:bold; font-size:18px; font-family:sans-serif;">🚀 哥哥科技：正在强制跃迁至 PC 网页版...</div>';
-        location.replace(`/cgi-bin/luci/;stok=${stok}/web?goto=pc#router`);
-      }
-    };
-
-    const origOpen = _w.XMLHttpRequest.prototype.open;
-    _w.XMLHttpRequest.prototype.open = function(method, url) {
-      let m = String(url).match(/;stok=([a-fA-F0-9]+)/);
-      if (m) jumpToPc(m[1]);
-      return origOpen.apply(this, arguments);
-    };
-
-    const origFetch = _w.fetch;
-    if (origFetch) {
-      _w.fetch = function() {
-        let m = String(arguments[0]).match(/;stok=([a-fA-F0-9]+)/);
-        if (m) jumpToPc(m[1]);
-        return origFetch.apply(this, arguments);
-      };
-    }
-  }
 
   const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
   function escapeHTML(str) {
@@ -866,7 +839,7 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
       requestAnimationFrame(() => {
         ol.innerHTML = `<div style="padding: 20px; width: 96%; max-width: 1600px; margin: 0 auto; min-height: 100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container"><div class="gege-section"><div class="config-title">有线设备${(window.gegeHiddenDevices && Object.keys(window.gegeHiddenDevices).length > 0) ? '<span style="color: #ff4c00; font-size: 13px; font-weight: normal; margin-left: 10px; font-family: Consolas;">(哥哥科技：智能Mesh适配)</span>' : ''}</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.8GHz':'5.2GHz'}）</div>${h52.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.2GHz':'5.8GHz'}）</div>${h58.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}
                 </div>
-        </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序基于 Delayed Open Source Attribution License 1.0 发行，按“原样 (AS IS)”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作任何明示或暗示的担保。<br>根据 DOSA-1.0 第 2 条规定，基于本程序的任何修改均不得移除、隐藏或篡改本界面的署名与法律声明。保留此界面GUI的完整性是使用本软件代码的合法性的前置条件。<a href="https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/%E6%B3%95%E5%BE%8B%E5%A3%B0%E6%98%8E%EF%BC%9A%E5%93%81%E7%89%8C%E4%BD%BF%E7%94%A8%E6%94%BF%E7%AD%96.md" target="_blank" style="color: #777; text-decoration: underline;">许可证</a>
+        </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序基于 Delayed Open Source Attribution License 1.0 发行，按“原样 (AS IS)”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作任何明示或暗示的担保。<br>根据 DOSA-1.0 第 2 条规定，基于本程序的任何修改均不得移除、隐藏或篡改本界面的署名与法律声明。保留此界面GUI的完整性是使用本软件代码的合法性的前置条件。<a href="https://github.com/ucxn/Bro-Stat/blob/main/License.md" target="_blank" style="color: #777; text-decoration: underline;">许可证</a>
         </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Bro-Stat" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat系列 增强组件</a><span title="构建日期：2026-08.20 23时&#10;架构设计：哥哥科技 BroTech&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px;">${(typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号'} Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1LZ6yBXESq" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/script-show-page/6675" target="_blank" style="color: #666; text-decoration: none;">点此分享</a>
         </div></div></div></div>`;
         S.DOM缓存 = null; S.DOM容器 = null;
