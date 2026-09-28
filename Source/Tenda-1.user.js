@@ -167,8 +167,9 @@
     wanRefreshInterval: 1, // WAN刷新周期(秒)，主调度时钟；只要快于LAN即可任意配置
     宽带最大外网上行速率: 3e8,
     宽带最大外网下行速率: 24e8, // 配置外网最大上传|下载比特(bit/bps)速率，请略微大于真实值；500兆为5e8，一千兆1e9
-    周期类型: 'M', // 'M'(每月), 'W'(每周), 其它任意字符：不开启周期重置+自动导出功能
+    周期类型: 'M', // 'M'(每月), 'W'(每周), 'D'(固定天数), 其它任意字符：不开启周期重置+自动导出功能
     周_天设置: 1, // M: 1~31号; W: 0~6(周日~周六); D: 间隔天数(如 7)
+    基准日期: '2026-06-20', // 原点时间(仅 D 模式有效) 任意一个历史周期的零点
     报告时间: -1080, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: 0, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
@@ -315,7 +316,8 @@ async function rSD(wantWan = !0, wantLan = !0) {
         S.wLT = now;
       }
       const 本轮刷新接口 = new Set();
-      for (const [m, cC] of Object.entries(cI)) {
+      for (const m in cI) {
+        const cC = cI[m];
         let cS = S.cls[m];
         if (!cS) cS = S.cls[m] = {
           upR: cC.upRate, dnR: cC.dnRate, lUT: now, aR: 0,
@@ -336,7 +338,8 @@ async function rSD(wantWan = !0, wantLan = !0) {
         }
         if (cC.name && cC.name !== '未知设备') cS.name = cC.name;
       }
-      for (const [m, cC] of Object.entries(cI)) {
+      for (const m in cI) {
+        const cC = cI[m];
         const cS = S.cls[m];
         if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cS.aR === 0 && 本轮刷新接口.has(cC.iface)) {
           const ms = now - cS.lUT;

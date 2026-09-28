@@ -381,17 +381,18 @@ async function rSD() {
             if (ol && ol.style.display === 'block' && (iD || !ol.querySelector('.gege-list-item'))) {
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
       }
-      let gDt = (S.lt !== 0) ? (lanNow - S.lt) * 0.001 : 0;
+      const gDt = (S.lt !== 0) ? (lanNow - S.lt) * 0.001 : 0;
             if (wanValid && S.wLT === undefined) {
         S.wLT = wanNow;
       }
       else if (wanValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
-        let wDt = wanNow - S.wLT;
+        const wDt = wanNow - S.wLT;
         /* @BroTech-Reserved wan-trapezoid-wakeup.part.js */
         S.wLT = wanNow;
       }
-      let 本轮刷新接口 = new Set();
-      for (const [m, cC] of Object.entries(cI)) {
+      const 本轮刷新接口 = new Set();
+      for (const m in cI) {
+        const cC = cI[m];
         let cS = S.cls[m];
         if (!cS) {
           cS = S.cls[m] = {
@@ -445,10 +446,11 @@ async function rSD() {
         cS.lU = cC.offUp;
         cS.lD = cC.offDn;
       }
-      for (const [m, cC] of Object.entries(cI)) {
+      for (const m in cI) {
+        const cC = cI[m];
         let cS = S.cls[m];
         if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cS.aR === 0 && 本轮刷新接口.has(cC.iface)) {
-          let ms = lanNow - cS.lUT;
+          const ms = lanNow - cS.lUT;
           /* @BroTech-Reserved lan-trapezoid-wakeup.part.js */
           cS.upR = cC.upRate;
           cS.dnR = cC.dnRate;

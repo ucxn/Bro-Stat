@@ -369,13 +369,14 @@ function fBy(bps) {
         S.wLT = wanNow;
       }
       else if (wanValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
-        let wDt = wanNow - S.wLT;
+        const wDt = wanNow - S.wLT;
         /* @BroTech-Reserved wan-trapezoid-wakeup.part.js */
         S.wLT = wanNow;
       }
       if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp && sp.timestamp > (typeof GM_getValue !== 'undefined' ? (GM_getValue('gege_reset_ms', 0) || 0) : 0) ? sp : {}; if(S.snap.global) { S.wTotUp = S.wTotUp === 0 ? S.snap.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? S.snap.global.wan_down || 0 : S.wTotDn; } } catch(e){console.warn(e)} S.snapLoaded = !0; }
-      for (const [m, cC] of Object.entries(cI)) {
-        let spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
+      for (const m in cI) {
+        const cC = cI[m];
+        const spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
         S.cls[m] ??= {
           upR: cC.upRate, dnR: cC.dnRate, lUT: lanNow, 
           intUp: spD ? (spD.integral_up || 0) : 0, intDn: spD ? (spD.integral_down || 0) : 0,
@@ -425,7 +426,7 @@ function fBy(bps) {
           cS.onS = cC.aRec ? Math.max(0, (Date.now() - new Date(cC.aRec.split('#')[0].replace(/-/g, '/')).getTime()) / 1000) : 0;
           
           if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) {
-            let ms = lanNow - cS.lUT;
+            const ms = lanNow - cS.lUT;
             /* @BroTech-Reserved lan-trapezoid-wakeup.part.js */
             cS.upR = cC.upRate;
             cS.dnR = cC.dnRate;
@@ -790,13 +791,14 @@ function doSettle(nowMs) {
                         cache.rBox = rB;
           }
           
-          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol = "#0059fa";
+          const bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0;
+          let tC = "", tCol = "#0059fa";
           if (CONFIG.calcMode === 1) {
-            let rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
+            const rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
             if (rt > CONFIG.ratioExtremeUp) { tCol = '#ff4c00'; tC = (rt === Infinity ? '∞' : rt.toFixed(2)) + '⚠️'; }
             else if (rt > CONFIG.ratioWarnUp) { tCol = '#ff4c00'; tC = (rt * 100).toFixed(1) + '%'; }
             else if (rt > CONFIG.ratioExtremeDown) { tCol = '#0059fa'; tC = (rt * 100).toFixed(1) + '%'; }
-            else { tCol = '#0059fa'; let rRt = hqU > 0 ? (hqD / hqU) : (hqD > 0 ? Infinity : 0); tC = (rRt === Infinity ? '∞' : rRt.toFixed(1)) + 'x'; }
+            else { tCol = '#0059fa'; const rRt = hqU > 0 ? (hqD / hqU) : (hqD > 0 ? Infinity : 0); tC = (rRt === Infinity ? '∞' : rRt.toFixed(1)) + 'x'; }
           } else {
             tCol = bR > CONFIG.ratioThreshold ? '#ff4c00' : '#0059fa';
             tC = bR.toFixed(1) + '%';
@@ -805,7 +807,7 @@ function doSettle(nowMs) {
           (cache.rBoxPort ??= rB.querySelector('.v-port')).textContent = CONFIG.portMap[cC.iface] || cC.iface || "未知";
                     (cache.rBoxUp ??= rB.querySelector('.v-interval .c-up')).textContent = '' + fSV(hqU);
           (cache.rBoxDn ??= rB.querySelector('.v-interval .c-down')).textContent = '' + fSV(hqD);
-          let rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
+          const rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
           rtP.textContent = tC; rtP.style.color = tCol;
           (cache.rBoxBar ??= rB.querySelector('.gege-ratio-bar-inner')).style.width = Math.min(bR, 100) + '%';
           

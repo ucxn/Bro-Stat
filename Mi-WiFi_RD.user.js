@@ -307,22 +307,23 @@ async function rSD() {
         window.gegeRenderedMacs = new Set(cM);
         window.gegeForceUIRedraw = !1;
       }
-      let gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
+      const gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
       if (wanRateValid && S.wLT === undefined) { S.wLT = n; }
       else if (wanRateValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
-        let wDt = n - S.wLT;
+        const wDt = n - S.wLT;
                 if (S.wInstUp > 0) { S.wTotUp += (S.wInstUp + cWU) * wDt * 0.0005; }
-        else if (cWU > 0) { let wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
+        else if (cWU > 0) { const wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
         if (S.wInstDn > 0) { S.wTotDn += (S.wInstDn + cWD) * wDt * 0.0005; }
-        else if (cWD > 0) { let wED = cWD * 0.5 * CONFIG.wanRefreshInterval; S.wTotDn += wED; S.wZED = (S.wZED || 0) + wED; S.wZEDC = (S.wZEDC || 0) + 1; }
+        else if (cWD > 0) { const wED = cWD * 0.5 * CONFIG.wanRefreshInterval; S.wTotDn += wED; S.wZED = (S.wZED || 0) + wED; S.wZEDC = (S.wZEDC || 0) + 1; }
         S.wLT = n;
       }
       if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp && sp.timestamp > (typeof GM_getValue !== 'undefined' ? (GM_getValue('gege_reset_ms', 0) || 0) : 0) ? sp : {}; if(S.snap.global) { S.wTotUp = S.wTotUp === 0 ? S.snap.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? S.snap.global.wan_down || 0 : S.wTotDn; } } catch(e){console.warn(e)} S.snapLoaded = !0; }
-      let 本轮刷新接口 = new Set();
-      for (const [m, cC] of Object.entries(cI)) {
+      const 本轮刷新接口 = new Set();
+      for (const m in cI) {
+        const cC = cI[m];
         let cS = S.cls[m];
         if (!cS) {
-          let spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
+          const spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
           let 有累计 = 有累计MAC.has(m);
           cS = S.cls[m] = {
             upR: cC.upRate, dnR: cC.dnRate, lUT: n,
@@ -370,14 +371,15 @@ async function rSD() {
         if (cS.lOS !== cC.onSec) { cS.onS = cC.onSec; cS.lOS = cC.onSec; }
         else { cS.onS = (cS.onS || cC.onSec || 0) + gDt; }
       }
-      for (const [m, cC] of Object.entries(cI)) {
+      for (const m in cI) {
+        const cC = cI[m];
         let cS = S.cls[m];
         if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || 本轮刷新接口.has(cC.iface)) {
-          let ms = n - cS.lUT;
+          const ms = n - cS.lUT;
                     if (cS.upR > 0) { cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
-          else if (cC.upRate > 0) { let eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
+          else if (cC.upRate > 0) { const eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
           if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
-          else if (cC.dnRate > 0) { let eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
+          else if (cC.dnRate > 0) { const eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
           cS.upR = cC.upRate; cS.dnR = cC.dnRate; cS.lUT = n;
         }
       }
@@ -456,7 +458,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
   }
         function 记总速率图(u, d) {
         u = u || 0; d = d || 0;
-        let i = S.总图点数 & 8191;
+        const i = S.总图点数 & 8191;
         S.总上行图[i] = u; S.总下行图[i] = d; S.总图点数++;
         if (u > S.wMaxU) S.wMaxU = u; if (d > S.wMaxD) S.wMaxD = d;
         if (u > 0 && u < S.wMinU) S.wMinU = u; if (d > 0 && d < S.wMinD) S.wMinD = d;
@@ -473,7 +475,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
         box.addEventListener('pointerdown', e => { if (!e.target.classList.contains('gege-chart-resize')) 起手(e, '拖'); });
         box.querySelector('.gege-chart-resize').addEventListener('pointerdown', e => 起手(e, '缩'));
         box.addEventListener('pointermove', e => {
-          let g = S.图表拖; if (!g) return;
+          const g = S.图表拖; if (!g) return;
           if (g.模式 === '拖') { box.style.left = (g.l + e.clientX - g.x) + 'px'; box.style.top = (g.t + e.clientY - g.y) + 'px'; }
           else { box.style.width = Math.max(260, g.w + e.clientX - g.x) + 'px'; box.style.height = Math.max(88, g.h + e.clientY - g.y) + 'px'; }
           if (!S.图表待画) { S.图表待画 = 1; requestAnimationFrame(() => { S.图表待画 = 0; 画总速率图(bd); }); }
@@ -485,24 +487,25 @@ const calcStageRatio = (W, L_int, L_hp) => {
         let box = 初始化总速率图(bd), cv = box.querySelector('canvas'), W = box.clientWidth | 0, H = box.clientHeight | 0, R = window.devicePixelRatio || 1;
         if (W < 40 || H < 40) return;
         if (cv.width !== (W * R | 0) || cv.height !== (H * R | 0)) { cv.width = W * R | 0; cv.height = H * R | 0; cv.style.width = '100%'; cv.style.height = '100%'; }
-        let x = cv.getContext('2d'); x.setTransform(R,0,0,R,0,0); x.clearRect(0,0,W,H);
+        const x = cv.getContext('2d'); x.setTransform(R,0,0,R,0,0); x.clearRect(0,0,W,H);
         let l = 34, r = 8, t = 20, b = 25, gw = W - l - r, gh = H - t - b, n = Math.min(S.总图点数, 8000), st = S.总图点数 - n, ym = 1, su = 0, sd = 0;
         for (let k = 0; k < n; k++) { let j = (st + k) & 8191, u = S.总上行图[j], d = S.总下行图[j]; if (u > ym) ym = u; if (d > ym) ym = d; su += u; sd += d; }
         x.fillStyle = 'rgba(255,255,255,.58)'; x.strokeStyle = 'rgba(0,89,250,.88)'; x.lineWidth = 1.5; x.beginPath(); x.roundRect ? x.roundRect(.5,.5,W-1,H-1,8) : x.rect(.5,.5,W-1,H-1); x.fill(); x.stroke();
         x.setLineDash([4,4]); x.strokeStyle = 'rgba(0,89,250,.45)'; x.lineWidth = 1;
-        for (let i = 5; i--; ) { let y = t + gh * i / 4; x.beginPath(); x.moveTo(l,y); x.lineTo(W-r,y); x.stroke(); }
-        for (let i = 7; i--; ) { let xx = l + gw * i / 6; x.beginPath(); x.moveTo(xx,t); x.lineTo(xx,H-b); x.stroke(); }
+        for (let i = 5; i--; ) { const y = t + gh * i / 4; x.beginPath(); x.moveTo(l,y); x.lineTo(W-r,y); x.stroke(); }
+        for (let i = 7; i--; ) { const xx = l + gw * i / 6; x.beginPath(); x.moveTo(xx,t); x.lineTo(xx,H-b); x.stroke(); }
         x.setLineDash([]);
-        let li = (S.总图点数 - 1) & 8191, au = n ? (n === 8000 ? su * .000125 : su / n) : 0, ad = n ? (n === 8000 ? sd * .000125 : sd / n) : 0;
+        const li = (S.总图点数 - 1) & 8191, au = n ? (n === 8000 ? su * .000125 : su / n) : 0, ad = n ? (n === 8000 ? sd * .000125 : sd / n) : 0;
         (box._gcMeta ??= box.querySelector('[data-gc="meta"]')).textContent = `采样:${window.gegeBActivated ? CONFIG.wanRefreshInterval : 3}s  点:${S.总图点数}`;
-        let rg = box._gcRange ??= box.querySelector('[data-gc="range"]'), rs = `峰↑${fBy(S.wMaxU)} ↓${fBy(S.wMaxD)}  谷↑${S.wMinU < Infinity ? fBy(S.wMinU) : '--'} ↓${S.wMinD < Infinity ? fBy(S.wMinD) : '--'}`; rg.textContent = rs; rg.title = rs;
+        const rg = box._gcRange ??= box.querySelector('[data-gc="range"]'), rs = `峰↑${fBy(S.wMaxU)} ↓${fBy(S.wMaxD)}  谷↑${S.wMinU < Infinity ? fBy(S.wMinU) : '--'} ↓${S.wMinD < Infinity ? fBy(S.wMinD) : '--'}`; rg.textContent = rs; rg.title = rs;
         (box._gcUp ??= box.querySelector('[data-gc="up"]')).textContent = `发 ${n ? fBy(S.总上行图[li]) : fBy(0)}`;
         (box._gcDown ??= box.querySelector('[data-gc="down"]')).textContent = `收 ${n ? fBy(S.总下行图[li]) : fBy(0)}`;
         (box._gcExtra ??= box.querySelector('[data-gc="extra"]')).textContent = `均↑${fBy(au)} ↓${fBy(ad)}`;
         const 画线 = (arr, col) => {
           if (!n) return;
           x.strokeStyle = col; x.lineWidth = 2.4; x.beginPath();
-          let bins = Math.max(1, Math.min(n, gw | 0)), first = !0;
+          const bins = Math.max(1, Math.min(n, gw | 0));
+          let first = !0;
           if (bins === n) {
             for (let k = 0; k < n; k++) { let xx = l + (n > 1 ? gw * k / (n - 1) : gw), yy = H - b - (arr[(st + k) & 8191] / ym) * gh; first ? (x.moveTo(xx, yy), first = !1) : x.lineTo(xx, yy); }
           } else {
@@ -792,7 +795,7 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
           (cache.rBoxPort ??= rB.querySelector('.v-port')).textContent = CONFIG.portMap[cC.iface] || cC.iface || "未知";
           (cache.rBoxUp ??= rB.querySelector('.v-interval .c-up')).textContent = '' + fSV(hqU);
           (cache.rBoxDn ??= rB.querySelector('.v-interval .c-down')).textContent = '' + fSV(hqD);
-          let rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
+          const rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
           rtP.textContent = tC; rtP.style.color = tCol;
           (cache.rBoxBar ??= rB.querySelector('.gege-ratio-bar-inner')).style.width = Math.min(bR, 100) + '%';
                     

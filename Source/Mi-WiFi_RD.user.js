@@ -426,19 +426,20 @@ async function rSD() {
         window.gegeRenderedMacs = new Set(cM);
         window.gegeForceUIRedraw = !1;
       }
-      let gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
+      const gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
       if (wanRateValid && S.wLT === undefined) { S.wLT = n; }
       else if (wanRateValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
-        let wDt = n - S.wLT;
+        const wDt = n - S.wLT;
         /* @BroTech-Reserved wan-trapezoid-wakeup.part.js */
         S.wLT = n;
       }
       if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp && sp.timestamp > (typeof GM_getValue !== 'undefined' ? (GM_getValue('gege_reset_ms', 0) || 0) : 0) ? sp : {}; if(S.snap.global) { S.wTotUp = S.wTotUp === 0 ? S.snap.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? S.snap.global.wan_down || 0 : S.wTotDn; } } catch(e){console.warn(e)} S.snapLoaded = !0; }
-      let 本轮刷新接口 = new Set();
-      for (const [m, cC] of Object.entries(cI)) {
+      const 本轮刷新接口 = new Set();
+      for (const m in cI) {
+        const cC = cI[m];
         let cS = S.cls[m];
         if (!cS) {
-          let spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
+          const spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
           let 有累计 = 有累计MAC.has(m);
           cS = S.cls[m] = {
             upR: cC.upRate, dnR: cC.dnRate, lUT: n,
@@ -486,10 +487,11 @@ async function rSD() {
         if (cS.lOS !== cC.onSec) { cS.onS = cC.onSec; cS.lOS = cC.onSec; }
         else { cS.onS = (cS.onS || cC.onSec || 0) + gDt; }
       }
-      for (const [m, cC] of Object.entries(cI)) {
+      for (const m in cI) {
+        const cC = cI[m];
         let cS = S.cls[m];
         if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || 本轮刷新接口.has(cC.iface)) {
-          let ms = n - cS.lUT;
+          const ms = n - cS.lUT;
           /* @BroTech-Reserved lan-trapezoid-wakeup.part.js */
           cS.upR = cC.upRate; cS.dnR = cC.dnRate; cS.lUT = n;
         }
@@ -771,7 +773,7 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
         /* @BroTech-Reserved rUI-nested-mi01-04.part.js */
           (cache.rBoxUp ??= rB.querySelector('.v-interval .c-up')).textContent = '' + fSV(hqU);
           (cache.rBoxDn ??= rB.querySelector('.v-interval .c-down')).textContent = '' + fSV(hqD);
-          let rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
+          const rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
           rtP.textContent = tC; rtP.style.color = tCol;
           (cache.rBoxBar ??= rB.querySelector('.gege-ratio-bar-inner')).style.width = Math.min(bR, 100) + '%';
                     

@@ -388,11 +388,12 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         window.gegeRenderedMacs = new Set(cM);
         window.gegeForceUIRedraw = !1;
       }
-      let gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
+      const gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
       // 保留原有 0 估算诊断；WAN 总量已经由官方累计增量更新，避免重复积分。
       if (S.wInstUp === 0 && cWU > 0) { S.wZEU = (S.wZEU || 0) + cWU * 0.5 * CONFIG.wanRefreshInterval; S.wZEUC = (S.wZEUC || 0) + 1; }
       if (S.wInstDn === 0 && cWD > 0) { S.wZED = (S.wZED || 0) + cWD * 0.5 * CONFIG.wanRefreshInterval; S.wZEDC = (S.wZEDC || 0) + 1; }
-      for (const [m, cC] of Object.entries(cI)) {
+      for (const m in cI) {
+        const cC = cI[m];
         S.cls[m] ??= {
           upR: cC.upRate, dnR: cC.dnRate, lUT: n, 
           intUp: 0, intDn: 0,
@@ -420,7 +421,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         else { cS.onS = (cS.onS || cC.onSec || 0) + gDt; }
         
         // 华硕 getTraffic 是整包快照：每一包都代表一次真实采样，即使连续两轮速率数值恰好相同也推进积分时间
-        let ms = n - cS.lUT;
+        const ms = n - cS.lUT;
         /* @BroTech-Reserved lan-trapezoid-wakeup.part.js */
         if (cC.name && cC.name !== '华硕设备') cS.name = cC.name;
         if (cC.ip && cC.ip !== '-.-.-.-') cS.ip = cC.ip;
@@ -754,7 +755,7 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
         /* @BroTech-Reserved rUI-nested-mi01-04.part.js */
                     (cache.rBoxUp ??= rB.querySelector('.v-interval .c-up')).textContent = '' + fSV(hqU);
           (cache.rBoxDn ??= rB.querySelector('.v-interval .c-down')).textContent = '' + fSV(hqD);
-          let rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
+          const rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
           rtP.textContent = tC; rtP.style.color = tCol;
           (cache.rBoxBar ??= rB.querySelector('.gege-ratio-bar-inner')).style.width = Math.min(bR, 100) + '%';
                     

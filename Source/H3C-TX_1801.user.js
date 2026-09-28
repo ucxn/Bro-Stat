@@ -504,16 +504,16 @@ const ts = Date.now();
             if (ol && ol.style.display === 'block' && (iD || !ol.querySelector('.gege-list-item'))) {
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
       }
-      let gDt = (S.lt !== 0) ? (lanNow - S.lt) * 0.001 : 0;
+      const gDt = (S.lt !== 0) ? (lanNow - S.lt) * 0.001 : 0;
       if (hasWanRate && S.wLT === undefined) {
         S.wLT = wanNow;
       }
       else if (hasWanRate && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
-        let wDt = wanNow - S.wLT;
+        const wDt = wanNow - S.wLT;
         /* @BroTech-Reserved wan-trapezoid-wakeup.part.js */
         S.wLT = wanNow;
       }
-      let 组刷新 = new Set;
+      const 组刷新 = new Set;
       for (const m in cI) {
         let cC = cI[m], 新设备 = !S.cls[m];
         S.cls[m] ??= {
@@ -561,7 +561,7 @@ const ts = Date.now();
       for (const m in cI) {
         let cC = cI[m], cS = S.cls[m], 自身刷新 = cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cC.包上 !== cS.上次包上 || cC.包下 !== cS.上次包下;
         if (自身刷新 || (!cS.aR && 组刷新.has(cC.iface))) {
-          let ms = lanNow - cS.lUT;
+          const ms = lanNow - cS.lUT;
           /* @BroTech-Reserved lan-trapezoid-wakeup.part.js */
           if (cS.上次包上 > 0) cS.包上总 += (cS.上次包上 + cC.包上) * ms * 0.0005;
           else if (cC.包上 > 0) cS.包上总 += cC.包上 * CONFIG.lanRefreshInterval * 0.5;
@@ -802,13 +802,14 @@ const ts = Date.now();
                         cache.rBox = rB;
           }
           
-          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol = "#0059fa";
+          const bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0;
+          let tC = "", tCol = "#0059fa";
           if (CONFIG.calcMode === 1) {
-            let rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
+            const rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
             if (rt > CONFIG.ratioExtremeUp) { tCol = '#ff4c00'; tC = (rt === Infinity ? '∞' : rt.toFixed(2)) + '⚠️'; }
             else if (rt > CONFIG.ratioWarnUp) { tCol = '#ff4c00'; tC = (rt * 100).toFixed(1) + '%'; }
             else if (rt > CONFIG.ratioExtremeDown) { tCol = '#0059fa'; tC = (rt * 100).toFixed(1) + '%'; }
-            else { tCol = '#0059fa'; let rRt = hqU > 0 ? (hqD / hqU) : (hqD > 0 ? Infinity : 0); tC = (rRt === Infinity ? '∞' : rRt.toFixed(1)) + 'x'; }
+            else { tCol = '#0059fa'; const rRt = hqU > 0 ? (hqD / hqU) : (hqD > 0 ? Infinity : 0); tC = (rRt === Infinity ? '∞' : rRt.toFixed(1)) + 'x'; }
           } else {
             tCol = bR > CONFIG.ratioThreshold ? '#ff4c00' : '#0059fa';
             tC = bR.toFixed(1) + '%';
@@ -818,7 +819,7 @@ const ts = Date.now();
           (cache.rBoxPort ??= rB.querySelector('.v-port')).textContent = pNm;
                     (cache.rBoxUp ??= rB.querySelector('.v-interval .c-up')).textContent = '' + fSV(hqU);
           (cache.rBoxDn ??= rB.querySelector('.v-interval .c-down')).textContent = '' + fSV(hqD);
-          let rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
+          const rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
           rtP.textContent = tC; rtP.style.color = tCol;
           (cache.rBoxBar ??= rB.querySelector('.gege-ratio-bar-inner')).style.width = Math.min(bR, 100) + '%';
                     let ipNode = cache.ipNode ??= inf.querySelector('.dev-ip');
