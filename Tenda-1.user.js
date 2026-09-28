@@ -86,8 +86,9 @@ let _saved = null;
   };
 
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
-  S.calcTime = (L) => {
-    S.Force_MS = (CONFIG.周期类型 === 'M' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth() + (L >= Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), CONFIG.周_天设置) ? 1 : 0), CONFIG.周_天设置) : (CONFIG.周期类型 === 'W' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + ((CONFIG.周_天设置 - new Date(L).getUTCDay() <= 0 ? CONFIG.周_天设置 - new Date(L).getUTCDay() + 7 : CONFIG.周_天设置 - new Date(L).getUTCDay()) * 86400000) : (CONFIG.周期类型 === 'D' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + CONFIG.周_天设置 * 86400000 : Infinity))) - CONFIG.时区补偿;
+
+    S.calcTime = (L) => {
+    S.Force_MS = (CONFIG.周期类型 === 'M' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth() + (L >= Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), CONFIG.周_天设置) ? 1 : 0), CONFIG.周_天设置) : (CONFIG.周期类型 === 'W' ? Date.UTC(new Date(L).getUTCFullYear(), new Date(L).getUTCMonth(), new Date(L).getUTCDate()) + ((CONFIG.周_天设置 - new Date(L).getUTCDay() > 0 ? CONFIG.周_天设置 - new Date(L).getUTCDay() : CONFIG.周_天设置 - new Date(L).getUTCDay() + 7) * 86400000) : (CONFIG.周期类型 === 'D' ? Date.parse(CONFIG.基准日期 + 'T00:00:00Z') + (Math.floor((L - Date.parse(CONFIG.基准日期 + 'T00:00:00Z')) / (CONFIG.周_天设置 * 86400000)) + 1) * CONFIG.周_天设置 * 86400000 : Infinity))) - CONFIG.时区补偿;
     S.Warn_MS = S.Force_MS + CONFIG.报告时间 * 60000;
     S.Force_MS += CONFIG.自动导出 * 60000;
   };S.calcTime((typeof GM_getValue !== 'undefined' && GM_getValue('gege_reset_ms')) ? (GM_getValue('gege_reset_ms') + CONFIG.时区补偿) : Date.now() + CONFIG.时区补偿);
@@ -139,7 +140,7 @@ let _saved = null;
   }
 
   const st = document.createElement('style');
-  st.innerHTML = `.config-item{
+    st.innerHTML = `.config-item{
         clear:both;}.config-item-box{display:flex!important;
         align-items:stretch!important;padding-bottom:
         12px!important;}.config-item .logo{width:33%!important;
@@ -188,7 +189,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
           cSU += u; cSD += dn;
         }
       }
-      if (lanValid) S.lastCI = cI;
+            if (lanValid) S.lastCI = cI;
       else {
         cI = S.lastCI || Object.create(null);
         for (const d of Object.values(cI)) { cSU += d.upRate || 0; cSD += d.dnRate || 0; }
@@ -197,10 +198,10 @@ async function rSD(wantWan = !0, wantLan = !0) {
       if (!iD && cM.length) for (let i = 0; i < cM.length; i++) if (!window.gegeRenderedMacs.has(cM[i])) { iD = !0; break; }
       if (iD) for (let m in S.cls) if (!cI[m]) {
         let cS = S.cls[m], ms = now - cS.lUT;
-        if (ms > CONFIG.lanRefreshInterval * 1000) ms = CONFIG.lanRefreshInterval * 1000;
-        cS.intUp += cS.upR * ms * 0.0005;
-        cS.intDn += cS.dnR * ms * 0.0005;
-        cS.upR = cS.dnR = 0;
+                  if (ms > CONFIG.lanRefreshInterval * 1000) ms = CONFIG.lanRefreshInterval * 1000;
+          cS.intUp += cS.upR * ms * 0.0005;
+          cS.intDn += cS.dnR * ms * 0.0005;
+          cS.upR = cS.dnR = 0;
       }
       if (ol && ol.style.display === 'block' && (iD || !ol.querySelector('.gege-list-item'))) {
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
@@ -209,10 +210,10 @@ async function rSD(wantWan = !0, wantLan = !0) {
       if (wanValid && S.wLT === undefined) S.wLT = now;
       else if (wanValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
         const wDt = now - S.wLT;
-        if (S.wInstUp > 0) S.wTotUp += (S.wInstUp + cWU) * wDt * 0.0005;
-        else if (cWU > 0) { const wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
-        if (S.wInstDn > 0) S.wTotDn += (S.wInstDn + cWD) * wDt * 0.0005;
-        else if (cWD > 0) { const wED = cWD * 0.5 * CONFIG.wanRefreshInterval; S.wTotDn += wED; S.wZED = (S.wZED || 0) + wED; S.wZEDC = (S.wZEDC || 0) + 1; }
+                if (S.wInstUp > 0) { S.wTotUp += (S.wInstUp + cWU) * wDt * 0.0005; }
+        else if (cWU > 0) { let wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
+        if (S.wInstDn > 0) { S.wTotDn += (S.wInstDn + cWD) * wDt * 0.0005; }
+        else if (cWD > 0) { let wED = cWD * 0.5 * CONFIG.wanRefreshInterval; S.wTotDn += wED; S.wZED = (S.wZED || 0) + wED; S.wZEDC = (S.wZEDC || 0) + 1; }
         S.wLT = now;
       }
       const 本轮刷新接口 = new Set();
@@ -241,10 +242,10 @@ async function rSD(wantWan = !0, wantLan = !0) {
         const cS = S.cls[m];
         if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cS.aR === 0 && 本轮刷新接口.has(cC.iface)) {
           const ms = now - cS.lUT;
-          if (cS.upR > 0) cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005;
-          else if (cC.upRate > 0) { const eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
-          if (cS.dnR > 0) cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005;
-          else if (cC.dnRate > 0) { const eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
+                    if (cS.upR > 0) { cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
+          else if (cC.upRate > 0) { let eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
+          if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
+          else if (cC.dnRate > 0) { let eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
           cS.upR = cC.upRate; cS.dnR = cC.dnRate; cS.lUT = now;
         }
       }
@@ -273,10 +274,10 @@ async function rSD(wantWan = !0, wantLan = !0) {
     S.wDue = now + CONFIG.wanRefreshInterval * 1000;
     S.lDue = now + CONFIG.lanRefreshInterval * 1000;
     window.gegeMasterTimer = setTimeout(gegePollLoop, Math.max(1, Math.min(S.wDue, S.lDue) - now));
-  }
+    }
 
   function buildCSV() {
-    const csvQ = s => `"${s.replaceAll('"', '""')}"`; // RFC 4180：字段整体加引号，内部双引号翻倍
+            const csvQ = s => `"${s.replaceAll('"', '""')}"`; // RFC 4180：字段整体加引号，内部双引号翻倍
     const csvE = v => {
       let s = String(v ?? '');
       if (typeof v === 'string' && /^(?:\s*[=+\-@＝＋－＠]|[\t\r\n])/.test(s)) s = "'" + s; // 防表格公式注入
@@ -294,7 +295,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
       csvRowT(['--- [设备明细] ---']),
       csvRow(['设备名称','MAC地址','IP地址','状态/接口','高精上行','高精下行','积分上行','积分下行','官方上行','官方下行']),
       ...Object.entries(sp.devices || {}).map(d => csvRow([d[1].name,d[0],d[1].ip,d[1].status,Math.round(d[1].up||0),Math.round(d[1].down||0),Math.round(d[1].integral_up||0),Math.round(d[1].integral_down||0),Math.round(d[1].raw_up||0),Math.round(d[1].raw_down||0)])),
-      '',
+            '',
       csvRow(['Bro-Stat@哥哥科技 https://space.bilibili.com/501430041']),
       csvRow(['项目主页: https://github.com/ucxn/Bro-Stat']),
       csvRow(['脚本下载: https://scriptcat.org/users/203510'])
@@ -305,7 +306,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
     );
   }
 function doSettle(nowMs) {
-    S._RST = !0; // 防重入锁
+        S._RST = !0; // 防重入锁
     let csv = buildCSV(), a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv;charset=utf-8;'})); a.download = `哥哥科技_路由器统计数据导出_${new Date(nowMs + CONFIG.时区补偿).toISOString().slice(2, 19).replace(/[-:]/g, '').replace('T', '_')}_${nowMs}.csv`; a.click(); // 文件
     let w = window.open('about:blank', '_blank');
@@ -314,7 +315,7 @@ function doSettle(nowMs) {
     GM_setValue('ha_snapshot', { timestamp: nowMs, global: {}, devices: {} }); _saved = null; S.cSnap = null;
     S.wTotUp = S.wTotDn = 0; // 内存原地清零
     for (let k in S.cls) { let s = S.cls[k]; s.intUp = s.intDn = 0; s.hU.fill(0); s.hD.fill(0); } // 内存原地清零底表
-    document.getElementById('gb-w-bnr')?.remove(); // 预警横幅
+        document.getElementById('gb-w-bnr')?.remove(); // 预警横幅
     S.calcTime(Math.max(nowMs, S.Force_MS - CONFIG.自动导出 * 60000 + 1000) + CONFIG.时区补偿); // 瞬间算出下月/下周新线
     window.gegeForceUIRedraw = !0; // 重绘 UI
     setTimeout(() => { S._RST = !1; }, 2000); // 解开安全锁
@@ -330,7 +331,7 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
         return s;
       }
 
-      function 记总速率图(u, d) {
+            function 记总速率图(u, d) {
         u = u || 0; d = d || 0;
         let i = S.总图点数 & 8191;
         S.总上行图[i] = u; S.总下行图[i] = d; S.总图点数++;
@@ -393,7 +394,6 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
         };
         画线(S.总上行图, '#ff1b00'); 画线(S.总下行图, '#006400');
       }
-
       const gPSvg = rate => {
         const c = rate === 10 ? '#E7B05C' : rate === 100 ? '#5394CC' : rate === 1000 ? '#4CAF50' : '';
         if (c) return `<svg viewBox="0 0 100 100" width="45" height="45" xmlns="http://www.w3.org/2000/svg"><g transform="rotate(180 50 50)"><path d="M18 82V36Q18 32 22 32H28V24Q28 20 32 20H38V14Q38 10 42 10H58Q62 10 62 14V20H68Q72 20 72 24V32H78Q82 32 82 36V82Q82 86 78 86H22Q18 86 18 82Z" fill="${c}" fill-opacity=".10" stroke="${c}" stroke-width="4" stroke-linejoin="round"/><g stroke="${c}" stroke-width="3.2" stroke-linecap="round"><path d="M31 54V76"/><path d="M36.5 54V76"/><path d="M42 54V76"/><path d="M47.5 54V76"/><path d="M53 54V76"/><path d="M58.5 54V76"/><path d="M64 54V76"/><path d="M69.5 54V76"/></g></g></svg>`;
@@ -421,7 +421,7 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
       LDn += S.cls[k].intDn || 0;
     }
     S.cSnap = {
-      timestamp: Date.now(),
+            timestamp: Date.now(),
       global: {
         wan_up: S.wTotUp,
         wan_down: S.wTotDn,
@@ -429,7 +429,7 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
         lan_integral_down: LDn,
         lan_high_up: LUp,
         lan_high_down: LDn
-      },
+            },
       devices: Object.keys(S.cls).reduce((acc, k) => {
         let s = S.cls[k], cC = cI[k];
         acc[k] = {
@@ -462,48 +462,48 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
             try { GM_setValue('ha_snapshot', S.cSnap); } catch (e) { console.warn(e); }
             Promise.resolve(gTD({modules:"ethPortStatus",timerRefresh:1})).then(d => { if (d?.ethPortStatus) S.pI = d.ethPortStatus; }).catch(e => console.warn("[哥哥科技/Tenda] 物理网口探测异常:", e));
           }
-          if (nowMs >= S.Force_MS && !S._RST) {doSettle(nowMs);
-          } else if (nowMs >= S.Warn_MS && !document.getElementById('gb-w-bnr')) {
-            let bd = document.getElementById('zte-geek-board');
-            if (bd) {
-              let bn = document.createElement('div'); bn.id = 'gb-w-bnr';
-              bn.style.cssText = 'background:#fff3cd;color:#856404;padding:10px 15px;margin-bottom:10px;border-radius:6px;border-left:5px solid #ffc107;font-weight:bold;font-size:13px;display:flex;justify-content:space-between;align-items:center;width:100%;box-sizing:border-box;';
-              bn.innerHTML = `<span> 统计周期即将结束，流量将在跨越边界时自动清零备份。</span><button id="gb-f-btn" style="background:#ffc107;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:bold;color:#333;">立即导出并清零</button>`;
-              bd.insertBefore(bn, bd.firstChild);
-              document.getElementById('gb-f-btn').onclick = () => doSettle(Date.now());}
-            }
-        }
+                  if (nowMs >= S.Force_MS && !S._RST) {doSettle(nowMs);
+        } else if (nowMs >= S.Warn_MS && !document.getElementById('gb-w-bnr')) {
+          let bd = document.getElementById('zte-geek-board');
+          if (bd) {
+            let bn = document.createElement('div'); bn.id = 'gb-w-bnr';
+            bn.style.cssText = 'background:#fff3cd;color:#856404;padding:10px 15px;margin-bottom:10px;border-radius:6px;border-left:5px solid #ffc107;font-weight:bold;font-size:13px;display:flex;justify-content:space-between;align-items:center;width:100%;box-sizing:border-box;';
+            bn.innerHTML = `<span> 统计周期即将结束，流量将在跨越边界时自动清零备份。</span><button id="gb-f-btn" style="background:#ffc107;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:bold;color:#333;">立即导出并清零</button>`;
+            bd.insertBefore(bn, bd.firstChild);
+            document.getElementById('gb-f-btn').onclick = () => doSettle(Date.now());}
+          }
+      }
         S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval * 4); S.lwTU = S.wTotUp;
         S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval * 4); S.lwTD = S.wTotDn;
         const rUp = S.wTotUp ? LUp / S.wTotUp : 1, rDn = S.wTotDn ? LDn / S.wTotDn : 1;
-        S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#ff4c00' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#ff4c00' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
-        if (document.getElementById('gb-ratio-display')) document.getElementById('gb-ratio-display').innerHTML = S.cRT;
-      }
+                    S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#ff4c00' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#ff4c00' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
+            if (document.getElementById('gb-ratio-display')) document.getElementById('gb-ratio-display').innerHTML = S.cRT;
+        }
     }
-    let bd = document.getElementById('zte-geek-board');
+        let bd = document.getElementById('zte-geek-board');
     if (!bd) {
       bd = document.createElement('div');
       bd.id = 'zte-geek-board';
  let layoutHtml = '';
-if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
-    layoutHtml = `
-        <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span><span style="margin-left: 5px;"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></span></div><div class="geek-right-box" style="font-weight: normal; color: #666;"><span style="color: #333;">0估算：</span><span id="gb-wan-zero-up"></span>，<span id="gb-wan-zero-down"></span>｜<span id="gb-wan-zero-up-cnt"></span>，<span id="gb-wan-zero-down-cnt"></span></div></div>
-        <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
-        <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span><span style="font-weight: bold; margin-left: 5px;">WAN总计：<span class="c-up" id="gb-wan-up-vol"></span> | <span class="c-down" id="gb-wan-down-vol"></span></span></div><div class="geek-right-box">内外网比：<span id="gb-ratio-display"></span></div></div>`;
+        if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
+            layoutHtml = `
+                <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span><span style="margin-left: 5px;"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></span><span id="gb-pwan-vol-container" style="display:none; position:absolute; left:clamp(450px, 60%, 700px); color:#333; font-weight:bold; white-space:nowrap;">副WAN总：<span class="c-up" id="gb-pwan-tot-up"></span> | <span class="c-down" id="gb-pwan-tot-down"></span></span></div><div class="geek-right-box" style="font-weight: normal; color: #666;"><span style="color: #333;">0估算：</span><span id="gb-wan-zero-up"></span>，<span id="gb-wan-zero-down"></span>｜<span id="gb-wan-zero-up-cnt"></span>，<span id="gb-wan-zero-down-cnt"></span></div></div>
+        <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span><span id="gb-pwan-bps-container" style="display:none; margin-left: 5px;"><span class="c-up" id="gb-pwan-bps-up"></span> | <span class="c-down" id="gb-pwan-bps-down"></span></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
+        <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span><span style="font-weight: bold; margin-left: 5px;">WAN总计：<span class="c-up" id="gb-wan-up-vol"></span> | <span class="c-down" id="gb-wan-down-vol"></span></span></div><div class="geek-right-box">${S.hasW2?'主次网比':'内外网比'}：<span id="gb-ratio-display"></span></div></div>`;
 } else if (CONFIG.uiLayout === 2) { // 平铺版 (报表流)
     layoutHtml = `
-        <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span></div><div class="geek-right-box"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></div></div>
-        <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
+        <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span><span id="gb-pwan-vol-container" style="display:none; position:absolute; left:clamp(450px, 60%, 700px); color:#333; font-weight:bold; white-space:nowrap;">副WAN总：<span class="c-up" id="gb-pwan-tot-up"></span> | <span class="c-down" id="gb-pwan-tot-down"></span></span></div><div class="geek-right-box"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></div></div>
+        <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span><span id="gb-pwan-bps-container" style="display:none; margin-left: 5px;"><span class="c-up" id="gb-pwan-bps-up"></span> | <span class="c-down" id="gb-pwan-bps-down"></span></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
         <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span></div><div class="geek-right-box"></div></div>
-        <div class="geek-row"><span class="geek-label">WAN总计：</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-wan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-wan-down-vol"></span></div><div class="geek-right-box"><span style="font-weight: normal;">内外网比：</span><span id="gb-ratio-display"></span></div></div>`;
+        <div class="geek-row"><span class="geek-label">WAN总计：</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-wan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-wan-down-vol"></span></div><div class="geek-right-box"><span style="font-weight: normal;">${S.hasW2?'主次网比':'内外网比'}：</span><span id="gb-ratio-display"></span></div></div>`;
 } else { // 经典版 (0)
     layoutHtml = `
-        <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span></div><div class="geek-right-box"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></div></div>
-        <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
+        <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span><span id="gb-pwan-vol-container" style="display:none; position:absolute; left:clamp(450px, 60%, 700px); color:#333; font-weight:bold; white-space:nowrap;">副WAN总：<span class="c-up" id="gb-pwan-tot-up"></span> | <span class="c-down" id="gb-pwan-tot-down"></span></span></div><div class="geek-right-box"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></div></div>
+        <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span><span id="gb-pwan-bps-container" style="display:none; margin-left: 5px;"><span class="c-up" id="gb-pwan-bps-up"></span> | <span class="c-down" id="gb-pwan-bps-down"></span></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
         <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span></div><div class="geek-right-box">WAN：<span class="c-up" id="gb-wan-up-vol"></span> | <span class="c-down" id="gb-wan-down-vol"></span></div></div>`;
 }
         layoutHtml += `<div class="geek-row" id="gb-phys-row" style="display:none;height:auto!important;flex-wrap:wrap;"><span class="geek-label" style="font-weight:normal;color:#666;">物理网口</span><div class="geek-val-box" id="gb-phys-data" style="flex-wrap:wrap;font-size:13px;font-weight:normal;"></div></div>`;
-        bd.innerHTML = layoutHtml;
+                bd.innerHTML = layoutHtml;
         let pinBtn = bd.querySelector('#gege-pin-btn');
         if (pinBtn) {
             if (S.isPinned) {
@@ -530,8 +530,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
       if (mn && bd.parentNode !== mn.parentNode) mn.parentNode.insertBefore(bd, mn);
     }
   
-    let oDC = Object.create(null);
-    if (!iPO) {
+        let oDC = Object.create(null);
+        if (!iPO) {
       const M_RX = /([a-fA-F0-9]{2}[:-]){5}[a-fA-F0-9]{2}/;
       let aI = aC.querySelectorAll('.config-item');
       for (let n of aI) {
@@ -557,7 +557,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
         setText('#gb-wan-down-bps', `🔽 ${fBy(wD)}`);
         setText('#gb-lan-up-bytes', `🔼 ${fB(sU)}`);
         setText('#gb-lan-down-bytes', `🔽 ${fB(sD)}`);
-        setText('#gb-perc-up', `🔼 ${wU>0?(sU*100/wU).toFixed(1):0.0}%`);
+                setText('#gb-perc-up', `🔼 ${wU>0?(sU*100/wU).toFixed(1):0.0}%`);
         setText('#gb-perc-down', `🔽 ${wD>0?(sD*100/wD).toFixed(1):0.0}%`);
         setText('#gb-lan-up-vol', `🔼 ${fV(LUp)}`);
         setText('#gb-lan-down-vol', `🔽 ${fV(LDn)}`);
@@ -570,7 +570,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
           bd.querySelector('#gb-phys-data').innerHTML = h;
         }
         画总速率图(bd);
-        if (bd.querySelector('#gb-ratio-display')) {
+                if (bd.querySelector('#gb-ratio-display')) {
           if (bd.querySelector('#gb-wan-zero-up')) {
               setText('#gb-wan-zero-up', !S.wZEU ? '' : fSV(S.wZEU));
               setText('#gb-wan-zero-down', !S.wZED ? '' : fSV(S.wZED));
@@ -579,8 +579,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
           }
         }
       }
-      const inv_LUp = LUp > 0 ? 100 / LUp : 0;
-      const inv_LDn = LDn > 0 ? 100 / LDn : 0;
+      const inv_boardUp = LUp > 0 ? 100 / LUp : 0;
+            const inv_LDn = LDn > 0 ? 100 / LDn : 0;
       const inv_sU = sU > 0 ? 100 / sU : 0;
       const inv_sD = sD > 0 ? 100 / sD : 0;
 
@@ -600,9 +600,9 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
         const rN = cache.rssiNode ??= (cache.devIntro ??= it.querySelector('.dev-intro'))?.querySelector('.gege-rssi');
         if (rN) { const p = Math.round((cC.rssi - (cC.iface === '2.4G' ? S.RSSI频率修正 || 0 : 0)) * 1.6666666666666667 + 133.33333333333334); rN.innerHTML = cC.iface === 'wire' ? escapeHTML(cC.vendor || '') : cC.rssi ? `<span style="color:${p < 0?'#ff4c00':'inherit'}">${p}%</span>, ${cC.rssi}` : ''; }
         
-        let hqU = cS.intUp || 0; 
+                let hqU = cS.intUp || 0; 
         let hqD = cS.intDn || 0;
-        let tN = cache.timeNode ??= it.querySelector('.gege-online-time');
+                let tN = cache.timeNode ??= it.querySelector('.gege-online-time');
         if (tN && cS.onS > 0) tN.textContent = `在线：${fOT(cS.onS)}`;
         
         const dI = cache.devIntro ??= it.querySelector('.dev-intro');
@@ -616,7 +616,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             rB.style.cssText = 'margin-top: 4px; width: 95%; margin-bottom: 2px;';
             rB.innerHTML = `<div class="gege-ratio-top"><span class="v-port"></span><span class="v-interval" style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-weight: normal; font-size: 12.5px; opacity: 0.75; letter-spacing: 0.5px;"><span class="c-up"></span><span style="color:#666; margin:0 3px;">，</span><span class="c-down"></span></span><span class="v-rt-pct"></span></div><div class="gege-ratio-bar"><div class="gege-ratio-bar-inner"></div></div>`;
             dI.appendChild(rB);
-            cache.rBox = rB;
+                        cache.rBox = rB;
           }
           
           let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol = "#0059fa";
@@ -631,19 +631,19 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             tC = bR.toFixed(1) + '%';
           }
           (cache.rBoxPort ??= rB.querySelector('.v-port')).textContent = CONFIG.portMap[cC.iface] || cC.iface || "未知";
-          (cache.rBoxUp ??= rB.querySelector('.v-interval .c-up')).textContent = '' + fSV(hqU);
+                    (cache.rBoxUp ??= rB.querySelector('.v-interval .c-up')).textContent = '' + fSV(hqU);
           (cache.rBoxDn ??= rB.querySelector('.v-interval .c-down')).textContent = '' + fSV(hqD);
           let rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
           rtP.textContent = tC; rtP.style.color = tCol;
           (cache.rBoxBar ??= rB.querySelector('.gege-ratio-bar-inner')).style.width = Math.min(bR, 100) + '%';
-          let ipNode = cache.ipNode ??= inf.querySelector('.dev-ip');
+                    let ipNode = cache.ipNode ??= inf.querySelector('.dev-ip');
           if (ipNode) {
             let zBadge = cache.zBadge ??= ipNode.querySelector('.gege-zero-badge');
             if (!zBadge) {
               zBadge = document.createElement('span'); zBadge.className = 'gege-zero-badge gege-box';
               ipNode.style.display = 'flex'; ipNode.style.justifyContent = 'space-between';
               zBadge.style.cssText = 'color: #999; font-size: 11.5px; font-family: system-ui, sans-serif; margin-right: 5px;';
-              ipNode.appendChild(zBadge);
+                            ipNode.appendChild(zBadge);
               cache.zBadge = zBadge;
             }
             zBadge.textContent = ((cS.zUC || 0) + (cS.zDC || 0)) < 6 ? "" : `[0估] ${!cS.zEU ? '' : fSV(cS.zEU)}，${!cS.zED ? '' : fSV(cS.zED)}｜${cS.zUC || 0},${cS.zDC || 0}`;
@@ -658,8 +658,8 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
             inf.appendChild(bx);
             cache.upBox = bx;
           }
-          let p = hqU * inv_LUp;
-          (cache.upVol ??= bx.querySelector('.v-vol')).textContent = fV(cS.intUp);
+          let p = hqU * inv_boardUp;
+                              (cache.upVol ??= bx.querySelector('.v-vol')).textContent = fV(cS.intUp);
           (cache.upPct ??= bx.querySelector('.v-pct')).textContent = p.toFixed(1) + '%';
           (cache.upBar ??= bx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(p, 100) + '%';
 
@@ -674,7 +674,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
           }
           let dp = cS.intDn * inv_LDn;
           (cache.dBoxVol ??= dBx.querySelector('.v-vol')).textContent = fV(cS.intDn);
-          (cache.dBoxPct ??= dBx.querySelector('.v-pct')).textContent = dp.toFixed(1) + '%';
+                    (cache.dBoxPct ??= dBx.querySelector('.v-pct')).textContent = dp.toFixed(1) + '%';
           (cache.dBoxBar ??= dBx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(dp, 100) + '%';
         }
         
@@ -725,7 +725,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
         ol.innerHTML = `<div style="padding:20px;width:96%;margin:0 auto;min-height:100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container"><div class="gege-section"><div class="config-title">有线设备</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.8GHz':'5.2GHz'}）</div>${h5.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div>${h6.length?`<div class="gege-section"><div class="config-title">无线设备（6GHz）</div>${h6.join('')}</div>`:''}<div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}
         </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序基于 Delayed Open Source Attribution License 1.0 发行，按“原样 (AS IS)”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作任何明示或暗示的担保。<br>根据 DOSA-1.0 第 2 条规定，基于本程序的任何修改均不得移除、隐藏或篡改本界面的署名与法律声明。保留此界面GUI的完整性是使用本软件代码的合法性的前置条件。<a href="https://github.com/ucxn/Bro-Stat/blob/main/License.md" target="_blank" style="color: #777; text-decoration: underline;">许可证</a>
         </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Bro-Stat" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件 Tenda-${版本号}</a> Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1PtR7B8ECC" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/zh-CN/users/203510" target="_blank" style="color: #666; text-decoration: none;">点此分享</a></div></div></div></div>`;
-      });}
+            });}
     catch (e) {
       requestAnimationFrame(() => {
         ol.innerHTML = `<div style="padding: 20px; color: red;">数据渲染失败: ${escapeHTML(e.message)}</div>`;
@@ -739,7 +739,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
     b.id = 'gege-floating-btn';
     b.innerHTML = '🛸';
     b.style.cssText = 'position: fixed; top: 20px; right: 30%; width: 50px; height: 50px; background: linear-gradient(135deg, #0059fa, #00c6ff); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 48px; box-shadow: 0 4px 15px rgba(0,89,250,0.5); cursor: pointer; z-index: 99999; transition: transform 0.3s ease; user-select: none;';
-    b.
+        b.
     onmouseover = () => {
       b.style.transform = 'scale(1.1) rotate(15deg)';
     };
@@ -750,7 +750,7 @@ if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
     b.onclick = () => window.gegeTogglePanel();
     document.body.appendChild(b);
   };
- window.gegeTogglePanel = function (fS = null) {
+  window.gegeTogglePanel = function (fS = null) {
     let o = document.getElementById('gege-global-overlay');
     let tS = fS !== null ? fS : !(o && o.style.display === 'block');
     
