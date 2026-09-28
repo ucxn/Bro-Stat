@@ -2,9 +2,8 @@ Required Notice: Copyright © 2026 哥哥科技 (BroTech)  <br>
 Required Notice: https://github.com/ucxn/Bro-Stat
 
 ### License Scope Notice
-The following license does not automatically apply to the entire repository. It applies on a file-by-file basis only to files that expressly state that they are licensed under this license. The presence of this license text in the repository does not, by itself, grant any rights under this license to files that do not contain such a declaration.
+无论选择何种授权路径，均同时受本文件所载 哥哥科技显著署名附加条款 约束。
 
-无论选择何种授权路径，均同时受本文件所载 哥哥科技显著署名附加条款 约束。</br>
 Regardless of the licensing path chosen, it is subject to the BroTech Prominent Attribution Terms set forth in this document. 
 
 ### 品牌使用政策和许可证文本
@@ -44,8 +43,8 @@ Regardless of the license used, the author's prominent attribution must be retai
 服务原则上应当以含有明确物理成本的线下服务为主，但不得以附带安装调试该脚本为由收取任何附加费用；不得以本程序的取得、复制、安装、配置、调试、更新、维护或者排错为对价；<br>也不得在在线平台以任何理由收取关于本程序的任何费用，来掩盖实质上为分发该软件所收取的任何费用。<br>
 无论如何、任何情况下不得将本软件本身源码或可执行产物打包倒卖，也不得作为售卖的商品的赠品。
 
-路由器官方原版、原厂固件开发者可以自行集成该程序，但是必须保留署名；署名具体的方式可以和相应公司官方商榷是否有更加合理的许可。
+本项目已适配的路由器品牌的官方原版、原厂固件开发者可以自行先行集成该程序，但是必须保留署名；署名具体的方式可以和相应公司官方商榷是否有更加合理的许可。
 
 哥哥科技 2026 © Bro-Tech 版权所有
 
-附加条款到此结束。
+附加条款到此结束。END OF THE Additional Terms.

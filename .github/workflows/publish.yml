@@ -1,0 +1,30 @@
+name: Publish Bro-Stat scripts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build userscripts
+        run: python3 .github/scripts/publish.py
+
+      - name: Commit changed products
+        shell: bash
+        run: |
+          git add ASUS-1.user.js H3C-TX_1801.user.js Huawei-1.user.js Mi-WiFi_RD.user.js TP-L1.user.js Tenda-1.user.js
+          if git diff --cached --quiet; then
+            echo "No dev files changed."
+            exit 0
+          fi
+          git config user.name "哥哥科技"
+          git config user.email "175325443+ucxn@users.noreply.github.com"
+          git commit -m "build"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

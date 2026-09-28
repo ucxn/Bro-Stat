@@ -19,7 +19,7 @@
 // @storageName     GBNPA_Storage
 // @source          https://github.com/ucxn/Bro-Stat
 // @supportURL      https://www.bilibili.com/video/BV1LZ6yBXESq
-// @license         LicenseRef-BroTech-Additional-Terms AND Delayed Open Source Attribution License 1.0 (DOSA-1.0)
+// @license         发行版作者哥哥科技保留所有权利，源码本身公开，请前往 GitHub Source 区域获得授权部分
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/H3C-TX_1801.user.js
 // @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/H3C-TX_1801.user.js
 
