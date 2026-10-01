@@ -69,7 +69,7 @@
 
 let _saved = null;
   if (CONFIG.readSaveData === 1 && typeof GM_getValue !== 'undefined') {
-    try { _saved = GM_getValue('ha_snapshot', null); } catch(e) {console.warn(e)}
+    try { _saved = GM_getValue('ha_snapshot', null); } catch(e) {console.warn(e);}
   }
 
   const S = {
@@ -323,9 +323,9 @@ async function rSD() {
 const ts = Date.now();
       let resW, resL, tW = "", tL = "", wanNow, lanNow;
       
-      try { resW = await fetch(`/flow_polling.asp?_=${ts}`); if(resW.ok) tW = GBK.decode(await resW.arrayBuffer()); } catch(e){console.warn(e)}
+      try { resW = await fetch(`/flow_polling.asp?_=${ts}`); if(resW.ok) tW = GBK.decode(await resW.arrayBuffer()); } catch(e){console.warn(e);}
       wanNow = performance.now();
-      try { resL = await fetch(`/ip_statistics.asp?_=${ts}`); if(resL.ok) tL = GBK.decode(await resL.arrayBuffer()); } catch(e){console.warn(e)}
+      try { resL = await fetch(`/ip_statistics.asp?_=${ts}`); if(resL.ok) tL = GBK.decode(await resL.arrayBuffer()); } catch(e){console.warn(e);}
       lanNow = performance.now();
 
       let wB_m = tW.match(/wan_bytes\[0\]\s*=\s*\[(\d+),\s*(\d+)\]/);
@@ -504,8 +504,10 @@ const ts = Date.now();
         let cC = cI[m], cS = S.cls[m], 自身刷新 = cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cC.包上 !== cS.上次包上 || cC.包下 !== cS.上次包下;
         if (自身刷新 || (!cS.aR && 组刷新.has(cC.iface))) {
           const ms = lanNow - cS.lUT;
-                    if (cS.upR > 0) { cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
-          else if (cC.upRate > 0) { const eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
+                    if (cS.upR > 0) {
+          cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
+          else if (cC.upRate > 0) {
+            const eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
           if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
           else if (cC.dnRate > 0) { const eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
           if (cS.上次包上 > 0) cS.包上总 += (cS.上次包上 + cC.包上) * ms * 0.0005;
@@ -677,7 +679,6 @@ const calcStageRatio = (W, L_int, L_hp) => {
     }
             if (bd.parentNode) {
         const setText = (id, text) => { const el = bd.querySelector(id); if (el) el.textContent = text; };
-        const setHTML = (id, html) => { const el = bd.querySelector(id); if (el) el.innerHTML = html; };
         let aW2U = S.hasW2 ? S.w2U : undefined, aW2D = S.hasW2 ? S.w2D : undefined, aW2TU = S.hasW2 ? S.w2TotUp : undefined, aW2TD = S.hasW2 ? S.w2TotDn : undefined;
         if (!S.runT) S.runT = performance.now();
         let dtR = (performance.now() - S.runT) / 1000;
@@ -760,7 +761,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
           }
           
           const bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0;
-          let tC = "", tCol = "#0059fa";
+          let tC = "", tCol;
           if (CONFIG.calcMode === 1) {
             const rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
             if (rt > CONFIG.ratioExtremeUp) { tCol = '#ff4c00'; tC = (rt === Infinity ? '∞' : rt.toFixed(2)) + '⚠️'; }
@@ -868,8 +869,8 @@ const calcStageRatio = (W, L_int, L_hp) => {
       }
       requestAnimationFrame(() => {
         ol.innerHTML = `<div style="padding: 20px; width: 96%; margin: 0 auto; min-height: 100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container"><div class="gege-section"><div class="config-title">有线设备${(window.gegeHiddenDevices && Object.keys(window.gegeHiddenDevices).length > 0) ? '<span style="color: #ff4c00; font-size: 13px; font-weight: normal; margin-left: 10px; font-family: system-ui, sans-serif;">(哥哥科技：智能Mesh适配)</span>' : ''}</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.8GHz':'5.2GHz'}）</div>${h52.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${S.is5G_149?'5.2GHz':'5.8GHz'}）</div>${h58.join('')||'<div class="gege-empty-state">没有连接设备</div>'}
-        </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序基于 Delayed Open Source Attribution License 1.0 发行，按“原样 (AS IS)”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作任何明示或暗示的担保。<br>根据 DOSA-1.0 第 2 条规定，基于本程序的任何修改均不得移除、隐藏或篡改本界面的署名与法律声明。保留此界面GUI的完整性是使用本软件代码的合法性的前置条件。<a href="https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/License.md" target="_blank" style="color: #777; text-decoration: underline;">许可证</a>
-        </div><div style="font-size: 12px; color: #555;"><a href="https://github.com/ucxn/Bro-Stat" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件</a> Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1PtR7B8ECC" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/zh-CN/users/203510" target="_blank" style="color: #666; text-decoration: none;">点此分享</a></div></div></div></div>`;
+        </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序属于“哥哥软件”系列；仅供使用，传播请尊重署名，二开或发行请参阅许可证；按“原样 (AS IS)”且免费提供，不对其适用性、稳定性、精密度或任何商业场景合规性作任何明示或暗示的担保。<br>基于本程序的任何修改、使用任意部分代码、再发布或相关衍生版本的合法性的前置条件是：在提供最终用户界面时，均应显著保留保留所有“哥哥科技”与法律声明，不得删除、隐藏或降低其可见性。<a href="https://github.com/ucxn/Bro-Stat/blob/main/License.md" target="_blank" style="color: #777; text-decoration: underline;">许可证</a>
+        <div style="font-size:12px;color:#555;"><svg xmlns="http://www.w3.org/2000/svg" width="131" height="18" viewBox="0 0 145 20" role="img" aria-label="Broware Attribution" style="vertical-align:middle;margin-right:6px"><defs><linearGradient id="bg1" x2="0" y2="1"><stop stop-color="#4b4b4b"/><stop offset=".5" stop-color="#333"/><stop offset="1" stop-color="#1f1f1f"/></linearGradient><linearGradient id="bg2" x2="0" y2="1"><stop stop-color="#52d58c"/><stop offset=".52" stop-color="#31bc71"/><stop offset="1" stop-color="#218b50"/></linearGradient><linearGradient id="sh" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".32"/><stop offset=".45" stop-color="#fff" stop-opacity=".08"/><stop offset=".46" stop-opacity="0"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="c"><rect width="145" height="20" rx="4"/></clipPath></defs><g clip-path="url(#c)"><path fill="url(#bg1)" d="M0 0h24v20H0z"/><path fill="url(#bg2)" d="M24 0h121v20H24z"/><path fill="url(#sh)" d="M0 0h145v20H0z"/></g><g transform="translate(4 2)"><rect width="15" height="15" rx=".6" fill="#fff"/><rect x="1" y="1" width="13" height="13" fill="#58d18d"/><path fill="#fff" d="M1 1h7v7z"/><path fill="#32bf70" d="M8 1h6v13H8z"/><path fill="#1ba856" d="M1 14h7V8l6 6z"/></g><g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11"><text x="84" y="15" fill="#000" fill-opacity=".28">Broware Attribution</text><text x="84" y="14">Broware Attribution</text></g></svg><a href="https://github.com/ucxn/Bro-Stat" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件</a> Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV1PtR7B8ECC" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/zh-CN/users/203510" target="_blank" style="color: #666; text-decoration: none;">点此分享</a></div></div></div></div>`;
         S.DOM已重建 = !0; S.DOM缓存 = null;
       });}
     catch (e) {
