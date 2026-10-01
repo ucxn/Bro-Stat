@@ -1,7 +1,7 @@
 ## 授权结构、主协议及冲突处理
 ### License Structure, Primary Terms and Conflict Resolution
 
-哥哥科技附加条款（BroTech Additional Terms）构成本项目的主授权条款、许可证、合同、协议、契约，是法律效力的必要条件。也是在合法条件下，唯一需要遵守的协议。
+哥哥科技附加条款（BroTech Additional Terms）构成本项目的**主授权条款**、许可证、合同、协议、契约，是法律效力的必要条件。***也是在合法基本条件下，唯一需要遵守的协议。***
 
 在您充分理解、阅读以及同意上述规则以及下述哥哥科技附加条款的情况下，理解为：本项目原创内容可以向公众提供一项完整、统一且不可任意拆分的复合授权，而非数份可以由接受者分别摘取、独立选择或相互替代的许可。
 
@@ -37,6 +37,7 @@ However: **Any rights I grant that conflict with the attribution-related provisi
 
 附加条款位于项目 GitHub 首页的 [LICENSE 中](https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/License.md)
 
+---
 BroTech, as the original author of this project, retains full copyright in the
 project and its original content.
 

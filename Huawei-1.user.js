@@ -20,7 +20,8 @@
 // @storageName     GBNPA_Storage
 // @source          https://github.com/ucxn/Bro-Stat
 // @supportURL      https://www.bilibili.com/video/BV1SeEb67Ep1
-// @license         发行版作者哥哥科技保留所有权利，源码本身公开，请前往 GitHub Source 区域获得授权部分
+// @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享） 
+// @note            发行版作者哥哥科技保留所有权利，源码本身公开，请前往 GitHub Source 区域获得授权部分
 // @run-at          document-start
 // @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/Huawei-1.user.js
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/Huawei-1.user.js
@@ -312,12 +313,12 @@ function fBy(bps) {
           
           if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) {
             const ms = lanNow - cS.lUT;
-                      if (cS.upR > 0) {
-          cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
-          else if (cC.upRate > 0) {
+          if (cS.upR > 0) {
+            cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
+           else if (cC.upRate > 0) {
             const eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
-          if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
-          else if (cC.dnRate > 0) { const eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1; }
+        } if (cS.dnR > 0) { cS.intDn += (cS.dnR + cC.dnRate) * ms * 0.0005; }
+           else if (cC.dnRate > 0) { const eD = cC.dnRate * CONFIG.lanRefreshInterval * 0.5; cS.intDn += eD; cS.zED = (cS.zED || 0) + eD; cS.zDC = (cS.zDC || 0) + 1;
             cS.upR = cC.upRate;
             cS.dnR = cC.dnRate;
             cS.lUT = lanNow;
