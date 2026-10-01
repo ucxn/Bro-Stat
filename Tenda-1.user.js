@@ -3,7 +3,7 @@
 // @name:en         Bro-Stat-Tenda
 // @namespace       ucxn
 // @version         5.9.9
-// @description     哥哥科技 QQ群 680464365
+// @description     腾达（Tenda）以及全品牌家用路由器增强脚本，网速流量一键统计计算，前端微积分事件驱动测控
 // @description:en  Enhancement script for Tenda and All-Brand consumer routers; one-click statistics and calculations for internet speed and data usage; front-end calculus-based event-driven M&C.
 // @author          哥哥科技 space.bilibili.com/501430041
 // @noframes

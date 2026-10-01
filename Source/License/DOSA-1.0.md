@@ -19,17 +19,17 @@ License text copyright © 2021 Child Mind Institute, Inc. All Rights Reserved.
 
 "Delayed Open Source Attribution License" and "DOSA License" are trademarks of Child Mind Institute, Inc.
                   
-[License text files available at https://github.com/ChildMindInstitute/DOSA-license]
+[The only authoritative full text is the copy hosted by 哥哥科技 at the link: https://github.com/ucxn/Bro-Stat/blob/main/Source/License/DOSA-1.0.md ; no license may be identified or construed by its name or by any generic version published elsewhere.]
 
 Though it is not itself an open source license, the purpose of this Delayed Open Source Attribution License 
 (the "DOSA License") is to provide open access to software for non-commercial use while giving attribution to its original developer, 
-and after a delay of three years, forcing the software to fall under the terms of the open source CPAL-1.0 license 
-(located at https://opensource.org/licenses/CPAL-1.0) or a future version of the CPAL-1.0 license published by Socialtext, Inc. (the "CPAL License") 
-that preserves the attribution information of this DOSA License. This delay is intended to protect the commercial interests of the licensor 
+and after a delay of three years, forcing the software to fall under the terms of the【BroTech Additional Terms
+(located at https://github.com/ucxn/Bro-Stat/blob/main/License.md) + CPAL-1.0 license】.
+that preserves the attribution information of this Brother License. This delay is intended to protect the commercial interests of the licensor 
 without compromising on the many benefits of creating open source products. 
             
 Child Mind Institute, Inc. ("CMI") hereby grants you permission to use this DOSA License’s text 
-(unmodified except for identifying the relevant parties and providing attribution information as called for in Section 1(a) and Schedule A) 
+(unmodified except for above texts, identifying the relevant parties and providing attribution information as called for in Section 1(a) and Schedule A) 
 to license your works, and to refer to it using the trademark "Delayed Open Source Attribution License" or "DOSA License".
             
 
@@ -37,7 +37,7 @@ to license your works, and to refer to it using the trademark "Delayed Open Sour
 <ol>
   <li><b>Delayed open source.</b></li>
     <ol type="a">
-      <li><Under the condition that you strictly comply with the BroTech Additional Terms, the "Licensor"> hereby grants permission, free of charge, to any person obtaining a copy of this Software, to use, copy, modify, merge, publish, and distribute the Software, in each case for any purpose other than a Commercial Purpose and to permit persons to whom the Software is furnished to do so, subject to the terms and conditions of this DOSA License.</li>
+      <li><b>Under the condition that you strictly comply with the BroTech Additional Terms, the "Licensor"</b> hereby grants permission, free of charge, to any person obtaining a copy of this Software, to use, copy, modify, merge, publish, and distribute the Software, in each case for any purpose other than a Commercial Purpose and to permit persons to whom the Software is furnished to do so, subject to the terms and conditions of this DOSA License.</li>
       <li>This DOSA License applies separately for each version of the Software. No version of the Software can be used for Commercial Purposes within three years of the first publicly available distribution of that version under this DOSA License.</li>
       <li>Effective on the third anniversary of the first publicly available distribution of each version of the Software under this DOSA License, you are hereby granted a license to that version of the Software under the terms of the CPAL License.  The " Notice Exhibits to the time-delayed CPAL License" set forth in Schedule A, below, shall constitute Exhibits A and B to the CPAL License (and shall not, for the avoidance of doubt, be deemed to constitute a license or other grant of rights in the Software under this DOSA License).</li>
     </ol>
@@ -120,7 +120,7 @@ Capitalized terms in the following exhibits refer to the corresponding terms as 
 ### EXHIBIT A. Common Public Attribution License Version 1.0.
 
 "The contents of this file are subject to the Common Public Attribution License Version 1.0 (the "License"); 
-you may not use this file except in compliance with the License. You may obtain a copy of the License at [ucxn/Bro-Stat/CPAL-1.0.md](https://github.com/ucxn/Bro-Stat/blob/main/LICENSE/CPAL-1.0.md). 
+you may not use this file except in compliance with the License. You may obtain a copy of the License at [ucxn/Bro-Stat/CPAL-1.0.md](https://github.com/ucxn/Bro-Stat/blob/main/Source/License/CPAL-1.0.md). 
 The License is based on the Mozilla Public License Version 1.1 but Sections 14 and 15 have been added to cover use of software 
 over a computer network and provide for limited attribution for the Original Developer. In addition, Exhibit A has been modified 
 to be consistent with Exhibit B.
@@ -128,7 +128,7 @@ to be consistent with Exhibit B.
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. 
 See the License for the specific language governing rights and limitations under the License.
 
-The Original Code is **Bro-Stat**.
+The Original Code is **Part of Bro-Stat（Under the non-negotiable compliance with BroTech Additional Terms of Attribution）**.
 
 The Original Developer is the Initial Developer and is 哥哥科技. If left blank, the Original Developer is the Initial Developer.
 
