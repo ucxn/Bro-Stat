@@ -720,7 +720,6 @@ const ts = Date.now();
     }
             if (bd.parentNode) {
         const setText = (id, text) => { const el = bd.querySelector(id); if (el) el.textContent = text; };
-        const setHTML = (id, html) => { const el = bd.querySelector(id); if (el) el.innerHTML = html; };
         let aW2U = S.hasW2 ? S.w2U : undefined, aW2D = S.hasW2 ? S.w2D : undefined, aW2TU = S.hasW2 ? S.w2TotUp : undefined, aW2TD = S.hasW2 ? S.w2TotDn : undefined;
         if (!S.runT) S.runT = performance.now();
         let dtR = (performance.now() - S.runT) / 1000;
@@ -803,7 +802,7 @@ const ts = Date.now();
           }
           
           const bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0;
-          let tC = "", tCol = "#0059fa";
+          let tC = "", tCol;
           if (CONFIG.calcMode === 1) {
             const rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
             if (rt > CONFIG.ratioExtremeUp) { tCol = '#ff4c00'; tC = (rt === Infinity ? '∞' : rt.toFixed(2)) + '⚠️'; }

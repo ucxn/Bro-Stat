@@ -1,5 +1,19 @@
-<h1><img width="100" src="https://github.com/ChildMindInstitute/DOSA-license/blob/main/DOSA_logo.png" class="img-responsive img-centered" alt="DOSA logo">
-Delayed Open Source Attribution License 1.0 (DOSA-1.0)</h1>
+IMPORTANT NOTICE: 
+This software is provided under the BroTech Additional Terms, which strictly require Prominent Attribution, SUBJECT TO THE FOLLOWING NON-NEGOTIABLE PRE-CONDITIONS:
+
+1. Under no circumstances may the name to 『哥哥科技』be altered or removed.</br>
+Under no circumstances may any occurrence of the literal Characters 『哥哥科技』 be altered, removed, concealed, or obscured in any manner.
+2. Where any portion, fragment, or snippet of this code is extracted, copied, or incorporated into another work, you must proactively append and display the literal Chinese characters 『哥哥科技』 in a manner with equal or greater prominence compared to its appearance in the original work.<br>
+Compliance with the literal preservation and proactive appending of 『哥哥科技』 as set forth above constitutes an absolute condition precedent to the grant of any rights under this License.
+3. Any breach, or failure to comply with Condition 1 and/or 2 shall immediately and automatically terminate all permissions granted herein.
+
+(Explanatory Note: The DOSA-1.0 and CPAL-1.0 license framework appended below serve solely as auxiliary reference frameworks to facilitate general understanding of the distribution model. They do not constitute the primary governing agreement. In the event of any conflict, discrepancy, or inconsistency between the attached texts and the BroTech Additional Terms, the BroTech Additional Terms shall absolutely and unconditionally prevail.)
+
+# License Scope Notice
+The following license does not automatically apply to the entire repository. It applies on a file-by-file basis only to files that expressly state that they are licensed under this license. The presence of this license text in the repository does not, by itself, grant any rights under this license to files that do not contain such a declaration.
+
+<h2><img width="100" src="https://github.com/ChildMindInstitute/DOSA-license/blob/main/DOSA_logo.png" class="img-responsive img-centered" alt="DOSA logo">
+Delayed Open Source Attribution License 1.0 (DOSA-1.0)</h2>
 
 License text copyright © 2021 Child Mind Institute, Inc. All Rights Reserved.
 
@@ -23,7 +37,7 @@ to license your works, and to refer to it using the trademark "Delayed Open Sour
 <ol>
   <li><b>Delayed open source.</b></li>
     <ol type="a">
-      <li>UCXN/Bro-Tech (the "Licensor") hereby grants permission, free of charge, to any person obtaining a copy of this Software, to use, copy, modify, merge, publish, and distribute the Software, in each case for any purpose other than a Commercial Purpose and to permit persons to whom the Software is furnished to do so, subject to the terms and conditions of this DOSA License.</li>
+      <li><Under the condition that you strictly comply with the BroTech Additional Terms, the "Licensor"> hereby grants permission, free of charge, to any person obtaining a copy of this Software, to use, copy, modify, merge, publish, and distribute the Software, in each case for any purpose other than a Commercial Purpose and to permit persons to whom the Software is furnished to do so, subject to the terms and conditions of this DOSA License.</li>
       <li>This DOSA License applies separately for each version of the Software. No version of the Software can be used for Commercial Purposes within three years of the first publicly available distribution of that version under this DOSA License.</li>
       <li>Effective on the third anniversary of the first publicly available distribution of each version of the Software under this DOSA License, you are hereby granted a license to that version of the Software under the terms of the CPAL License.  The " Notice Exhibits to the time-delayed CPAL License" set forth in Schedule A, below, shall constitute Exhibits A and B to the CPAL License (and shall not, for the avoidance of doubt, be deemed to constitute a license or other grant of rights in the Software under this DOSA License).</li>
     </ol>
@@ -119,16 +133,18 @@ The Original Code is **Bro-Stat**.
 The Original Developer is the Initial Developer and is 哥哥科技. If left blank, the Original Developer is the Initial Developer.
 
 The Initial Developer of the Original Code is 哥哥科技. 
-All portions of the code written by 哥哥科技 are Copyright (c) 2026. All Rights Reserved.
 
-Contributor 1-Reality.
+All portions of the code written by 哥哥科技 are Copyright (c) 2026. All Rights Reserved.
+ANY RIGHTS GRANTED herein are ABSOLUTELY contingent upon your ADHERENCE to the BroTech Additional Terms.
+
+Contributor 1-Reality（Under the condition that you strictly comply with the BroTech Additional Terms）.
 
 
 ### EXHIBIT B. Attribution Information.
 
 Attribution copyright notice: Copyright © 2026 哥哥科技 (BroTech)
 
-Attribution phrase: 自由的网络是每个人的基本权利
+Attribution phrase: 自由的网络是每个人的基本权利 (Subject to BroTech Terms)
 
 Attribution URL: https://space.bilibili.com/501430041
 

@@ -1,6 +1,6 @@
-                const hqU = cS.intUp || 0; 
+        const hqU = cS.intUp || 0; 
         const hqD = cS.intDn || 0;
-                const tN = cache.timeNode ??= it.querySelector('.gege-online-time');
+        const tN = cache.timeNode ??= it.querySelector('.gege-online-time');
         if (tN && cS.onS > 0) tN.textContent = `在线：${fOT(cS.onS)}`;
         
         const dI = cache.devIntro ??= it.querySelector('.dev-intro');

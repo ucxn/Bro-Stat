@@ -1,7 +1,3 @@
-## License Scope Notice
-
-The following license does not automatically apply to the entire repository. It applies on a file-by-file basis only to files that expressly state that they are licensed under this license. The presence of this license text in the repository does not, by itself, grant any rights under this license to files that do not contain such a declaration.
-
 ## 授权结构、主协议及冲突处理
 ### License Structure, Primary Terms and Conflict Resolution
 
@@ -23,8 +19,21 @@ The following license does not automatically apply to the entire repository. It 
 
 本项目接受者所取得的权利，始终以哥哥科技实际作出的完整授权为准。不得通过孤立援引、拆分解释或选择性适用任何被引用的公共许可证，取得与主协议相抵触的权利。不得将除正确包含哥哥科技附加协议以外的任一单独文本从本项目完整的授权声明中单独摘出，并据此主张免除本项目已经明确列示的授权条件。
 
-## 哥哥科技 Source 文件许可与适用范围声明
+## 哥哥科技文件许可与适用范围声明
+
+按照法律规定，一般情况下著作权在初始状态下完全归原作者所有。公共许可证及其模板只是方便软件传播使用的工具，方便公众有一套约定俗成的协议去理解并遵守，其法律效力和自编许可证并无本质区别。模板中的观点自然是许可证原作者的观点，且值得尊重，但并不能自动完全代表甚至覆盖哥哥科技在本协议中明确表达的真实意思表示；也不能在法律上认为是我同意的合同；也不能脱离本协议的整体约定，认定为我对模板全部内容的无条件同意。
+
+因此，在本协议当中，哥哥科技附加条款为本项目的主许可证，其中又以署名条款为最高要求。无论是程序中的文本，还是许可证等，违背了哥哥科技的署名要求：只要署名条款不与法律抵触，并不能认为引用的公共许可证模板或者其他说明能够削弱哥哥科技对署名要求条款的实质性表达。就本项目而言，任何要求都不能与显著署名条款相抵触。若其它要求和本项目的主许可证有冲突，应当在最大范围内求得兼容；若不能兼容，以本项目的主许可证为准。同时，保留我在 File by File 中针对单独文件授予的许可，部分条款发生冲突并不当然导致该许可整体无效。
+
+但是：**我授予的任何许可，只要其中有与哥哥科技附加条款中署名相关规定相抵触的内容，无论该许可以何种方式表达，只要是我未单独签订的格式条款或预先许可（除非我另行签订的协议明确约定外），就本项目而言，相抵触部分一律无效：除非授予时间早于哥哥科技附加条款的创建时间；否则，不构成本项目的授权依据；哥哥科技附加条款和署名要求后续发生更新的，也不能据此理解为该要求比其他许可证授予的更晚。**
+
 ### BroTech Source File License and Scope Notice
+Under the law, copyright generally belongs entirely to the original author from the outset. Public licenses and their templates are merely tools to facilitate the distribution and use of software, providing the public with a conventional set of terms to understand and follow. Their legal effect is not fundamentally different from that of self-drafted licenses. The views expressed in a template are naturally those of the license’s original drafter and deserve respect, but they cannot automatically and fully represent, let alone override, BroTech’s true intent, nor can such a template legally be regarded as a contract to which I have agreed.
+
+Therefore, under this Agreement, the BroTech Additional Terms constitute the primary license for this project, with the attribution provisions taking precedence over all other provisions. Where any text in the program, licenses, or elsewhere conflicts with BroTech’s attribution requirements, the referenced public license templates or other statements must not be construed as weakening BroTech’s substantive expression of those requirements, provided that the attribution provisions do not conflict with the law. For this project, no requirement may conflict with the prominent attribution provisions. If other requirements conflict with this project’s primary license, they must be reconciled to the greatest extent possible. Where reconciliation is impossible, this project’s terms shall prevail, while preserving the licenses I have granted for individual files under File by File; this does not automatically mean that such a license is invalid in its entirety.
+
+However: **Any rights I grant that conflict with the attribution-related provisions of the BroTech Additional Terms shall, regardless of the form in which other licenses are expressed, be invalid for this project if they arise from standard-form terms or advance licenses not separately signed by me, unless those rights were granted before the creation of the BroTech Additional Terms. Subsequent updates to the BroTech Additional Terms and the attribution requirements must not be construed as meaning that those requirements postdate grants made under other licenses.**
+
 
 附加条款位于项目 GitHub 首页的 LICENSE 中
 
