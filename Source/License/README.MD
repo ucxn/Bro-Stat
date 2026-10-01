@@ -35,7 +35,7 @@ Therefore, under this Agreement, the BroTech Additional Terms constitute the pri
 However: **Any rights I grant that conflict with the attribution-related provisions of the BroTech Additional Terms shall, regardless of the form in which other licenses are expressed, be invalid for this project if they arise from standard-form terms or advance licenses not separately signed by me, unless those rights were granted before the creation of the BroTech Additional Terms. Subsequent updates to the BroTech Additional Terms and the attribution requirements must not be construed as meaning that those requirements postdate grants made under other licenses.**
 
 
-附加条款位于项目 GitHub 首页的 LICENSE 中
+附加条款位于项目 GitHub 首页的 [LICENSE 中](https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/License.md)
 
 BroTech, as the original author of this project, retains full copyright in the
 project and its original content.

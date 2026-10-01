@@ -9,7 +9,7 @@ Regardless of the licensing path chosen, it is subject to the BroTech Prominent 
 ### 品牌使用政策和许可证文本
 
 在此处查看，品牌使用政策和许可证法律效力不分高低</br>
-[LICENSE文件夹](https://github.com/ucxn/Bro-Stat/tree/main/LICENSE)
+[LICENSE文件夹](./Source/License)
 
 # BroTech Additional Terms
 ### 哥哥科技附加许可证
