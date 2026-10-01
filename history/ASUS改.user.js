@@ -281,7 +281,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
       S.lt = n;
       S.wInstUp = cWU; S.wInstDn = cWD;
       rUI(S.dWU, S.dWD, cSU, cSD, cI);
-    } catch (err) {console.warn(err)} finally {window.__gIsF = !1;}
+    } catch (err) {console.warn(err);} finally {window.__gIsF = !1;}
   }
 const calcStageRatio = (W, L_int, L_hp) => {
     if (W === 0) return 1.0;
@@ -553,7 +553,7 @@ S.rTick = ((S.rTick || 0) + 1) & 31;  //内外网比消除抖动
             cache.rBox = rB;
           }
           
-          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol = "#0059fa";
+          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol;
           if (CONFIG.calcMode === 1) {
             let rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
             if (rt > CONFIG.ratioExtremeUp) { tCol = '#ff4c00'; tC = (rt === Infinity ? '∞' : rt.toFixed(2)) + '⚠️'; }
@@ -711,7 +711,7 @@ if (!window.gegeBActivated) {
                 window.__aD[nM(k)] = { n: d[k].nickName || d[k].name || "未知设备", ip: d[k].ip || "", wl: d[k].isWL };
             }
         }
-    } catch(e) {console.warn(e)}
+    } catch(e) {console.warn(e);}
   }
 
   const _initUI = () => {

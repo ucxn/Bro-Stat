@@ -185,7 +185,7 @@ async function rSD() {
       if (dD.code !== 0 || !dD.list) return;
 
       let sD = null;
-      if (sR && sR.ok) { try { sD = await sR.json(); } catch(e){console.warn(e)} }
+      if (sR && sR.ok) { try { sD = await sR.json(); } catch(e){console.warn(e);} }
 
       let cWU = 0, cWD = 0;
       let ws = sD?.wan || sD?.wanStatistics;
@@ -199,7 +199,7 @@ async function rSD() {
             let xD = await xR.json(); ws = xD?.wanStatistics || xD?.wan || {}; 
             cWU = (+ws.upspeed || 0) * 8; cWD = (+ws.downspeed || 0) * 8; 
           }
-        } catch (err) { console.warn(err) }
+        } catch (err) { console.warn(err) ;}
       }
       S.oWU = (+ws?.upload || 0) * 8; S.oWD = (+ws?.download || 0) * 8; 
 
@@ -314,7 +314,7 @@ async function rSD() {
       S.lt = n;
       S.wInstUp = cWU; S.wInstDn = cWD;
       rUI(S.dWU, S.dWD, cSU, cSD, cI);
-    } catch (err) {console.warn(err)} finally {window.__gIsF = !1;}
+    } catch (err) {console.warn(err);} finally {window.__gIsF = !1;}
   }
 const calcStageRatio = (W, L_int, L_hp) => {
     if (W === 0) return 1.0;
@@ -586,7 +586,7 @@ S.rTick = ((S.rTick || 0) + 1) & 31;  //内外网比消除抖动
             cache.rBox = rB;
           }
           
-          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol = "#0059fa";
+          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol;
           if (CONFIG.calcMode === 1) {
             let rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
             if (rt > CONFIG.ratioExtremeUp) { tCol = '#ff4c00'; tC = (rt === Infinity ? '∞' : rt.toFixed(2)) + '⚠️'; }

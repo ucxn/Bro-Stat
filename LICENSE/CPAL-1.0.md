@@ -1,4 +1,18 @@
-# Common Public Attribution License Version 1.0 (CPAL-1.0)
+IMPORTANT NOTICE: 
+This software is provided under the BroTech Additional Terms, which strictly require Prominent Attribution, SUBJECT TO THE FOLLOWING NON-NEGOTIABLE PRE-CONDITIONS:
+
+1. Under no circumstances may the name to 『哥哥科技』be altered or removed.</br>
+Under no circumstances may any occurrence of the literal Characters 『哥哥科技』 be altered, removed, concealed, or obscured in any manner.
+2. Where any portion, fragment, or snippet of this code is extracted, copied, or incorporated into another work, you must proactively append and display the literal Chinese characters 『哥哥科技』 in a manner with equal or greater prominence compared to its appearance in the original work.<br>
+Compliance with the literal preservation and proactive appending of 『哥哥科技』 as set forth above constitutes an absolute condition precedent to the grant of any rights under this License.
+3. Any breach, or failure to comply with Condition 1 and/or 2 shall immediately and automatically terminate all permissions granted herein.
+
+(Explanatory Note: The DOSA-1.0 and CPAL-1.0 license framework appended below serve solely as auxiliary reference frameworks to facilitate general understanding of the distribution model. They do not constitute the primary governing agreement. In the event of any conflict, discrepancy, or inconsistency between the attached texts and the BroTech Additional Terms, the BroTech Additional Terms shall absolutely and unconditionally prevail.)
+
+# License Scope Notice
+The following license does not automatically apply to the entire repository. It applies on a file-by-file basis only to files that expressly state that they are licensed under this license. The presence of this license text in the repository does not, by itself, grant any rights under this license to files that do not contain such a declaration.
+
+## Common Public Attribution License Version 1.0 (CPAL-1.0)
 
 Full text also available through the Open Source Initiative: https://opensource.org/licenses/cpal_1.0
 
@@ -37,7 +51,7 @@ B. Any new file that contains any part of the Original Code or previous Modifica
 ## 2. Source Code License.
 
 2.1 The Initial Developer Grant.
-The Initial Developer hereby grants You a world-wide, royalty-free, non-exclusive license, subject to third party intellectual property claims:
+Subject to the Important Notice above, the Initial Developer hereby grants You a world-wide, royalty-free, non-exclusive license, subject to third party intellectual property claims:
 (a) under intellectual property rights (other than patent or trademark) Licensable by Initial Developer to use, reproduce, modify, display, perform, sublicense and distribute the Original Code (or portions thereof) with or without Modifications, and/or as part of a Larger Work; and
 (b) under Patents Claims infringed by the making, using or selling of Original Code, to make, have made, use, practice, sell, and offer for sale, and/or otherwise dispose of the Original Code (or portions thereof).
 (c) the licenses granted in this Section 2.1(a) and (b) are effective on the date Initial Developer first distributes Original Code under the terms of this License.
@@ -156,7 +170,7 @@ The contents of this file are subject to the Common Public Attribution License V
 
 The License is based on the Mozilla Public License Version 1.1 but Sections 14 and 15 have been added to cover use of software over a computer network and provide for limited attribution for the Original Developer. In addition, Exhibit A has been modified to be consistent with Exhibit B. Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the specific language governing rights and limitations under the License. The Original Code is https://github.com/ucxn/Bro-Stat.
 
-The Original Developer is 哥哥科技. All portions of the code written by the 哥哥科技 are Copyright (c) 2026. All Rights Reserved.
+The Initial Developer and Original Developer is 哥哥科技 (conditioned upon compliance with BroTech Additional Terms, failing which all grants in CPAL are void ab initio). All portions of the code written by 哥哥科技 are Copyright (c) 2026. All Rights Reserved.
 
 Contributor: Inspired by my friend, the original idea come from him, whose influence sparked my interest in networking and ultimately led me to made this project possible.
 
