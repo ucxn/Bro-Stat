@@ -74,7 +74,7 @@ async function gWT() {
     try {
       let r = await fetch('/api/ntwk/wan?type=active&_=' + Date.now());
       if (r.ok) return await r.text();
-    } catch(e) {console.warn(e)}
+    } catch(e) {console.warn(e) ; }
     return "";
   }
 
@@ -225,7 +225,7 @@ const F_ARR = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/8]
         else if (cWD > 0) { let wED = cWD * 0.5 * CONFIG.wanRefreshInterval; S.wTotDn += wED; S.wZED = (S.wZED || 0) + wED; S.wZEDC = (S.wZEDC || 0) + 1; }
         S.wLT = n;
       }
-      if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp || {}; if(sp && sp.global) { S.wTotUp = S.wTotUp === 0 ? sp.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? sp.global.wan_down || 0 : S.wTotDn; } } catch(e){console.warn(e)} S.snapLoaded = !0; }
+      if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp || {}; if(sp && sp.global) { S.wTotUp = S.wTotUp === 0 ? sp.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? sp.global.wan_down || 0 : S.wTotDn; } } catch(e){console.warn(e);} S.snapLoaded = !0; }
       for (const [m, cC] of Object.entries(cI)) {
         let spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
         S.cls[m] ??= {
@@ -335,13 +335,13 @@ const F_ARR = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/8]
               let c = window.__gegeDebugCache.targets[mac]; let n = c.deltas.length;
               if (n === 0 && !isWarmingUp) continue;
               let isWan = mac === "WAN_MASTER"; let nameTag = isWan ? "<span style='color:#ffd700; font-weight:bold;'>[WAN] 出口</span>" : "<span style='color:#aaa;'>MAC: " + mac.slice(-8) + "</span>"; let colorBase = isWan ? "#ffd700" : "#0f0";
-              let mean=0, variance=0, stdDev=0, jitter=0, cv=0, d95=0, d98=0, maxD=0;
+              let mean=0, variance=0, stdDev=0, jitter=0, cv=0, d95=0, maxD=0;
               if (n > 0) {
                   let sum = 0; for(let i=0; i<n; i++) sum += c.deltas[i];
                   mean = sum / n; let varianceSum = 0, jitterSum = 0, deviations = [];
                   for(let i=0; i<n; i++) { let diff = c.deltas[i] - mean; varianceSum += diff * diff; deviations.push(Math.abs(diff)); if (i > 0) jitterSum += Math.abs(c.deltas[i] - c.deltas[i-1]); }
                   variance = varianceSum / n; stdDev = Math.sqrt(variance); jitter = n > 1 ? (jitterSum / (n - 1)) : 0; cv = mean > 0 ? (stdDev / mean * 100) : 0; 
-                  deviations.sort((a, b) => a - b); d95 = deviations[Math.floor(n * 0.95)] || 0; d98 = deviations[Math.floor(n * 0.98)] || 0; maxD = deviations[n - 1] || 0;
+                  deviations.sort((a, b) => a - b); d95 = deviations[Math.floor(n * 0.95)] || 0; maxD = deviations[n - 1] || 0;
               }
               let statsHtml = `<div style="font-size:11px; color:#999; display:flex; gap:12px; background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:3px;"><span style="width:50px;">N:<b style="color:${colorBase}">${n}</b></span><span style="width:70px;">μ:<b style="color:#fff">${mean.toFixed(1)}</b></span><span style="width:85px;">Jitter:<b style="color:#ff4c00">${jitter.toFixed(1)}</b></span><span style="width:65px;">CV:<b style="color:#00ffff">${cv.toFixed(1)}%</b></span><span style="width:65px;">σ²:<b style="color:#aaa">${variance.toFixed(1)}</b></span><span style="width:75px;">95%:<b style="color:#fff">±${d95.toFixed(1)}</b></span><span style="width:75px;">Max:<b style="color:#ff0000">±${maxD.toFixed(1)}</b></span></div>`;
               let deltaStr = isWarmingUp ? "<span style='color:#666;'>[预热静默中... 数据暂不入库]</span>" : c.deltas.join(', ');
@@ -663,7 +663,7 @@ const calcStageRatio = (W, L_int, L_hp) => {
             cache.rBox = rB;
           }
           
-          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol = "#0059fa";
+          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol;
           if (CONFIG.calcMode === 1) {
             let rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
             if (rt > CONFIG.ratioExtremeUp) { tCol = '#ff4c00'; tC = (rt === Infinity ? '∞' : rt.toFixed(2)) + '⚠️'; }
