@@ -122,7 +122,7 @@
 
   function fSV(bits) {
     if (bits >= 84607500288) return `${(bits / 8589934592).toPrecision(4)}G`;
-  	if (bits > 8388608000) return `${Math.round(bits / 8388608)}M`;
+    if (bits > 8388608000) return `${Math.round(bits / 8388608)}M`;
     if (bits > 8388608) return `${(bits / 8388608).toFixed(2)}M`;
     if (bits >= 8192) return `${(bits / 8192).toFixed(1)}K`;
     return `${Math.round(bits / 8)}B`;}

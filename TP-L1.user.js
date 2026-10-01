@@ -569,9 +569,7 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
               bn.innerHTML = `<span> 统计周期即将结束，流量将在跨越边界时自动清零备份。</span><button id="gb-f-btn" style="background:#ffc107;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:bold;color:#333;">立即导出并清零</button>`;
               bd.insertBefore(bn, bd.firstChild);
               document.getElementById('gb-f-btn').onclick = () => doSettle(Date.now());}
-          }
-      }
-          }
+          }}
       }
       S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 2); S.lwTU = S.wTotUp;
       S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 2); S.lwTD = S.wTotDn;
@@ -584,7 +582,6 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
           S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#ff4c00' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#ff4c00' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
       }
       if (document.getElementById('gb-ratio-display')) document.getElementById('gb-ratio-display').innerHTML = S.cRT;
-        }
         let bd = document.getElementById('zte-geek-board');
     if (!bd) {
       bd = document.createElement('div');
@@ -717,7 +714,7 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
           }
           
           const bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0;
-          let tC = "", tCol = "#0059fa";
+          let tC = "", tCol;
           if (CONFIG.calcMode === 1) {
             const rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
             if (rt > CONFIG.ratioExtremeUp) { tCol = '#ff4c00'; tC = (rt === Infinity ? '∞' : rt.toFixed(2)) + '⚠️'; }
