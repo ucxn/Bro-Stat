@@ -220,6 +220,7 @@ let _saved = null;
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
 
   /* @BroTech-Reserved cycle-time.part.js */
+  
   const 版本号 = (typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号';
 
   function fB(bps) {
