@@ -22,7 +22,8 @@
 // @storageName     GBNPA_Storage
 // @source          https://github.com/ucxn/Bro-Stat
 // @supportURL      https://www.bilibili.com/video/BV1LZ6yBXESq
-// @license         发行版作者哥哥科技保留所有权利，源码本身公开，请前往 GitHub Source 区域获得授权部分
+// @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享） 
+// @note            发行版作者哥哥科技保留所有权利，源码本身公开，请前往 GitHub Source 区域获得授权部分
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/ASUS-1.user.js
 // @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/ASUS-1.user.js
 
@@ -764,7 +765,7 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
                         cache.rBox = rB;
           }
           
-          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol = "#0059fa";
+          let bR = (hqU + hqD) > 0 ? (hqU * 100 / (hqU + hqD)) : 0, tC = "", tCol;
           if (CONFIG.calcMode === 1) {
             let rt = hqD > 0 ? (hqU / hqD) : (hqU > 0 ? Infinity : 0);
             if (rt > CONFIG.ratioExtremeUp) { tCol = '#ff4c00'; tC = (rt === Infinity ? '∞' : rt.toFixed(2)) + '⚠️'; }

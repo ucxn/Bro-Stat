@@ -6,13 +6,13 @@ Required Notice: https://github.com/ucxn/Bro-Stat
 
 Regardless of the licensing path chosen, it is subject to the BroTech Prominent Attribution Terms set forth in this document. 
 
-### 品牌使用政策和许可证文本
+### 品牌使用政策和辅助许可证文本
 
-在此处查看，品牌使用政策和许可证法律效力不分高低</br>
+在此处查看，品牌使用政策和引用指向的许可证法律效力无高低之分</br>
 [LICENSE文件夹](./Source/License)
 
-# BroTech Additional Terms
-### 哥哥科技附加许可证
+# 哥哥科技附加许可证
+## BroTech Additional Terms
 Regardless of the license used, the author's prominent attribution must be retained.<br>
 必须保留对作者 **“哥哥科技”** 的显著署名。
 

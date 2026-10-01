@@ -5,7 +5,7 @@
 ![Preview](./华为预览图.png)
 **Bro-Stat** is a browser-based extension designed to improve the native web management experience of consumer and prosumer routers across multiple brands.
 
-## One-Click Installation
+## One-Click Install&emsp;![哥哥软件](.github/Broware.svg)
 
 **[Userscript Manager](https://github.com/ucxn/ZTE-Stat_Max/blob/main/README_EN.md#requirements)**&emsp;**[Home Assistant Smart Home Integration](https://github.com/ucxn/ZTE-Stat_HA/blob/main/custom_components/gbnpa_router/Readme.md)**
 
