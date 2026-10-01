@@ -14,7 +14,7 @@ The following license does not automatically apply to the entire repository. It 
 
 ## Common Public Attribution License Version 1.0 (CPAL-1.0)
 
-Full text also available through the Open Source Initiative: https://opensource.org/licenses/cpal_1.0
+The only authoritative full text is the copy hosted by 哥哥科技 at the link: https://github.com/ucxn/Bro-Stat/blob/main/Source/License/CPAL-1.0.md ; no license may be identified or construed by its name or by any generic version published elsewhere.
 
 ## 1. "Definitions"
 
@@ -106,7 +106,7 @@ This License applies to code to which the Initial Developer has attached the not
 Socialtext, Inc. ("Socialtext") may publish revised and/or new versions of the License from time to time. Each version will be given a distinguishing version number.
 
 6.2 Effect of New Versions.
-Once Covered Code has been published under a particular version of the License, You may always continue to use it under the terms of that version. You may also choose to use such Covered Code under the terms of any subsequent version of the License published by Socialtext. No one other than Socialtext has the right to modify the terms applicable to Covered Code created under this License.
+Once Covered Code has been published under a particular version of the License, You may always continue to use it under the terms of that version.
 
 6.3 Derivative Works.
 If You create or use a modified version of this License (which you may only do in order to apply it to code which is not already Covered Code governed by this License), You must (a) rename Your license so that the phrases "Socialtext", "CPAL" or any confusingly similar phrase do not appear in your license (except to note that your license differs from this License) and (b) otherwise make it clear that Your version of the license contains terms which differ from the CPAL. (Filling in the name of the Initial Developer, Original Developer, Original Code or Contributor in the notice described in Exhibit A shall not of themselves be deemed to be modifications of this License.)
@@ -166,9 +166,9 @@ The term "External Deployment" means the use, distribution, or communication of 
 
 ## EXHIBIT A. Common Public Attribution License Version 1.0.
 
-The contents of this file are subject to the Common Public Attribution License Version 1.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at https://github.com/ucxn/Bro-Stat/blob/main/LICENSE/CPAL-1.0.md. 
+The contents of this file are subject to the Common Public Attribution License Version 1.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at https://github.com/ucxn/Bro-Stat/blob/main/Source/License/CPAL-1.0.md.
 
-The License is based on the Mozilla Public License Version 1.1 but Sections 14 and 15 have been added to cover use of software over a computer network and provide for limited attribution for the Original Developer. In addition, Exhibit A has been modified to be consistent with Exhibit B. Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the specific language governing rights and limitations under the License. The Original Code is https://github.com/ucxn/Bro-Stat.
+The License is based on the Mozilla Public License Version 1.1 but Sections 14 and 15 have been added to cover use of software over a computer network and provide for limited attribution for the Original Developer. In addition, Exhibit A has been modified to be consistent with Exhibit B. Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the specific language governing rights and limitations under the License. The Original Code is https://github.com/ucxn/Bro-Stat/Source.
 
 The Initial Developer and Original Developer is 哥哥科技 (conditioned upon compliance with BroTech Additional Terms, failing which all grants in CPAL are void ab initio). All portions of the code written by 哥哥科技 are Copyright (c) 2026. All Rights Reserved.
 

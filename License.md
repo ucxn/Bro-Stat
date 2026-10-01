@@ -71,9 +71,8 @@ If objective technical limitations prevent a user-visible interface from properl
 Any redistribution, modification, porting, merging, integration, translation, conversion to another programming language, or incorporation into a Larger Work must not diminish the prominence of the original manner in which “哥哥科技” is attributed, or reduce it below the level of attribution identifying the author in the original work; **no reduction whatsoever in the degree of display is permitted, not merely no substantial reduction.**
 
 Preserving the complete literal text “哥哥科技”, together with its actual display, visibility, and prominence, is an inseparable condition of every license right granted by the author for this software.
-
+---
 ### Commercial Use Provisions
-
 *This section and the attribution section above are severable. Under all circumstances,* **the attribution provisions must be fully enforced.** *Any irreconcilable conflict arising from applicable law or between licensing provisions shall not affect the validity of other provisions that are not in conflict. Provisions may be subdivided into smaller constituent parts; a complete sentence shall not simply be treated as an indivisible whole. To the fullest extent permitted by law, an interpretation that reconciles the relevant provisions and is most favorable to the author's interests shall be adopted. I am the original author of this project in its entirety, and the addition of the foregoing supplemental terms is therefore reasonable.*
 
 You may charge technical service fees within a customary range that both parties to the transaction consider reasonable and that have no direct or indirect connection with this program; for example, you may provide complimentary value-added services while installing a router at a customer's premises, but you must not promote such services under the name “哥哥科技”.
