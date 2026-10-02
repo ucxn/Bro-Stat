@@ -1,5 +1,5 @@
 IMPORTANT NOTICE: 
-This software is provided under the BroTech Additional Terms, which strictly require Prominent Attribution, SUBJECT TO THE FOLLOWING NON-NEGOTIABLE PRE-CONDITIONS:
+This software is provided under the BroTech Additional License, which strictly require Prominent Attribution, SUBJECT TO THE FOLLOWING NON-NEGOTIABLE PRE-CONDITIONS:
 
 1. Under no circumstances may the name to 『哥哥科技』be altered or removed.</br>
 Under no circumstances may any occurrence of the literal Characters 『哥哥科技』 be altered, removed, concealed, or obscured in any manner.
@@ -7,7 +7,16 @@ Under no circumstances may any occurrence of the literal Characters 『哥哥科
 Compliance with the literal preservation and proactive appending of 『哥哥科技』 as set forth above constitutes an absolute condition precedent to the grant of any rights under this License.
 3. Any breach, or failure to comply with Condition 1 and/or 2 shall immediately and automatically terminate all permissions granted herein.
 
-(Explanatory Note: The DOSA-1.0 and CPAL-1.0 license framework appended below serve solely as auxiliary reference frameworks to facilitate general understanding of the distribution model. They do not constitute the primary governing agreement. In the event of any conflict, discrepancy, or inconsistency between the attached texts and the BroTech Additional Terms, the BroTech Additional Terms shall absolutely and unconditionally prevail.)
+(Explanatory Note: The DOSA-1.0 and CPAL-1.0 license framework appended below serve solely as auxiliary reference frameworks to facilitate general understanding of the distribution model. They do not constitute the primary governing agreement. In the event of any conflict, discrepancy, or inconsistency between the attached texts and the BroTech Additional License, the BroTech Prominent Attribution Terms shall absolutely and unconditionally prevail.)
+
+许可证名称、SPDX 标识及其他简写仅用于识别。实际授权范围、条件及义务，以本仓库随软件发布的实际许可证文本、补充文件以及本文件中明确纳入的实际许可文本为准。
+
+无论使用何种许可证，都应当保留作者的显著署名。
+Regardless of the license used, the 哥哥科技's prominent attribution must be retained.
+
+绝对、一定、必须保留哥哥科技这几个字，并且不得以任何形式降低“原有的署名方式的显著程度”，而不仅仅是显著降低。
+
+无论何种原因，哪怕是技术困难导致在更大的作品中或其他编程语言中无法原样显示“哥哥科技”，“您” 也必须保留字面量，仅追加其他可以显著表达哥哥科技的方式，并及时通过 GitHub 或者邮件联系告知。保留“哥哥科技”的完整可见性是我许可的任何权利所不可分割的部分。
 
 # License Scope Notice
 The following license does not automatically apply to the entire repository. It applies on a file-by-file basis only to files that expressly state that they are licensed under this license. The presence of this license text in the repository does not, by itself, grant any rights under this license to files that do not contain such a declaration.
@@ -170,9 +179,10 @@ The contents of this file are subject to the Common Public Attribution License V
 
 The License is based on the Mozilla Public License Version 1.1 but Sections 14 and 15 have been added to cover use of software over a computer network and provide for limited attribution for the Original Developer. In addition, Exhibit A has been modified to be consistent with Exhibit B. Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License for the specific language governing rights and limitations under the License. The Original Code is https://github.com/ucxn/Bro-Stat/Source.
 
-The Initial Developer and Original Developer is 哥哥科技 (conditioned upon compliance with BroTech Additional Terms, failing which all grants in CPAL are void ab initio). All portions of the code written by 哥哥科技 are Copyright (c) 2026. All Rights Reserved.
+The Initial Developer and Original Developer is 哥哥科技 (conditioned upon compliance with BroTech Additional License & Prominent Attribution Terms, failing which all grants in CPAL are void ab initio). All portions of the code written by 哥哥科技 are Copyright (c) 2026. All Rights Reserved.
+ANY RIGHTS GRANTED herein are ABSOLUTELY contingent upon your ADHERENCE to the BroTech Additional License.
 
-Contributor: Inspired by my friend, the original idea come from him, whose influence sparked my interest in networking and ultimately led me to made this project possible.
+Contributor:（Under the condition that you strictly comply with the BroTech Additional License） Inspired by my friend, the original idea come from him, whose influence sparked my interest in networking and ultimately led me to made this project possible.
 
 [NOTE: The text of this Exhibit A may differ slightly from the text of the notices in the Source Code files of the Original Code. You should use the text of this Exhibit A rather than the text found in the Original Code Source Code for Your Modifications.]
 

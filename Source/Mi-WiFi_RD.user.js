@@ -161,7 +161,7 @@
     injectMode: 3, // 【UI注入模式】 0: 原生侧边栏(1min)| 1: 仅悬浮舱 | 2: 智能选一 | 3：默认模式
     calcMode: 1, // 1: 上行/下行倍数模式, 0: 上行占总和比例模式
     ratioExtremeUp: 10, // 极端上传判定阈值 (> 1000%)
-    ratioWarnUp: 0.12, // 重度上传警告阈值 (> 7%)
+    ratioWarnUp: 0.12, // 重度上传警告阈值 (> 12%)
     ratioExtremeDown: 0.01, // 极端下载判定阈值 (< 1%)
     ratioThreshold: 7, // (仅calcMode=0时有效) 上传占比报警阈值(%)
     lanRefreshInterval: 3, // LAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
@@ -582,6 +582,7 @@ for (let k in S.cls) {
       s.hIdx = (s.hIdx + 1) & 63;
       s.hU[s.hIdx] = cC ? cC.upRate : 0;
       s.hD[s.hIdx] = cC ? cC.dnRate : 0;
+/* @BroTech-Reserved ha-quick-report.part.js */
     }
     S.cSnap = {
       timestamp: Date.now(),

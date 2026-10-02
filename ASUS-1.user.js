@@ -1,9 +1,10 @@
 // ==UserScript==
-// @name            华硕路由器增强
-// @name:en         Bro-Stat-ASUS
+// @name            华硕路由器增强 ASUS/ROG 路由器 WiFi 后台插件
+// @name:en         Bro-Stat-ASUS for ROG/TUF Router
 // @namespace       ucxn
-// @version         5.9.8
+// @version         5.9.9
 // @description     适用于华硕/TUF/ASUS/ROG路由器的网页端网速查看和显示优化的增强脚本插件
+// @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  An enhanced script plugin for viewing and optimizing internet speed on the web interface of ASUS/TUF/ROG routers
 // @tag             华硕 ROG 败家之眼 ASUS 梅林 官改 Merlin 魔盒 路由器 极客 天选 微分 求导 JS 前端 字节 流量 网速 宽带 逆向 脚本
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -24,7 +25,7 @@
 // @supportURL      https://www.bilibili.com/video/BV1LZ6yBXESq
 // @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享） 
 // @note            发行版作者哥哥科技保留所有权利，源码本身公开，请前往 GitHub Source 区域获得授权部分
-// @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/ASUS-1.user.js
+// @updateURL       https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/ASUS-1.user.js
 // @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/ASUS-1.user.js
 
 // ==/UserScript==
@@ -41,14 +42,14 @@
     injectMode: 3, // 【UI注入模式】 0: 原生侧边栏(1min)| 1: 仅悬浮舱 | 2: 智能选一 | 3：默认模式
     calcMode: 1, // 1: 上行/下行倍数模式, 0: 上行占总和比例模式
     ratioExtremeUp: 10, // 极端上传判定阈值 (> 1000%)
-    ratioWarnUp: 0.12, // 重度上传警告阈值 (> 7%)
+    ratioWarnUp: 0.12, // 重度上传警告阈值 (> 12%)
     ratioExtremeDown: 0.01, // 极端下载判定阈值 (< 1%)
     ratioThreshold: 7, // (仅calcMode=0时有效) 上传占比报警阈值(%)
     lanRefreshInterval: 3, // LAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
     wanRefreshInterval: 3, // 【新增】WAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
     周期类型: 'M', // 'M'(每月), 'W'(每周), 'D'(固定天数), 其它任意字符：不开启周期重置+自动导出功能
     周_天设置: 1, // M: 1~31号; W: 0~6(周日~周六); D: 间隔天数(如 7)
-    基准日期: '2026-06-20', // 原点时间(仅 D 模式有效) 任意一个历史周期的零点
+    基准日期: '2026-10-08', // 原点时间(仅 D 模式有效) 任意一个历史周期的零点
     报告时间: -600, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: 1, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
@@ -519,6 +520,40 @@ const calcStageRatio = (W, L_int, L_hp) => {
       s.hIdx = (s.hIdx + 1) & 63;
       s.hU[s.hIdx] = cC ? cC.upRate : 0;
       s.hD[s.hIdx] = cC ? cC.dnRate : 0;
+      /* ⚠️ 需要使用 HA 快速上线下线报告的用户，请删除该注释以启用该功能。
+      try {
+        if (S.cSnap) {
+          if (CONFIG.盲漫游 === 1) {
+            if (cC) {
+              if (s.haOff === 0 || (s.haOff === undefined && !S.cSnap.devices?.[k])) {
+                GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: cC.name || s.name || k, status: "上线" } } });
+                s.haOff = undefined;
+              } else if (s.haOff > 0) s.haOff = undefined;
+            } else if (s.haOff > 0) {
+              if (Date.now() >= s.haOff) {
+                GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: s.name || k, status: "下线" } } });
+                s.haOff = 0;
+              }
+            } else if (s.haOff === undefined) {
+              GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: s.name || k, status: "下线" } } });
+              s.haOff = 0;
+            }
+          } else {
+            if (cC) {
+              if (s.haOff === 0 || (s.haOff === undefined && !S.cSnap.devices?.[k])) {
+                GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: cC.name || s.name || k, status: "上线" } } });
+                s.haOff = undefined;
+              } else if (s.haOff > 0) s.haOff = undefined;
+            } else if (s.haOff === undefined) {
+              s.haOff = Date.now() + 300000;
+            } else if (s.haOff > 0 && Date.now() >= s.haOff) {
+              GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: s.name || k, status: "下线" } } });
+              s.haOff = 0;
+            }
+          }
+        }
+      } catch(e) { console.warn("[哥哥科技] HA上下线事件写入失败:", e); }
+      ⚠️ 需要使用 HA 快速上线下线报告的用户，请删除该注释以启用该功能。*/
     }
 
 S.rTick = ((S.rTick || 0) + 1) & 3;

@@ -1,9 +1,10 @@
 // ==UserScript==
-// @name            TP路由器增强
-// @name:en         Bro-Stat-TP
+// @name            TP-LINK 路由器增强 Bro-Stat-TP 测控 离散采样 微积分
+// @name:en         TP and Multi-brand Concumer / Home Router Enhancement
 // @namespace       ucxn
-// @version         5.9.9.lab
+// @version         5.9.9.n
 // @description     适用于TP-LINK普联+几乎所有家用消费级硬路由的网速显示和流量微积分统计工具
+// @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  A tool for displaying internet speeds and tracking data usage statistics, compatible with nearly all TP-LINK + Multi brand home gateways
 // @tag             TP TP-link 普联 路由器 WiFi 微积分 高数 统计 流量 网速 事件驱动 大屏 铺平 测控 累加 统计 监控 网络 宽带 P2P
 // @author          哥哥科技 space.bilibili.com/501430041
@@ -25,7 +26,7 @@
 // @supportURL      https://www.bilibili.com/video/BV1LZ6yBXESq
 // @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享） 
 // @note            发行版作者哥哥科技保留所有权利，源码本身公开，请前往 GitHub Source 区域获得授权部分
-// @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/TP-L1.user.js
+// @downloadURL     https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/TP-L1.user.js
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/TP-L1.user.js
 // ==/UserScript==
 
@@ -553,6 +554,40 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
         s.hIdx = (s.hIdx + 1) & 127;
         s.hU[s.hIdx] = cC ? cC.upRate : 0;
         s.hD[s.hIdx] = cC ? cC.dnRate : 0;
+      /* ⚠️ 需要使用 HA 快速上线下线报告的用户，请删除该注释以启用该功能。
+      try {
+        if (S.cSnap) {
+          if (CONFIG.盲漫游 === 1) {
+            if (cC) {
+              if (s.haOff === 0 || (s.haOff === undefined && !S.cSnap.devices?.[k])) {
+                GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: cC.name || s.name || k, status: "上线" } } });
+                s.haOff = undefined;
+              } else if (s.haOff > 0) s.haOff = undefined;
+            } else if (s.haOff > 0) {
+              if (Date.now() >= s.haOff) {
+                GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: s.name || k, status: "下线" } } });
+                s.haOff = 0;
+              }
+            } else if (s.haOff === undefined) {
+              GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: s.name || k, status: "下线" } } });
+              s.haOff = 0;
+            }
+          } else {
+            if (cC) {
+              if (s.haOff === 0 || (s.haOff === undefined && !S.cSnap.devices?.[k])) {
+                GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: cC.name || s.name || k, status: "上线" } } });
+                s.haOff = undefined;
+              } else if (s.haOff > 0) s.haOff = undefined;
+            } else if (s.haOff === undefined) {
+              s.haOff = Date.now() + 300000;
+            } else if (s.haOff > 0 && Date.now() >= s.haOff) {
+              GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: s.name || k, status: "下线" } } });
+              s.haOff = 0;
+            }
+          }
+        }
+      } catch(e) { console.warn("[哥哥科技] HA上下线事件写入失败:", e); }
+      ⚠️ 需要使用 HA 快速上线下线报告的用户，请删除该注释以启用该功能。*/
       }
       if (typeof GM_setValue !== 'undefined') {
         S.haTick = ((S.haTick || 0) + 1) & 63;

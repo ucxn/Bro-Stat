@@ -11,8 +11,8 @@ Regardless of the licensing path chosen, it is subject to the BroTech Prominent 
 在此处查看，品牌使用政策和引用指向的许可证法律效力无高低之分</br>
 [LICENSE文件夹](./Source/License)
 
-# 哥哥科技附加许可证
-## BroTech Additional Terms
+# 哥哥科技许可证
+## 哥哥科技显著署名附加条款
 Regardless of the license used, the author's prominent attribution must be retained.<br>
 必须保留对作者 **“哥哥科技”** 的显著署名。
 
@@ -47,10 +47,10 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 哥哥科技 2026 © Bro-Tech 版权所有
 
-附加条款到此结束。
+本项目主协议：哥哥科技许可证到此结束。
 
-## English of the Primary License
-
+# English of the Primary Law：BroTech Additional License
+## BroTech Prominent Attribution Terms
 Regardless of the license used, the author's prominent attribution must be retained.<br>
 Prominent attribution to the author, **“哥哥科技”**, must be retained.
 
@@ -85,4 +85,4 @@ Developers of official, original factory firmware for router brands already supp
 
 哥哥科技 2026 © Bro-Tech. All rights reserved.
 
-END OF THE Terms.
+END OF THE License.
