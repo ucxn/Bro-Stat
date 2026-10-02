@@ -427,7 +427,7 @@ function fBy(bps) {
           
           if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) {
             const ms = lanNow - cS.lUT;
-            /* @BroTech-Reserved lan-trapezoid-wakeup.part.js */
+          /* @BroTech-Reserved lan-trapezoid-wakeup.part.js */
             cS.upR = cC.upRate;
             cS.dnR = cC.dnRate;
             cS.lUT = lanNow;

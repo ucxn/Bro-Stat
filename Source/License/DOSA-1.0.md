@@ -153,7 +153,7 @@ Contributor 1-Reality（Under the condition that you strictly comply with the Br
 
 Attribution copyright notice: Copyright © 2026 哥哥科技 (BroTech)
 
-Attribution phrase: 自由的网络是每个人的基本权利 (Subject to BroTech Terms)
+Attribution phrase: 自由的网络是每个人的基本权利 (Subject to BroTech License)
 
 Attribution URL: https://space.bilibili.com/501430041
 
