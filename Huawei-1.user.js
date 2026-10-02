@@ -1,9 +1,10 @@
 // ==UserScript==
-// @name            华为路由器增强 HUAWEI-Stat_Max
-// @name:en         Bro-Stat_HUAWEI
+// @name            华为路由器增强 WiFi 智慧生活 网页 增强 脚本 插件 数学统计 分析
+// @name:en         Bro-Stat_HUAWEI-Stat_Max
 // @namespace       ucxn
-// @version         5.9.9.U
+// @version         5.9.9.V
 // @description     适用于华为路由器的RSSI显示、网速统计分析、流量一键查看的路由器Web网页后台增强利器
+// @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  A powerful tool for enhancing the web-based admin interface of Huawei routers, featuring RSSI display, network speed statistics and analysis, and one-click traffic viewing.
 // @author          哥哥科技 space.bilibili.com/501430041
 // @noframes
@@ -23,7 +24,7 @@
 // @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享） 
 // @note            发行版作者哥哥科技保留所有权利，源码本身公开，请前往 GitHub Source 区域获得授权部分
 // @run-at          document-start
-// @downloadURL     https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/Huawei-1.user.js
+// @downloadURL     https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/Huawei-1.user.js
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/Huawei-1.user.js
 // ==/UserScript==
 
@@ -51,7 +52,7 @@
     盲漫游: undefined, //也就是无线交换机（AP/有线桥接）模式，无线设备被主路由识别为有线设备则设置1
     周期类型: 'M', // 'M'(每月), 'W'(每周), 'D'(固定天数), 其它任意字符：不开启周期重置+自动导出功能
     周_天设置: 1, // M: 1~31号; W: 0~6(周日~周六); D: 间隔天数(如 7)
-    基准日期: '2026-06-20', // 原点时间(仅 D 模式有效) 任意一个历史周期的零点
+    基准日期: '2026-10-08', // 原点时间(仅 D 模式有效) 任意一个历史周期的零点
     报告时间: -540, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: 0, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
@@ -522,6 +523,40 @@ const calcStageRatio = (W, L_int, L_hp) => {
       s.hIdx = (s.hIdx + 1) & 31;
       s.hU[s.hIdx] = cC ? cC.upRate : 0;
       s.hD[s.hIdx] = cC ? cC.dnRate : 0;
+      /* ⚠️ 需要使用 HA 快速上线下线报告的用户，请删除该注释以启用该功能。
+      try {
+        if (S.cSnap) {
+          if (CONFIG.盲漫游 === 1) {
+            if (cC) {
+              if (s.haOff === 0 || (s.haOff === undefined && !S.cSnap.devices?.[k])) {
+                GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: cC.name || s.name || k, status: "上线" } } });
+                s.haOff = undefined;
+              } else if (s.haOff > 0) s.haOff = undefined;
+            } else if (s.haOff > 0) {
+              if (Date.now() >= s.haOff) {
+                GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: s.name || k, status: "下线" } } });
+                s.haOff = 0;
+              }
+            } else if (s.haOff === undefined) {
+              GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: s.name || k, status: "下线" } } });
+              s.haOff = 0;
+            }
+          } else {
+            if (cC) {
+              if (s.haOff === 0 || (s.haOff === undefined && !S.cSnap.devices?.[k])) {
+                GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: cC.name || s.name || k, status: "上线" } } });
+                s.haOff = undefined;
+              } else if (s.haOff > 0) s.haOff = undefined;
+            } else if (s.haOff === undefined) {
+              s.haOff = Date.now() + 300000;
+            } else if (s.haOff > 0 && Date.now() >= s.haOff) {
+              GM_setValue('ha_presence', { timestamp: Date.now(), devices: { [k]: { name: s.name || k, status: "下线" } } });
+              s.haOff = 0;
+            }
+          }
+        }
+      } catch(e) { console.warn("[哥哥科技] HA上下线事件写入失败:", e); }
+      ⚠️ 需要使用 HA 快速上线下线报告的用户，请删除该注释以启用该功能。*/
     }
     S.cSnap = {
       timestamp: Date.now(),

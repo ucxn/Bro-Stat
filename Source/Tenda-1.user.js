@@ -458,6 +458,7 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
           s.hIdx = (s.hIdx + 1) & 127;
           s.hU[s.hIdx] = cC ? cC.upRate : 0;
           s.hD[s.hIdx] = cC ? cC.dnRate : 0;
+/* @BroTech-Reserved ha-quick-report.part.js */
         }
         if (typeof GM_setValue !== 'undefined') {
           let nowMs = Date.now();

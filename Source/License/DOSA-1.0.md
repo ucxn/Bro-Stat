@@ -1,5 +1,5 @@
 IMPORTANT NOTICE: 
-This software is provided under the BroTech Additional Terms, which strictly require Prominent Attribution, SUBJECT TO THE FOLLOWING NON-NEGOTIABLE PRE-CONDITIONS:
+This software is provided under the BroTech Additional License, which strictly require Prominent Attribution, SUBJECT TO THE FOLLOWING NON-NEGOTIABLE PRE-CONDITIONS:
 
 1. Under no circumstances may the name to 『哥哥科技』be altered or removed.</br>
 Under no circumstances may any occurrence of the literal Characters 『哥哥科技』 be altered, removed, concealed, or obscured in any manner.
@@ -7,7 +7,16 @@ Under no circumstances may any occurrence of the literal Characters 『哥哥科
 Compliance with the literal preservation and proactive appending of 『哥哥科技』 as set forth above constitutes an absolute condition precedent to the grant of any rights under this License.
 3. Any breach, or failure to comply with Condition 1 and/or 2 shall immediately and automatically terminate all permissions granted herein.
 
-(Explanatory Note: The DOSA-1.0 and CPAL-1.0 license framework appended below serve solely as auxiliary reference frameworks to facilitate general understanding of the distribution model. They do not constitute the primary governing agreement. In the event of any conflict, discrepancy, or inconsistency between the attached texts and the BroTech Additional Terms, the BroTech Additional Terms shall absolutely and unconditionally prevail.)
+(Explanatory Note: The DOSA-1.0 and CPAL-1.0 license framework appended below serve solely as auxiliary reference frameworks to facilitate general understanding of the distribution model. They do not constitute the primary governing agreement. In the event of any conflict, discrepancy, or inconsistency between the attached texts and the BroTech Additional License, the BroTech Prominent Attribution Terms shall absolutely and unconditionally prevail.)
+
+许可证名称、SPDX 标识及其他简写仅用于识别。实际授权范围、条件及义务，以本仓库随软件发布的实际许可证文本、补充文件以及本文件中明确纳入的实际许可文本为准。
+
+无论使用何种许可证，都应当保留作者的显著署名。
+Regardless of the license used, the 哥哥科技's prominent attribution must be retained.
+
+绝对、一定、必须保留哥哥科技这几个字，并且不得以任何形式降低“原有的署名方式的显著程度”，而不仅仅是显著降低。
+
+无论何种原因，哪怕是技术困难导致在更大的作品中或其他编程语言中无法原样显示“哥哥科技”，“您” 也必须保留字面量，仅追加其他可以显著表达哥哥科技的方式，并及时通过 GitHub 或者邮件联系告知。保留“哥哥科技”的完整可见性是我许可的任何权利所不可分割的部分。
 
 # License Scope Notice
 The following license does not automatically apply to the entire repository. It applies on a file-by-file basis only to files that expressly state that they are licensed under this license. The presence of this license text in the repository does not, by itself, grant any rights under this license to files that do not contain such a declaration.
@@ -23,7 +32,7 @@ License text copyright © 2021 Child Mind Institute, Inc. All Rights Reserved.
 
 Though it is not itself an open source license, the purpose of this Delayed Open Source Attribution License 
 (the "DOSA License") is to provide open access to software for non-commercial use while giving attribution to its original developer, 
-and after a delay of three years, forcing the software to fall under the terms of the【BroTech Additional Terms
+and after a delay of three years, forcing the software to fall under the terms of the【BroTech Additional License
 (located at https://github.com/ucxn/Bro-Stat/blob/main/License.md) + CPAL-1.0 license】.
 that preserves the attribution information of this Brother License. This delay is intended to protect the commercial interests of the licensor 
 without compromising on the many benefits of creating open source products. 
@@ -37,7 +46,7 @@ to license your works, and to refer to it using the trademark "Delayed Open Sour
 <ol>
   <li><b>Delayed open source.</b></li>
     <ol type="a">
-      <li><b>Under the condition that you strictly comply with the BroTech Additional Terms, the "Licensor"</b> hereby grants permission, free of charge, to any person obtaining a copy of this Software, to use, copy, modify, merge, publish, and distribute the Software, in each case for any purpose other than a Commercial Purpose and to permit persons to whom the Software is furnished to do so, subject to the terms and conditions of this DOSA License.</li>
+      <li><b>Under the condition that you strictly comply with the BroTech Additional License, the "Licensor"</b> hereby grants permission, free of charge, to any person obtaining a copy of this Software, to use, copy, modify, merge, publish, and distribute the Software, in each case for any purpose other than a Commercial Purpose and to permit persons to whom the Software is furnished to do so, subject to the terms and conditions of this DOSA License.</li>
       <li>This DOSA License applies separately for each version of the Software. No version of the Software can be used for Commercial Purposes within three years of the first publicly available distribution of that version under this DOSA License.</li>
       <li>Effective on the third anniversary of the first publicly available distribution of each version of the Software under this DOSA License, you are hereby granted a license to that version of the Software under the terms of the CPAL License.  The " Notice Exhibits to the time-delayed CPAL License" set forth in Schedule A, below, shall constitute Exhibits A and B to the CPAL License (and shall not, for the avoidance of doubt, be deemed to constitute a license or other grant of rights in the Software under this DOSA License).</li>
     </ol>
@@ -128,16 +137,16 @@ to be consistent with Exhibit B.
 Software distributed under the License is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. 
 See the License for the specific language governing rights and limitations under the License.
 
-The Original Code is **Part of Bro-Stat（Under the non-negotiable compliance with BroTech Additional Terms of Attribution）**.
+The Original Code is **Part of Bro-Stat（Under the non-negotiable compliance with BroTech Prominent Attribution Terms of Attribution）**.
 
 The Original Developer is the Initial Developer and is 哥哥科技. If left blank, the Original Developer is the Initial Developer.
 
 The Initial Developer of the Original Code is 哥哥科技. 
 
 All portions of the code written by 哥哥科技 are Copyright (c) 2026. All Rights Reserved.
-ANY RIGHTS GRANTED herein are ABSOLUTELY contingent upon your ADHERENCE to the BroTech Additional Terms.
+ANY RIGHTS GRANTED herein are ABSOLUTELY contingent upon your ADHERENCE to the BroTech Additional License.
 
-Contributor 1-Reality（Under the condition that you strictly comply with the BroTech Additional Terms）.
+Contributor 1-Reality（Under the condition that you strictly comply with the BroTech Additional License）.
 
 
 ### EXHIBIT B. Attribution Information.
