@@ -7,10 +7,11 @@
 
 ## One-Click Install&emsp;[![哥哥软件](.github/Broware.svg)](https://github.com/ucxn/ZTE-Stat_Max/blob/main/LICENSE/BR-BY-NC-1.0.md)
 
-**[Userscript Manager](https://github.com/ucxn/ZTE-Stat_Max/blob/main/README_EN.md#requirements)**&emsp;**[Home Assistant Smart Home Integration](https://github.com/ucxn/ZTE-Stat_HA/blob/main/custom_components/gbnpa_router/Readme.md)**
+**[Userscript Manager](https://github.com/ucxn/ZTE-Stat_Max/blob/main/README_EN.md#requirements)**&emsp;**[HA / Mi Smart Home Integration](https://github.com/ucxn/ZTE-Stat_HA/blob/main/custom_components/gbnpa_router/Readme.md)**
 
-[**Development Build (Latest)**](./.github/Install.md)&nbsp;
-[**Release Build (Stable)**](https://github.com/ucxn/Bro-Stat/releases)
+[**Develop Ver.(Latest)**](./.github/Install.md)&emsp;
+[**Release Build (Stable)**](https://github.com/ucxn/Bro-Stat/releases)&nbsp;&emsp;**[Trouble?](./.github/Install.md#trouble)**
+
 
 The current universal edition primarily supports and enhances routers from **TP-Link, Xiaomi (MiWiFi), ASUS/ROG，HUAWEI, H3C(ISP), Tenda, ZTE**, and other mainstream vendors.
 

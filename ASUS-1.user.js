@@ -308,7 +308,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
         
         // 华硕 getTraffic 是整包快照：每一包都代表一次真实采样，即使连续两轮速率数值恰好相同也推进积分时间
         const ms = n - cS.lUT;
-                  if (cS.upR > 0) {
+        if (cS.upR > 0) {
           cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
           else if (cC.upRate > 0) {
             const eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }

@@ -314,7 +314,7 @@ function fBy(bps) {
           
           if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) {
             const ms = lanNow - cS.lUT;
-                      if (cS.upR > 0) {
+          if (cS.upR > 0) {
           cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
           else if (cC.upRate > 0) {
             const eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
