@@ -21,6 +21,10 @@ Regardless of the license used, the 哥哥科技's prominent attribution must be
 # License Scope Notice
 The following license does not automatically apply to the entire repository. It applies on a file-by-file basis only to files that expressly state that they are licensed under this license. The presence of this license text in the repository does not, by itself, grant any rights under this license to files that do not contain such a declaration.
 
+The following license is effective only if all attribution requirements set forth in the project’s primary license are fully and continuously complied with.
+
+仅当完全且持续遵守项目主license里面的所有、全部署名要求时，以下授权才能生效。
+
 <h2><img width="100" src="https://github.com/ChildMindInstitute/DOSA-license/blob/main/DOSA_logo.png" class="img-responsive img-centered" alt="DOSA logo">
 Delayed Open Source Attribution License 1.0 (DOSA-1.0)</h2>
 

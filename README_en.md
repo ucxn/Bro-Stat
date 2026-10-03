@@ -5,7 +5,7 @@
 ![Preview](./华为预览图.png)
 **Bro-Stat** is a browser-based extension designed to improve the native web management experience of consumer and prosumer routers across multiple brands.
 
-## One-Click Install&emsp;![哥哥软件](.github/Broware.svg)
+## One-Click Install&emsp;[![哥哥软件](.github/Broware.svg)](https://github.com/ucxn/ZTE-Stat_Max/blob/main/LICENSE/BR-BY-NC-1.0.md)
 
 **[Userscript Manager](https://github.com/ucxn/ZTE-Stat_Max/blob/main/README_EN.md#requirements)**&emsp;**[Home Assistant Smart Home Integration](https://github.com/ucxn/ZTE-Stat_HA/blob/main/custom_components/gbnpa_router/Readme.md)**
 
@@ -45,71 +45,48 @@ https://github.com/ucxn/ZTE-Stat_Max
 ![signal](Wi-Fi图标映射设计稿.png)
 
 ## 💡 Core Features
-
 ### 1. Persistent Traffic Storage
-
 Most router traffic counters have no memory.
 
 Bro-Stat introduces a local snapshot persistence mechanism. Every time the dashboard is opened, the extension automatically loads the previous traffic snapshot and seamlessly continues tracking from the latest router statistics.
 
 Even after router reboots or device reconnections, historical upload and download consumption remains visible, making it much easier to identify devices silently consuming bandwidth.
-
 ### 2. Miniature Time-Series Sparklines
-
 Instead of relying on third-party chart libraries, Bro-Stat renders dynamic traffic waveforms directly using lightweight character-based sparklines.
-
-**Peak Retention**
-
+#### Peak Retention
 Inspired by Windows Task Manager, the Y-axis uses a sticky scaling algorithm. After a large traffic spike, the scale gradually falls back rather than instantly collapsing, significantly reducing visual jitter.
-
-**Noise Suppression**
-
+#### Noise Suppression
 Background traffic is automatically filtered out. Tiny fluctuations disappear into silence, while meaningful throughput creates visible waveforms, allowing network activity patterns to be recognized at a glance.
-
 ### 3. Heartbeat Detection
-
 When traffic drops to extremely low levels, such as MQTT heartbeat packets from smart home devices, native router interfaces typically display crude values like `0 KB/s` or `1 KB/s`.
 
 Bro-Stat introduces a fractional display mechanism based on sixteenth increments, such as `[3/16] KiB/s`.
 
 Even when a device is effectively idle, these subtle "digital heartbeats" allow users to determine whether the device remains online and active.
-
 ### 4. High-Precision Upload Tracking (PCDN Spotlight)
-
 Because upstream bandwidth is often the most valuable resource on residential broadband connections, Bro-Stat treats upload and download traffic differently.
-
-**Download Direction**
-
+#### Download Direction
 Focused on real-time competition. Instantly shows which devices are consuming downstream bandwidth.
-
-**Upload Direction**
-
+#### Upload Direction
 Uses an accounting-oriented visualization model. Independent orange progress bars and proportional radar indicators clearly display cumulative upload contributions for every device.
 
 Combined with waveform patterns (continuous transmission versus burst traffic), suspicious PCDN activity within the LAN can be identified quickly and intuitively.
+### 5. High-Precision Traffic Counter & Redesigned Grid UI ⏱️🖥️
+Along with high-frequency frontend sampling, supported router models also pull cumulative throughput data directly from the router’s internal interface. This allows you to track the actual bandwidth consumed by each device during your current browsing session. Both metrics are displayed side-by-side for easy cross-referencing and normalized to current session values, making usage changes clear at a glance.
 
-### 5. Performance Optimization
+*Note:* The "high-precision" counter pulls from the router’s native per-MAC cumulative metrics, but we’ve calibrated it to correct common vendor bugs like counter resets, overflows, and rollbacks. Unlike the vague summaries in official companion apps, this gives you a clean breakdown of both upload and download traffic. The frontend counter simply serves as a reliable secondary reference so you don't lose visibility if the router's interface hiccups—its sampling rate does not affect the accuracy of the underlying hardware counter.
+### 6. Event-Driven Sampling 🌈
+We refined the data integration logic to prevent phase mismatches and sampling misalignments from throwing off total traffic calculations (the area under the curve). Instead of relying on rigid polling timers, sampling intervals are anchored to actual throughput changes: the moment upload or download speeds shift, a new sample is recorded, preventing stale or cached values from being read.
 
-A monitoring dashboard should remain smooth even after running continuously for weeks.
-
-Bro-Stat uses a pure mathematical trapezoidal integration engine to eliminate unnecessary polling overhead, while the rendering layer leverages native DOM optimizations and Flexbox-based layout stabilization to minimize browser reflow.
-
-Even when hundreds of smart devices are refreshing simultaneously, memory usage and CPU consumption remain remarkably stable.
-
-### 6. 🏠 Home Assistant Integration
-
+This approach resolves the common issue of mismatched refresh intervals across different router endpoints. More importantly, it eliminates the pitfall where polling faster than the router's internal update cycle actually makes the numbers *less* accurate. In addition, an internal "Group Time" window significantly reduces the chance of consecutive speed frames colliding with each other.
+### 7. 🏠 Home Assistant Integration
 When paired with the dedicated **BroTech Hub Integration**, device and traffic states can be pushed to Home Assistant through Webhooks and HACS-compatible integrations.
 
 This eliminates the single-client limitation of traditional web dashboards and enables simultaneous monitoring from multiple devices and platforms.
 
 Companion project:
-
-**ZTE-Stat_HA**
-https://github.com/ucxn/ZTE-Stat_HA
-
-### 7. Customized, Precise Wi-Fi Signal SVG Icons
-
-
+[**ZTE-Stat_HA**](https://github.com/ucxn/ZTE-Stat_HA)
+### 8. Customized, Precise Wi-Fi Signal SVG Icons
 ## ⚙️ Supported Layouts & Modes
 
 Bro-Stat provides flexible configuration options for different screen sizes and visual preferences. Settings can be adjusted directly through the `CONFIG` section.
@@ -140,9 +117,7 @@ You may also pin the panel to the top of the page using the 📌 icon for perman
 
 ## 📜 Legal Notice & Open Source Statement
 
-> *"In a civilized society, a clean network free from surveillance and exploitation is a fundamental right for everyone."*
-
-This software is Source-Available and is provided **"AS IS"**, without any express or implied warranties regarding suitability, stability, accuracy, fitness for a particular purpose, or compliance with any commercial use case.
+> *"In a civilized society, a clean network—free from surveillance and leeching—is a fundamental right for everyone."*
 
 Out of respect for Developer-friendly contributors, any modification, redistribution, or derivative work based on this project must preserve the attribution and legal notice section displayed at the bottom of the interface.
 

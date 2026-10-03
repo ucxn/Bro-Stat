@@ -21,6 +21,10 @@ Regardless of the license used, the 哥哥科技's prominent attribution must be
 # License Scope Notice
 The following license does not automatically apply to the entire repository. It applies on a file-by-file basis only to files that expressly state that they are licensed under this license. The presence of this license text in the repository does not, by itself, grant any rights under this license to files that do not contain such a declaration.
 
+The following license is effective only if all attribution requirements set forth in the project’s primary license are fully and continuously complied with.
+
+仅当完全且持续遵守项目主license里面的所有、全部署名要求时，以下授权才能生效。
+
 ## Common Public Attribution License Version 1.0 (CPAL-1.0)
 
 The only authoritative full text is the copy hosted by 哥哥科技 at the link: https://github.com/ucxn/Bro-Stat/blob/main/Source/License/CPAL-1.0.md ; no license may be identified or construed by its name or by any generic version published elsewhere.
