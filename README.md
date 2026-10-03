@@ -6,10 +6,10 @@
 **Bro-Stat** 是一个网速监控、流量多维查看工具，运用了专业的测控思想，融合 哥哥科技 的匠心打造。支持多种市面上的家用硬路由品牌，且架构理论上可适配几乎全品牌：所有网页端给数据的消费级网关。
 
 ## 一键安装&nbsp;&emsp;[![哥哥软件](.github/哥哥软件.svg)](https://github.com/ucxn/ZTE-Stat_Max/blob/main/LICENSE/BR-BY-NC-1.0.md)
-**[脚本管理器](https://github.com/ucxn/ZTE-Stat_Max#环境要求)**&emsp;**[HA智能家居联动](https://github.com/ucxn/ZTE-Stat_HA)**
+**[脚本管理器](https://github.com/ucxn/ZTE-Stat_Max#环境要求)**&emsp;**[HA集成/米家 智能家居联动](https://github.com/ucxn/ZTE-Stat_HA)**
 
 [**开发版（最新）**](./.github/Install.md)&nbsp;
-[**发行版（稳定）**](https://github.com/ucxn/Bro-Stat/releases)
+[**发行版（稳定）**](https://github.com/ucxn/Bro-Stat/releases)&nbsp;**[故障排查](./.github/Install.md#故障排查)**
 
 文档介绍和思路参见[个人主页](https://github.com/UCXN/BroTech)，强烈建议阅读架构设计；当然我更欢迎直接审计源码，通常比看简介能感受到的惊喜多得多；这不是一个简单的 UI增强 插件，更是一套完整的针对混沌离散数据源的处理算法，颇具极客精神。
 

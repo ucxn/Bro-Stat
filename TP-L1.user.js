@@ -353,7 +353,7 @@ async function rSD() {
         let cS = S.cls[m];
         if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cS.aR === 0 && 本轮刷新接口.has(cC.iface)) {
           const ms = lanNow - cS.lUT;
-                    if (cS.upR > 0) {
+          if (cS.upR > 0) {
           cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
           else if (cC.upRate > 0) {
             const eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }

@@ -506,7 +506,7 @@ const ts = Date.now();
         let cC = cI[m], cS = S.cls[m], 自身刷新 = cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cC.包上 !== cS.上次包上 || cC.包下 !== cS.上次包下;
         if (自身刷新 || (!cS.aR && 组刷新.has(cC.iface))) {
           const ms = lanNow - cS.lUT;
-                    if (cS.upR > 0) {
+          if (cS.upR > 0) {
           cS.intUp += (cS.upR + cC.upRate) * ms * 0.0005; }
           else if (cC.upRate > 0) {
             const eU = cC.upRate * CONFIG.lanRefreshInterval * 0.5; cS.intUp += eU; cS.zEU = (cS.zEU || 0) + eU; cS.zUC = (cS.zUC || 0) + 1; }
