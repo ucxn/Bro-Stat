@@ -9,7 +9,9 @@ Regardless of the licensing path chosen, it is subject to the BroTech Prominent 
 ### 品牌使用政策和辅助许可证文本
 
 在此处查看，品牌使用政策和引用指向的许可证法律效力无高低之分</br>
-[LICENSE文件夹](./Source/License)
+[引用的 辅助LICENSE 参考文本存放文件夹](./Source/License)
+
+**[必读：主章程，总则、冲突处理，法律裁决](./LICENSE/README.MD)**
 
 # 哥哥科技许可证
 ## 哥哥科技显著署名附加条款
