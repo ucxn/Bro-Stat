@@ -1,3 +1,6 @@
+# 总则 General Provisions
+### [点击查看 Click to View](.../LICENSE/README.md)
+
 ## 授权结构、主协议及冲突处理
 哥哥科技许可证（BroTech Additional License）构成本项目的**主授权法律条件**、许可证、合同、协议、契约，是法律效力的必要条件。***也是在合法基本下限条件下，唯一需要遵守的协议。***
 
