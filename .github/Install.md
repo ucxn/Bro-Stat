@@ -1,4 +1,4 @@
-# 🚀 Bro-Stat Development Installation
+# 🚀 Bro-Stat 开发版安装&nbsp;&nbsp;![哥哥软件](哥哥软件.svg)
 
 [English](#English) | **简体中文**
 
@@ -35,7 +35,7 @@
 
 如需正式发行版，请前往 [Bro-Stat Releases](https://github.com/ucxn/Bro-Stat/releases)。
 
-# English
+# English&emsp;&nbsp;![哥哥软件](Broware.svg)
 This page provides direct installation links for the **latest development builds** of Bro-Stat.
 
 > Tampermonkey, **ScriptCat**, or another compatible userscript manager is required.  
