@@ -36,6 +36,8 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 保留“哥哥科技”的完整字面量和实质显示、可见性与显著性，是作者授予本软件任何许可权利所不可分割的条件。
 
+为免疑义，本款项下的任何终止均为立即、绝对且不可补救的，且严格不受任何宽限期、通知要求、时间流逝或任何其它条件的限制。
+
 ---
 ### 商用说明条款
 *本部分和上述的署名部分是可以分割的，无论在任何情况下*，**署名条款必须完全得到执行**。*如果因为法律规定或许可条款之间产生不可调和的冲突，不得影响其他未发生冲突的条款之效力。条款的最小单位是可细分的，不应简单地以完整句子作为不可分割的整体。应当在法律允许的最大范围内，作出与作者利益最为有利且能够兼容的解释。本人系该项目的完整原作者，因此增加上述附加条款具有合理性。*
@@ -72,6 +74,8 @@ If objective technical limitations prevent a user-visible interface from properl
 
 Any redistribution, modification, porting, merging, integration, translation, conversion to another programming language, or incorporation into a Larger Work must not diminish the prominence of the original manner in which “哥哥科技” is attributed, or reduce it below the level of attribution identifying the author in the original work; **no reduction whatsoever in the degree of display is permitted, not merely no substantial reduction.**
 
+For the avoidance of doubt, any termination under this paragraph is immediate, absolute, and non-curable, and shall operate strictly without regard to any cure period, notice requirement, lapse of time, or any other condition whatsoever.
+
 Preserving the complete literal text “哥哥科技”, together with its actual display, visibility, and prominence, is an inseparable condition of every license right granted by the author for this software.
 ---
 ### Commercial Use Provisions
@@ -87,4 +91,4 @@ Developers of official, original factory firmware for router brands already supp
 
 哥哥科技 2026 © Bro-Tech. All rights reserved.
 
-END OF THE License.
+END OF THE License. Strict compliance with this Agreement constitutes an absolute condition precedent to the legality of using any code from this library.

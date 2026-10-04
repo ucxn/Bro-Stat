@@ -2,6 +2,10 @@
 
 以下内容全部由LLM生成，是Agent优化的那种，方便比较代码。但AI味太浓，有时小短句很烦，懒得清洗了。AI还喜欢否定表达，相反个人喜好正向叙事。排比句也很机械，看的鼠标滚轮要废了要力竭了。
 
+强烈建议直接看这个版本。We strongly suggest to see this version first.
+
+[这个版本已经经历了初步润色，但没有逐段检查。](https://github.com/ucxn/ZTE-Stat_Max/blob/main/%E5%8F%91%E5%B1%95%E5%8F%B2%E6%95%85%E4%BA%8B.md)
+
 # Bro-Stat发展史：从5.9共同祖池到多品牌独立适配
 
 ## 一、研究这部历史，先分清 Bro-Stat 的两套版本号

@@ -1,22 +1,28 @@
 # 总则
-您应当理解并明确同意，[《哥哥科技许可证》](../License.md#哥哥科技许可证)[《哥哥科技显著署名条款》](../License.md#哥哥科技显著署名附加条款)构成本授权协议的最高效力唯一主协议和最高效力的法律声明。
+您应当理解并明确同意，[《哥哥科技许可证》](../License.md#哥哥科技许可证)[《哥哥科技显著署名条款》](https://github.com/ucxn/Bro-Stat?tab=License-1-ov-file#哥哥科技显著署名附加条款)构成本授权协议的最高效力唯一主协议和最高效力的法律声明。
 
 仅在您完全尊重本署名要求，且持续、完整、严格地遵守本协议各项规定的前提下，您方被授予使用本软件的其他衍生权利。如果您无法准确理解本条款的法律含义，请自行咨询专业律师；反之，您绝对无权将“权利授予条款”与“显著署名条款”割裂或孤立适用。
 
 若您无法理解何为“显著署名”，则您必须选择不使用本软件的任何代码。在此情况下，除分享官方原始链接及下载至本地仅供个人自用外，严禁对本软件进行任何其他操作或分发行为。
 
 ---
+以下指南仅严格适用于一种极其特定的情形：即您将本软件代码实质性地集成至一个更大的整体作品中，且由于系统结构或技术原因，导致实质上已无法原封不动地保留原汁原味的原版最终用户界面（GUI）及其署名设计。</br>
+请特别注意（权利之保留）： 本指南仅出于指导合规之目的而提供。本指南该指南并不代表作者向您授予了额外的权利，也不意味着您只需遵守另外的义务。您对本指南的参考或执行，绝不意味着您可以免除对前述所有累加式法定前置条件的严格遵守，其无法表示任何豁免、替代或削弱。
+
 若您作为开发者将本程序集成至更大的作品或项目中，您必须严格履行以下界面展示规则：署名的物理|逻辑显著程度（包括但不限于排版样式、字体字号、颜色及对比度等）绝对不得发生任何改变或削弱。
 
 基于本程序进行二次开发时，署名在用户界面（GUI）上的绝对深度层级不得被更改；将其集成至更大作品时，其在界面交互架构中的“相对深度层级”亦不得发生任何降级。
 
 例如：当最终用户进入主要由本软件构建的模块或功能页面时，必须在该特定模块/目录的最终用户界面内、且在本软件原设计的固定位置，原样且显著地呈现“哥哥科技”字样。严禁将其折叠、收纳或移至任何隐藏菜单。
 # General Provisions
-You shall understand and expressly agree that the [*BroTech Additional License*](../License.md#english-of-the-primary-lawbrotech-additional-license) | *[BroTech Prominent Attribution Terms](../License.md#brotech-prominent-attribution-terms)*  constitutes the Primary Law of this Agreement.
+You shall understand and expressly agree that the [*BroTech Additional License*](../License.md#english-of-the-primary-lawbrotech-additional-license) | *[BroTech Prominent Attribution Terms](https://github.com/ucxn/Bro-Stat?tab=License-1-ov-file#brotech-prominent-attribution-terms)*  constitutes the Primary Law of this Agreement.
 
 The rights to use this software are granted to you ONLY subject to the absolute condition precedent of your complete, continuous, and strict compliance with the prominent attribution requirements herein. If you are unable to comprehend the legal implications of these terms, you are advised to consult independent legal counsel. Conversely, under no circumstances may you isolate, sever, or selectively apply the rights-granting clauses without fulfilling the prominent attribution obligations. 
 
 Should you fail to understand what constitutes "prominent attribution," you MUST elect NOT to use the source code of this software. In such an event, you are permitted solely to share the official original link or download the software exclusively for personal, local use; any and all other operations or distributions are strictly prohibited.
+
+The following guidelines apply strictly and exclusively to the specific scenario where you integrate this software into a larger, overarching work, rendering it structurally or technically impossible to preserve the original unmodified Graphical User Interface (GUI) and its attribution design in their exact original form.</br>
+EXPRESS RESERVATION OF RIGHTS AND OBLIGATIONS: This guide is provided solely for instructional compliance purposes. It does NOT, under any circumstances, operate as an implicit or explicit grant of any additional rights or licenses beyond the primary agreement. Furthermore, it does NOT waive, substitute, or dilute any of your strict obligations under the primary licenses and the BroTech Prominent Attribution Terms. Adherence to this guide is merely a compliant implementation method for integration scenarios, and shall by no means exempt you from the absolute and simultaneous satisfaction of all conditions precedent set forth above.
 
 Should you, as a developer, integrate this software into a larger work or project, you must strictly adhere to the following display protocols: The physical prominence of the attribution (including but not limited to layout style, font size, color, and contrast) shall absolutely NOT be altered or diminished in any manner.
 
