@@ -79,6 +79,6 @@ Therefore, under this Agreement, the BroTech Additional License constitute the p
 
 However: **Any rights I grant that conflict with the attribution-related provisions of the BroTech Additional License shall, regardless of the form in which other licenses are expressed, be invalid for this project if they arise from standard-form terms or advance licenses not separately signed by me, unless those rights were granted before the creation of the BroTech Additional License. Subsequent updates to the BroTech Additional License and the attribution requirements must not be construed as meaning that those requirements postdate grants made under other licenses.**
 
-主许可证通常位于项目 GitHub 首页的 Licence中
+主许可证通常位于项目 GitHub 首页的 [Licence中](https://github.com/ucxn/Bro-Stat?tab=License-1-ov-file#哥哥科技许可证)
 
 全局许可证位于 [哥哥科技主页](https://github.com/ucxn/ucxn/blob/main/README.md)

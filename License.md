@@ -13,6 +13,7 @@ Regardless of the licensing path chosen, it is subject to the BroTech Prominent 
 
 **[必读：主章程，总则、冲突处理，法律裁决](./LICENSE/README.MD)**
 
+[快速查看简要版 See the Simplified Summary](Copyright.md)
 # 哥哥科技许可证
 ## 哥哥科技显著署名附加条款
 Regardless of the license used, the author's prominent attribution must be retained.<br>

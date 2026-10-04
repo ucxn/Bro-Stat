@@ -1,8 +1,8 @@
 # 总则 General Provisions
 ### [点击查看 Click to View](/LICENSE/README.MD#总则)
 
-## 授权结构、主协议及冲突处理
-哥哥科技许可证（BroTech Additional License）构成本项目的**主授权法律条件**、许可证、合同、协议、契约，是法律效力的必要条件。***也是在合法基本下限条件下，唯一需要遵守的协议。***
+# 授权结构、主协议及冲突处理
+[哥哥科技许可证](/License.md#哥哥科技许可证) 构成本项目的**主授权法律条件**、许可证、合同、协议、契约，是法律效力的必要条件。***也是在合法基本下限条件下，唯一需要遵守的协议。***
 
 在您充分理解、阅读以及同意上述规则以及**哥哥科技许可证**的情况下，理解为：本项目原创内容可以向公众提供一项完整、统一且不可任意拆分的复合授权，而非数份可以由接受者分别摘取、独立选择或相互替代的许可。
 
@@ -19,8 +19,10 @@
 上述冲突不导致哥哥科技许可证自动失效，也不得被解释为作者放弃已经明确保留的署名权利、授权条件及其他相关权益。
 
 本项目接受者所取得的权利，始终以哥哥科技实际作出的完整授权为准。不得通过孤立援引、拆分解释或选择性适用任何被引用的公共许可证，取得与主协议相抵触的权利。不得将除正确包含哥哥科技附加协议以外的任一单独文本从本项目完整的授权声明中单独摘出，并据此主张免除本项目已经明确列示的授权条件。
-### License Structure, Primary License and Conflict Resolution
-The BroTech Additional License constitute the **Primary LICENSE** of this project, serving as its license, contract, agreement, and covenant, and are a necessary condition for legal effect. ***Subject to the minimum conditions required by law, they are also the only agreement that must be observed.***
+
+### [开发者快速查看参考](/Copyright.md)
+## License Structure, Primary License and Conflict Resolution
+The [*BroTech Additional License*](https://github.com/ucxn/Bro-Stat?tab=License-1-ov-file#english-of-the-primary-lawbrotech-additional-license) constitute the **Primary LICENSE** of this project, serving as its license, contract, agreement, and covenant, and are a necessary condition for legal effect. ***Subject to the minimum conditions required by law, they are also the only agreement that must be observed.***
 
 Where you have fully understood, read, and agreed to the above rules and the BroTech Additional License below, it is understood that the original content of this project may be offered to the public under a single, complete, and unified composite license that may not be arbitrarily split. It is not a set of several licenses that a recipient may separately pick from, independently choose among, or substitute for one another.
 
@@ -38,7 +40,9 @@ Such a conflict shall not cause the BroTech Additional License to lapse automati
 
 The rights obtained by recipients of this project are at all times determined by the complete grant actually made by BroTech. No one may obtain rights that conflict with the primary agreement by citing any referenced public license in isolation, interpreting it in a fragmented manner, or applying it selectively. No single text, other than one that correctly incorporates the BroTech Additional License, may be extracted from this project's complete license statement in order to claim exemption from the license conditions that this project has expressly set out.
 
-**Regardless of the licensing path chosen, it is subject to the BroTech Prominent Attribution Terms set forth in this document.</br></br>无论选择何种授权路径，均同时受本文件所载 哥哥科技显著署名附加条款 约束。**
+**Regardless of the licensing path chosen, it is subject to the *[BroTech Prominent Attribution Terms](/License.md#brotech-prominent-attribution-terms)* set forth in this document.</br></br>无论选择何种授权路径，均同时受本文件所载 [哥哥科技显著署名附加条款](https://github.com/ucxn/Bro-Stat?tab=License-1-ov-file#哥哥科技显著署名附加条款) 约束。**
+
+### [Summary for Developers for a Quick Reference](/Copyright.md)
 
 ## 哥哥科技文件许可与适用范围声明
 

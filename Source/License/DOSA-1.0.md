@@ -1,5 +1,5 @@
 IMPORTANT NOTICE: 
-This software is provided under the BroTech Additional License, which strictly require Prominent Attribution, SUBJECT TO THE FOLLOWING NON-NEGOTIABLE PRE-CONDITIONS:
+This software is provided under the ***[BroTech Additional License](/License.md#english-of-the-primary-lawbrotech-additional-license)***, which strictly require Prominent Attribution, SUBJECT TO THE FOLLOWING NON-NEGOTIABLE PRE-CONDITIONS:
 
 1. Under no circumstances may the name to 『哥哥科技』be altered or removed.</br>
 Under no circumstances may any occurrence of the literal Characters 『哥哥科技』 be altered, removed, concealed, or obscured in any manner.
