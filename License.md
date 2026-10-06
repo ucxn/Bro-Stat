@@ -92,4 +92,4 @@ Developers of official, original factory firmware for router brands already supp
 
 哥哥科技 2026 © Bro-Tech. All rights reserved.
 
-END OF THE License. Strict compliance with this Agreement constitutes an absolute condition precedent to the legality of using any code from this library.
+END OF THE License. Strict compliance with this Agreement constitutes an absolute condition precedent to the legality of using any code from this repository.
