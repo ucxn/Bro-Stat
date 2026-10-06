@@ -37,6 +37,8 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 保留“哥哥科技”的完整字面量和实质显示、可见性与显著性，是作者授予本软件任何许可权利所不可分割的条件。
 
+只要使用了我的代码，则您的作品最终用户日常实际可使用的界面中出现“哥哥科技”的次数不能比我的原始完整作品更少，署名不得仅存在于普通用户不会使用的深层菜单当中，也不能藏在和我的主要功能无关的地方。
+
 为免疑义，本款项下的任何终止均为立即、绝对且不可补救的，且严格不受任何宽限期、通知要求、时间流逝或任何其它条件的限制。
 
 ---
@@ -74,6 +76,8 @@ Even if the target runtime environment, display device, programming language, or
 If objective technical limitations prevent a user-visible interface from properly displaying “哥哥科技”, supplementary representations such as `BroTech`, `Bro-Tech`, the author's username, the project link, or other forms that clearly identify the author may be added, provided that the program's substantive representation of the Chinese characters “哥哥科技” is not removed. The author must also be promptly notified through GitHub or email.
 
 Any redistribution, modification, porting, merging, integration, translation, conversion to another programming language, or incorporation into a Larger Work must not diminish the prominence of the original manner in which “哥哥科技” is attributed, or reduce it below the level of attribution identifying the author in the original work; **no reduction whatsoever in the degree of display is permitted, not merely no substantial reduction.**
+
+Once my code is used, the number of appearances of “哥哥科技” in the runtime end-user interface / end-user interface (UI) actually accessible of your work must NOT be lower than the number of appearances in my original complete work. Attribution must not be hidden away solely in deep or secondary menus that users rarely visit, It must at least be placed near the relevant interface, framework, module, or area that primarily uses my code.
 
 For the avoidance of doubt, any termination under this paragraph is immediate, absolute, and non-curable, and shall operate strictly without regard to any cure period, notice requirement, lapse of time, or any other condition whatsoever.
 

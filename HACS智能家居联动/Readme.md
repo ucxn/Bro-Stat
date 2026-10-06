@@ -1,7 +1,7 @@
 # Bro-Stat_HA by 哥哥科技（GBNPA Router Sync）
 
 ### ⚠️ 建议前往[主项目](https://github.com/ucxn/ZTE-Stat_HA)研究使用
-### ℹ️ Go to the [Main Project](https://github.com/ucxn/ZTE-Stat_HA) to explore and use it.
+### ℹ️ Go to the [Main Project](https://github.com/ucxn/ZTE-Stat_HA/blob/main/custom_components/gbnpa_router/Readme.md) to explore and use it.
 
 ---
 
@@ -19,14 +19,14 @@
 
 该项目包含两个相互配合的子组件：
 
-**主项目**&emsp;&nbsp;[![主项目](https://img.shields.io/badge/Network-Bro--Stat-FF4C00?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ucxn/Bro-Stat)
+**HA 项目**&emsp;&nbsp;[![主项目](https://img.shields.io/badge/Network-Stat--HA-FF4C00?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ucxn/Bro-Stat)
 
-1. **Bro-Stat（双 JS 脚本）**：运行于浏览器前端，负责接管中兴路由器后台的数据流并优化本地 UI 展示。
+1. **Bro-Stat（双 JS 脚本）**：运行于浏览器前端，负责接管家用路由器后台的数据流并优化本地 UI 展示。
 2. **GBNPA-Router-Sync（HA 集成）**：运行于 Home Assistant 服务器，实现状态的多端无限转发与图表记录。
 
 ## 📖 设计初衷与痛点解决
 
-小米路由器的硬件转发性能优异，但其官方 Web 管理后台在多终端登录和数据展示上存在些限制：
+消费级路由器的纯硬件转发性能优异，但其官方 Web 管理后台在多终端登录和数据展示上存在些限制：
 
 **数据层级较深**：实时的设备网速与历史累积流量被隐藏在二级或三级菜单中，无法在同一个全局列表中进行直观的跨设备对比。
 
@@ -88,8 +88,6 @@ const webhookSecret = "你的鉴权密钥";
 ## 📄 协议 (License)
 
 详见 </kbd>**[ZTE-Stat_HA](https://github.com/ucxn/ZTE-Stat_HA)**</kbd> 对应仓库。
-
-特别声明：**主项目 [Bro-Stat](https://github.com/ucxn/Bro-Stat)** 保持独立.
 
 ---
 *Authored by 哥哥科技*
