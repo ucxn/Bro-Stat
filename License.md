@@ -52,7 +52,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 哥哥科技 2026 © Bro-Tech 版权所有
 
-本项目主协议：哥哥科技许可证到此结束。
+本项目主协议：哥哥科技许可证到此结束。严格遵守该协议是使用本库任意部分或完整代码合法性的前置条件。
 
 # English of the Primary Law：BroTech Additional License
 ## BroTech Prominent Attribution Terms
