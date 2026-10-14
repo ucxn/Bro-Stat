@@ -16,6 +16,7 @@
 | **TP-Link（普联）** | [安装 TP-Link 版](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/TP-L1.user.js) |
 | **华硕 ASUS / ROG / TUF** | [安装华硕版](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/ASUS-1.user.js) |
 | **华为 HUAWEI** | [安装华为版](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/Huawei-1.user.js) |
+| **中兴光猫（ISP）** | [安装ZTE光猫E8版](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/ZTE-ONU-E8-CMCC1.user.js) |
 | **H3C / 新华三** | [安装 H3C 版](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/H3C-TX_1801.user.js) |
 | **腾达 Tenda** | [安装腾达版](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/Tenda-1.user.js) |
 | **小米 / MiWiFi** | [安装小米版](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/Mi-WiFi_RD.user.js) |
@@ -67,6 +68,7 @@ Choose the router brand you are using:
 | **TP-Link** | [Install TP-Link](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/TP-L1.user.js) |
 | **ASUS / ROG / TUF** | [Install ASUS](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/ASUS-1.user.js) |
 | **HUAWEI** | [Install HUAWEI](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/Huawei-1.user.js) |
+| **ZTE ISP Gateway** | [Install Carrier E8 ZTE](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/ZTE-ONU-E8-CMCC1.user.js) |
 | **H3C / ISP Customized** | [Install H3C](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/H3C-TX_1801.user.js) |
 | **Tenda** | [Install Tenda](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/Tenda-1.user.js) |
 | **Xiaomi / MiWiFi** | [Install Xiaomi](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/Mi-WiFi_RD.user.js) |
