@@ -12,6 +12,9 @@
 [**Develop Ver.(Latest)**](./.github/Install.md)&emsp;
 [**Release Build (Stable)**](https://github.com/ucxn/Bro-Stat/releases)&nbsp;&emsp;**[Trouble?](./.github/Install.md#trouble)**
 
+[![Bilibili](https://img.shields.io/badge/Bilibili-guide-FF8EB3?style=for-the-badge&logo=bilibili&logoColor=white)](https://www.bilibili.com/video/BV19ZpB64E6D)
+
+[**Mobile Phone APP**](https://github.com/ucxn/Bili.Libre.Speed) ➡️ For Android. Please install Script directly on PC.
 
 The current universal edition primarily supports and enhances routers from **TP-Link, Xiaomi (MiWiFi), ASUS/ROG，HUAWEI, H3C(ISP), Tenda, ZTE, RuiJie**, and other mainstream vendors.
 
