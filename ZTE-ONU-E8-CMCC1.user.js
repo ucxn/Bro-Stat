@@ -18,16 +18,15 @@
 // @include         https://172.16.*
 // @match           *://*/start.ghtml*
 // @exclude         *://*/cgi-bin/luci*
-// @note            发行版作者哥哥科技保留所有权利，必须完整转载，若摘取则需自行在GUI一级加上哥哥科技的显著署名；源码本身公开，请前往 GitHub 获得授权范围许可证。
 // @grant           GM_setValue
 // @grant           GM_getValue
 // @grant           unsafeWindow
 // @storageName     GBNPA_Storage
 // @source          https://github.com/ucxn/Bro-Stat
 // @website         https://www.bilibili.com/video/BV19ZpB64E6D
-// @supportURL      https://www.bilibili.com/video/BV1SeEb67Ep1
+// @supportURL      https://www.bilibili.com/video/BV1LZ6yBXESq
 // @copying         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享） 
-// @license         LicenseRef-BR-BY-NC-1.0+ OR (SUL-1.0 AND BroTech-Prominent-Attribution-Terms+) OR Adaptive Public License - Bro 0.1
+// @license         LicenseRef-BR-BY-NC-1.0+ OR (SUL-1.0 AND BroTech-Prominent-Attribution-Terms+) OR Adaptive Public License - Bro 0.1（详情参阅 GitHub）
 // @run-at          document-end
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/ZTE-ONU-E8-CMCC1.user.js
 // @downloadURL     https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/ZTE-ONU-E8-CMCC1.user.js
