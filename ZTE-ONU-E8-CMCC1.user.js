@@ -107,7 +107,7 @@
   }
   function kvRows(t) {
     const out = [], re = /<td[^>]*class="tdleft"[^>]*>([\s\S]*?)<\/td>\s*<td[^>]*class="tdright"[^>]*>([\s\S]*?)<\/td>/g; let m;
-    while ((m = re.exec(t))) out.push([m[1].replace(/<[^>]*>/g, '').trim(), m[2].replace(/<[^>]*>/g, '').trim()]);
+    while ((m = re.exec(t))) out.push([m[1].replace(/<[^>]*>|[<>]/g, '').trim(), m[2].replace(/<[^>]*>|[<>]/g, '').trim()]);
     return out;
   }
   const slashBytes = v => +String(v).split('/')[1];
