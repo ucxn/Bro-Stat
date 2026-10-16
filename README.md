@@ -11,9 +11,10 @@
 [**开发版（最新）**](./.github/Install.md)&nbsp;
 [**发行版（稳定）**](https://github.com/ucxn/Bro-Stat/releases)&nbsp;**[故障排查](./.github/Install.md#故障排查)**
 
-[![Bilibili](https://img.shields.io/badge/Bilibili-观看演示视频-FF8EB3?style=for-the-badge&logo=bilibili&logoColor=white)](https://www.bilibili.com/video/BV19ZpB64E6D)
 
-[**手机 App**](https://github.com/ucxn/Bili.Libre.Speed) ➡️  在“我的”页网关诊断，此版支持安卓，电脑请正常安装脚本。
+[**手机 App**](https://github.com/ucxn/Bili.Libre.Speed)  ➡️ 在“我的”页选『网关诊断』，此版支持安卓，电脑请正常安装脚本。
+
+[![Bilibili](https://img.shields.io/badge/Bilibili-观看演示视频-FF8EB3?style=for-the-badge&logo=bilibili&logoColor=white)](https://www.bilibili.com/video/BV19ZpB64E6D)
 
 文档介绍和思路参见[个人主页](https://github.com/UCXN/BroTech)，强烈建议阅读架构设计；当然我更欢迎直接审计源码，通常比看简介能感受到的惊喜多得多；这不是一个简单的 UI增强 插件，更是一套完整的针对混沌离散数据源的处理算法，颇具极客精神。
 
