@@ -24,17 +24,14 @@
 | **锐捷 / Reyee** | [安装锐捷版](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/Ruijie-1.user.js) |
 
 点击对应链接后，脚本管理器通常会自动弹出安装页面。
-#### 故障排查
-如果浏览器直接显示了 JavaScript 源码，请检查是否已经安装并启用了兼容的用户脚本管理器。**[脚本如何安装？三方教程](https://docs.scriptcat.org/docs/use/use)**
-
+## 安卓客户端
+[从 GitHub 下载（推荐，最新）](https://github.com/ucxn/Bili.Libre.Speed)  
+[从 SourceForge 下载](https://sourceforge.net/projects/bilibili/files)
 > [!NOTE]
-> 移动端  **Via** 浏览器 脚本/插件 *功能无法生效*？
-> <details>
-> <summary>👉 点此展开查看解决办法</summary>
-> <br>由于 Via 浏览器的内核机制限制，默认的 `document-idle` 无法成功注入。
-> <br>请进入 Via 的脚本管理界面，将运行时期修改为 `document-start`或`document-end` 均可。<br>
-> ![操作截图](./.github/Via.png)</br>
-> </details>
+> 出于安全、权限以及工程等各方面平衡，完整的客户端体验仅在安卓版上提供，您可以自行在网上搜索如何安装侧载来源的APK，安装以后点击“我的”页面，然后在一排金刚键当中，可以找到一个名为「网关管理」的功能。
+> Windows 端、PC 端建议直接使用浏览器来完成任务，苹果端可以自行搜索关于 UserScript（名字就叫这个）APP的安装使用、配置教程。
+## 故障排查
+如果浏览器直接显示了 JavaScript 源码，请检查是否已经安装并启用了兼容的用户脚本管理器。**[脚本如何安装？三方教程](https://docs.scriptcat.org/docs/use/use)**
 
 > [!IMPORTANT]
 > 请确保 **脚本管理器** 运行正常！！也就是 浏览器 拓展图标这里，正常显示数字！允许用户脚本注入教程如下图。</br>
@@ -76,6 +73,12 @@ Choose the router brand you are using:
 | **RuiJie / Reyee** | [Install Reyee](https://raw.githubusercontent.com/ucxn/Bro-Stat/main/Ruijie-1.user.js) |
 
 After clicking the corresponding link, your userscript manager should automatically open the installation page.
+## App
+[Download from GitHub](https://github.com/ucxn/Bili.Libre.Speed)&nbsp;&emsp;[SourceForge](https://sourceforge.net/projects/bilibili/files)
+> [!NOTE]
+> To balance security, system permissions, and engineering overhead, the full client experience is exclusively available on Android. You can easily look up how to sideload an APK online if needed. Once installed, head to the **"我的"** tab, and across the row of quick-action icons, you'll find a feature named **「网关管理」**.
+> On Windows and desktop platforms, we recommend simply using a desktop browser to get the job done. On Apple devices, you can search online for tutorials on how to install and configure the **UserScript** app (yes, that's literally what it's called).
+
 ### Trouble?
 If the source code is displayed directly instead, make sure a compatible userscript manager is installed and enabled in your browser.</br>
 **[Third-Party Guide](https://docs.scriptcat.org/en/docs/use/use/)**
