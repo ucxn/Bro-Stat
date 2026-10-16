@@ -86,7 +86,6 @@ If the source code is displayed directly instead, make sure a compatible userscr
 > [!IMPORTANT]
 > **Alternative entry point**: Make sure the **userscript** extension is running correctly. The extension icon in your browser should show a number. See the image below for how to enable userscript injection.
 
-> [!NOTE]
 > **Via Browser (mobile)**: Script/plugin features *not working*?
 > <details>
 > <summary>👉 Click to view the fix</summary>
