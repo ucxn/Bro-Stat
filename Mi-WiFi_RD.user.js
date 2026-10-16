@@ -18,7 +18,6 @@
 // @grant           GM_setValue
 // @grant           GM_getValue
 // @storageName     GBNPA_Storage
-// @source          https://github.com/1-Reality/Bro-Stat
 // @website         https://github.com/ucxn/Mi-Stat_Max
 // @supportURL      https://www.bilibili.com/video/BV1SeEb67Ep1
 // @license         LicenseRef-BR-BY-NC-1.0+ OR (SUL-1.0 AND BroTech Additional License+)
