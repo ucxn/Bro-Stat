@@ -27,4 +27,4 @@ jobs:
           git config user.name "哥哥科技"
           git config user.email "175325443+ucxn@users.noreply.github.com"
           git commit -m "build"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          git push origin "HEAD:refs/heads/${GITHUB_REF_NAME}"
