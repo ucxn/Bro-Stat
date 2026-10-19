@@ -246,8 +246,7 @@ let _saved = null;
   const st = document.createElement('style');
     st.innerHTML = `/* @BroTech-Reserved style-panel.part.js */
     `;
-  document.head.
-  appendChild(st);
+  (document.head || document.documentElement).appendChild(st); // document-start 时 head 往往还不存在
   window.gegeRenderedMacs = new Set();
   let gTD = p => { const v = _w.document.querySelector('#app')?.__vue__; if (!v?.$getData) return; gTD = v.$getData.bind(v); return gTD(p); };
   function fCH() {
@@ -262,8 +261,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
     if (window.__gIsF || !wantWan && !wantLan) return;
     window.__gIsF = !0;
     try {
-      const d = await gTD({modules:wantWan?(wantLan?"wanStatus,deviceList":"wanStatus"):"deviceList",timerRefresh:1});
-      if (!d) return;
+      const d = (await gTD({modules:wantWan?(wantLan?"wanStatus,deviceList":"wanStatus"):"deviceList",timerRefresh:1})) || {}; // 没登录、官方接口还没就绪时也照常画面板，数据按 0
       const now = performance.now(), wanValid = !!d.wanStatus, lanValid = Array.isArray(d.deviceList);
       let cWU = S.wInstUp, cWD = S.wInstDn, cSU = 0, cSD = 0, cI = Object.create(null);
       if (wanValid) {
@@ -533,10 +531,6 @@ async function rSD(wantWan = !0, wantLan = !0) {
       return;
     }
 
-    if (location.href.toLowerCase().includes('login')) {
-      GM_setValue('gege_open_after_jump', 0);
-      return;
-    }
     if (location.pathname.includes('/phone/')) {
       GM_setValue('gege_open_after_jump', Date.now());
       const p = _w.document.querySelector('#app')?.__vue_app__?._context?.provides, g = p?.$getData, m = p?.$postModule;
@@ -554,7 +548,6 @@ async function rSD(wantWan = !0, wantLan = !0) {
       });
       return;
     }
-    if (location.pathname !== '/index.html') return;
     if (location.hash !== '#/advance/advance/dmz') location.hash = '#/advance/advance/dmz';
     
     if (!o) {
@@ -576,7 +569,7 @@ if (!window.gegeBActivated) {
       if (window.createGegeFloatingBtn) window.createGegeFloatingBtn();
     }
 (j => {
-  if (location.pathname !== '/index.html' || !j) return;
+  if (!j) return;
   function f() {
     clearTimeout(f.t);
     f.t = setTimeout(() => {

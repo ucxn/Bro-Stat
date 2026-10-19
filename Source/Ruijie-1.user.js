@@ -157,7 +157,6 @@ the project’s primary license are fully and continuously complied with.
 (function () {
   'use strict';
 
-  if (!/^\/cgi-bin\/luci/.test(location.pathname)) return;
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
 
   console.log("🚀 哥哥科技 V5.9.9 引擎已装载...");
@@ -234,20 +233,16 @@ the project’s primary license are fully and continuously complied with.
     if (ol && ol.style.display === 'block') 画锐行();
   }
   (() => {
-    const XP = _w.XMLHttpRequest && _w.XMLHttpRequest.prototype;
-    if (!XP) return;
-    const oOpen = XP.open, oSend = XP.send;
+    const XP = _w.XMLHttpRequest.prototype, oOpen = XP.open, oSend = XP.send;
     XP.open = function (m, u) {
-      try {
-        const s = String(u), k = /[?&]auth=([0-9a-f]+)/.exec(s);
-        if (k) { const 首次 = !锐.auth; 锐.auth = k[1]; if (首次) setTimeout(锐取射频); } // 网页打开后读取一次射频信道
-        this.__gegeU = s;
-      } catch (e) { console.warn(e); }
+      const s = String(u), k = /[?&]auth=([0-9a-f]+)/.exec(s);
+      if (k) { const 首次 = !锐.auth; 锐.auth = k[1]; if (首次) setTimeout(锐取射频); } // 网页打开后读取一次射频信道
+      this.__gegeU = s;
       return oOpen.apply(this, arguments);
     };
     XP.send = function (b) {
       if (typeof b === 'string' && b.indexOf('"method":"ping"') !== -1 && (this.__gegeU || '').indexOf('/api/system') !== -1) {
-        this.addEventListener('load', function () { try { 收延迟(this.responseText); } catch (e) { console.warn('[Ruijie] ping 响应无效', e); } });
+        this.addEventListener('load', function () { 收延迟(this.responseText); });
       }
       return oSend.apply(this, arguments);
     };
@@ -372,7 +367,7 @@ the project’s primary license are fully and continuously complied with.
     isF = !0;
     try {
       const wanNow = now, lanNow = now;
-      const wanValid = !!ovD && typeof ovD === 'object' && 'up_rate' in ovD && 'down_rate' in ovD;
+      const wanValid = !!ovD; // 只区分“这一轮请求成功没有”：失败沿用上一轮；成功但缺字段按 0 显示
       let cWU = S.wInstUp, cWD = S.wInstDn, cI = Object.create(null);
       if (wanValid) {
         锐.ov = ovD;
@@ -810,7 +805,6 @@ async function eBET() {
     }
   }
   const 起 = () => {
-    if (!document.querySelector('script[src*="eweb-"],link[href*="eweb-"]')) return; // 非锐捷 eWeb 后台：不挂任何界面
     挂样式();
     if (window.createGegeFloatingBtn) window.createGegeFloatingBtn();
   };
