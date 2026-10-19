@@ -103,7 +103,9 @@
     if (ol && ol.style.display === 'block') 画锐行();
   }
   (() => {
-    const XP = _w.XMLHttpRequest.prototype, oOpen = XP.open, oSend = XP.send;
+    const XP = _w.XMLHttpRequest && _w.XMLHttpRequest.prototype;
+    if (!XP) return;
+    const oOpen = XP.open, oSend = XP.send;
     XP.open = function (m, u) {
       const s = String(u), k = /[?&]auth=([0-9a-f]+)/.exec(s);
       if (k) { const 首次 = !锐.auth; 锐.auth = k[1]; if (首次) setTimeout(锐取射频); } // 网页打开后读取一次射频信道
@@ -597,10 +599,10 @@ function doSettle(nowMs) {
         stE.style.color = 锐.错误 || (ov && ov.status !== 'connected') ? '#ff4c00' : '#18A058';
         q('#gb-rj-ping').textContent = 锐.延迟 === null ? '--（停留在官方概览页时自动获取）' : `${锐.延迟.toFixed(1)} ms`;
         q('#gb-rj-loss').textContent = 锐.延迟 === null ? '' : `丢包 ${锐.丢包}%`;
-        q('#gb-rj-conn').textContent = ov ? `${ov.conntrack_count ?? 0} / ${ov.conntrack_max ?? 0}` : '--';
-        q('#gb-rj-on').textContent = ov ? ov.online_users ?? 0 : '--';
+        q('#gb-rj-conn').textContent = ov ? `${ov.conntrack_count} / ${ov.conntrack_max}` : '--';
+        q('#gb-rj-on').textContent = ov ? ov.online_users : '--';
         q('#gb-rj-ch').textContent = 锐.信道文 || '--';
-        q('#gb-rj-cpu').textContent = ov ? ov.cpuutil ?? 0 : '--';
+        q('#gb-rj-cpu').textContent = ov ? ov.cpuutil : '--';
         q('#gb-rj-run').textContent = ov ? fOT(+ov.runtime || 0) : '--';
         画延迟图(q('#gb-rj-pcv'));
       }
