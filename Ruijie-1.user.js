@@ -27,7 +27,6 @@
 (function () {
   'use strict';
 
-  if (!/^\/cgi-bin\/luci/.test(location.pathname)) return;
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
 
   console.log("🚀 哥哥科技 V5.9.9 引擎已装载...");
@@ -104,20 +103,16 @@
     if (ol && ol.style.display === 'block') 画锐行();
   }
   (() => {
-    const XP = _w.XMLHttpRequest && _w.XMLHttpRequest.prototype;
-    if (!XP) return;
-    const oOpen = XP.open, oSend = XP.send;
+    const XP = _w.XMLHttpRequest.prototype, oOpen = XP.open, oSend = XP.send;
     XP.open = function (m, u) {
-      try {
-        const s = String(u), k = /[?&]auth=([0-9a-f]+)/.exec(s);
-        if (k) { const 首次 = !锐.auth; 锐.auth = k[1]; if (首次) setTimeout(锐取射频); } // 网页打开后读取一次射频信道
-        this.__gegeU = s;
-      } catch (e) { console.warn(e); }
+      const s = String(u), k = /[?&]auth=([0-9a-f]+)/.exec(s);
+      if (k) { const 首次 = !锐.auth; 锐.auth = k[1]; if (首次) setTimeout(锐取射频); } // 网页打开后读取一次射频信道
+      this.__gegeU = s;
       return oOpen.apply(this, arguments);
     };
     XP.send = function (b) {
       if (typeof b === 'string' && b.indexOf('"method":"ping"') !== -1 && (this.__gegeU || '').indexOf('/api/system') !== -1) {
-        this.addEventListener('load', function () { try { 收延迟(this.responseText); } catch (e) { console.warn('[Ruijie] ping 响应无效', e); } });
+        this.addEventListener('load', function () { 收延迟(this.responseText); });
       }
       return oSend.apply(this, arguments);
     };
@@ -271,7 +266,7 @@
     isF = !0;
     try {
       const wanNow = now, lanNow = now;
-      const wanValid = !!ovD && typeof ovD === 'object' && 'up_rate' in ovD && 'down_rate' in ovD;
+      const wanValid = !!ovD; // 只区分“这一轮请求成功没有”：失败沿用上一轮；成功但缺字段按 0 显示
       let cWU = S.wInstUp, cWD = S.wInstDn, cI = Object.create(null);
       if (wanValid) {
         锐.ov = ovD;
@@ -602,10 +597,10 @@ function doSettle(nowMs) {
         stE.style.color = 锐.错误 || (ov && ov.status !== 'connected') ? '#ff4c00' : '#18A058';
         q('#gb-rj-ping').textContent = 锐.延迟 === null ? '--（停留在官方概览页时自动获取）' : `${锐.延迟.toFixed(1)} ms`;
         q('#gb-rj-loss').textContent = 锐.延迟 === null ? '' : `丢包 ${锐.丢包}%`;
-        q('#gb-rj-conn').textContent = ov ? `${ov.conntrack_count} / ${ov.conntrack_max}` : '--';
-        q('#gb-rj-on').textContent = ov ? ov.online_users : '--';
+        q('#gb-rj-conn').textContent = ov ? `${ov.conntrack_count ?? 0} / ${ov.conntrack_max ?? 0}` : '--';
+        q('#gb-rj-on').textContent = ov ? ov.online_users ?? 0 : '--';
         q('#gb-rj-ch').textContent = 锐.信道文 || '--';
-        q('#gb-rj-cpu').textContent = ov ? ov.cpuutil : '--';
+        q('#gb-rj-cpu').textContent = ov ? ov.cpuutil ?? 0 : '--';
         q('#gb-rj-run').textContent = ov ? fOT(+ov.runtime || 0) : '--';
         画延迟图(q('#gb-rj-pcv'));
       }
@@ -1051,7 +1046,6 @@ async function eBET() {
     }
   }
   const 起 = () => {
-    if (!document.querySelector('script[src*="eweb-"],link[href*="eweb-"]')) return; // 非锐捷 eWeb 后台：不挂任何界面
     挂样式();
     if (window.createGegeFloatingBtn) window.createGegeFloatingBtn();
   };

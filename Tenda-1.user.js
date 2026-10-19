@@ -154,8 +154,7 @@ let _saved = null;
     .gege-list-item:last-child{border-bottom:none!important;}#zte-geek-board{contain:layout style;background-color:transparent!important;border-left:4px solid #0059fa!important;border-radius:0!important;padding:5px 0 5px 15px!important;margin:10px 0 15px 0!important;box-shadow:none!important;border-bottom:1px solid #f0f0f0!important;font-size:14px;display:flex;flex-direction:column;gap:6px;padding-bottom:15px!important;}#gege-global-overlay #zte-geek-board.geek-frozen-pane{position:sticky!important;top:0px!important;z-index:100!important;background-color:#f3f4f5!important;margin-top:0!important;padding-top:15px!important;box-shadow:0 10px 15px -3px rgba(0,0,0,0.05)!important;border-radius:0 0 8px 8px!important;}.gege-pin{cursor:pointer;font-size:11px;filter:grayscale(100%);opacity:0.5;transition:transform 0.2s;margin-left:2px;}
     .gege-pin.active{filter:none;opacity:1;transform:scale(1.1);}#gege-global-overlay{position:fixed;top:7.5%;right:0;bottom:0;background:#f3f4f5;z-index:9999;overflow-y:auto;padding-bottom:50px;left:0!important;border-radius:16px 16px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,0.15);transition:top 0.3s ease;}@media (max-width: 768px){.geek-right-box:has(#gb-wan-zero-up),.geek-right-box:has(#gb-cur-up-vol){display:none!important}.gege-list-item{padding:12px 10px!important;position:relative!important}.config-item-box{flex-direction:column!important;padding-bottom:0!important}.config-item .info,.config-item .logo,.config-item .speed{width:100%!important;border:none!important;padding:0!important;position:static!important}.config-item .dev-intro{min-height:auto!important;justify-content:center!important;padding-right:90px!important}.config-item .logo{padding-bottom:4px!important}.config-item .info{flex-direction:column!important;margin:0 0 6px 0!important;gap:2px!important}.dev-ip{position:absolute!important;top:12px!important;right:10px!important;font-size:11px!important;background:rgba(0,89,250,0.08);color:#0059fa!important;padding:2px 6px!important;border-radius:4px;font-weight:bold;line-height:1.2;z-index:10;width:auto!important}.dev-number{width:auto!important;margin:0!important;font-size:11px!important}.gege-ratio-box{width:100%!important;margin-top:2px!important;margin-bottom:0!important}.gege-down-box{width:100%!important;margin-top:2px!important}#zte-geek-board{padding:8px!important;gap:0!important;font-size:11.5px!important}.geek-row{height:auto!important;flex-wrap:wrap!important;margin-bottom:4px!important;justify-content:flex-start!important;gap:2px 6px!important;line-height:1.3!important}.geek-label{width:auto!important;min-width:60px!important;font-size:11.5px!important;flex:0 0 auto!important}.geek-val-box{width:auto!important;flex:1 1 0%!important;display:flex!important;flex-wrap:wrap!important;margin-left:0!important;gap:2px 6px!important}.geek-fixed-width{width:auto!important}.geek-right-box{width:100%!important;flex:0 0 100%!important;text-align:left!important;font-size:11.5px!important;margin-top:2px!important;margin-left:0!important}.gege-list-container{padding:8px!important}.zte-enhance-speed{gap:4px!important}}#zte-geek-board{position:relative!important;overflow:visible!important;}#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;}#gege-speed-chart canvas{display:block;width:100%;height:100%;}.gege-chart-head,.gege-chart-foot{position:absolute;left:clamp(28px,8%,36px);right:8px;display:flex;align-items:center;pointer-events:none;font:bold clamp(9px,2.1cqw,11px) system-ui,sans-serif;white-space:nowrap;overflow:hidden;}.gege-chart-head{top:2px;color:#111;gap:8px;}.gege-chart-head [data-gc="range"]{color:#666;font-weight:normal;overflow:hidden;text-overflow:ellipsis;margin-left:auto;}.gege-chart-foot{bottom:4px;justify-content:flex-start;gap:clamp(3px,1.1cqw,12px);}.gege-chart-foot span{min-width:0;overflow:hidden;text-overflow:ellipsis;}.gc-up{color:#ff4c00;flex:0 1 auto;}.gc-down{color:#0b5;flex:0 1 auto;}.gc-extra{color:#666;text-align:right;margin-left:auto;flex:1 1 0;min-width:0;}#gege-speed-chart .gege-chart-resize{position:absolute;right:-4px;bottom:-4px;width:13px;height:13px;border-right:3px solid #0059fa;border-bottom:3px solid #0059fa;cursor:nwse-resize;border-radius:2px;}
     `;
-  document.head.
-  appendChild(st);
+  (document.head || document.documentElement).appendChild(st); // document-start 时 head 往往还不存在
   window.gegeRenderedMacs = new Set();
   let gTD = p => { const v = _w.document.querySelector('#app')?.__vue__; if (!v?.$getData) return; gTD = v.$getData.bind(v); return gTD(p); };
   function fCH() {
@@ -170,8 +169,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
     if (window.__gIsF || !wantWan && !wantLan) return;
     window.__gIsF = !0;
     try {
-      const d = await gTD({modules:wantWan?(wantLan?"wanStatus,deviceList":"wanStatus"):"deviceList",timerRefresh:1});
-      if (!d) return;
+      const d = (await gTD({modules:wantWan?(wantLan?"wanStatus,deviceList":"wanStatus"):"deviceList",timerRefresh:1})) || {}; // 没登录、官方接口还没就绪时也照常画面板，数据按 0
       const now = performance.now(), wanValid = !!d.wanStatus, lanValid = Array.isArray(d.deviceList);
       let cWU = S.wInstUp, cWD = S.wInstDn, cSU = 0, cSD = 0, cI = Object.create(null);
       if (wanValid) {
@@ -798,10 +796,6 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
       return;
     }
 
-    if (location.href.toLowerCase().includes('login')) {
-      GM_setValue('gege_open_after_jump', 0);
-      return;
-    }
     if (location.pathname.includes('/phone/')) {
       GM_setValue('gege_open_after_jump', Date.now());
       const p = _w.document.querySelector('#app')?.__vue_app__?._context?.provides, g = p?.$getData, m = p?.$postModule;
@@ -819,7 +813,6 @@ const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
       });
       return;
     }
-    if (location.pathname !== '/index.html') return;
     if (location.hash !== '#/advance/advance/dmz') location.hash = '#/advance/advance/dmz';
     
     if (!o) {
@@ -841,7 +834,7 @@ if (!window.gegeBActivated) {
       if (window.createGegeFloatingBtn) window.createGegeFloatingBtn();
     }
 (j => {
-  if (location.pathname !== '/index.html' || !j) return;
+  if (!j) return;
   function f() {
     clearTimeout(f.t);
     f.t = setTimeout(() => {
