@@ -2,7 +2,7 @@
 // @name            腾达路由器增强 by 哥哥科技
 // @name:en         Bro-Stat-Tenda
 // @namespace       ucxn
-// @version         5.9.9
+// @version         5.9.9.beta
 // @description     腾达（Tenda）以及全品牌家用路由器增强脚本，网速流量一键统计计算，前端微积分事件驱动测控
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  Enhancement script for Tenda and All-Brand consumer routers; one-click statistics and calculations for internet speed and data usage; front-end calculus-based event-driven M&C.

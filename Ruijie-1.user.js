@@ -2,7 +2,7 @@
 // @name            锐捷睿易路由器增强 Reyee 网页 增强 脚本 插件 网速 流量 连接数 延迟 数学统计 分析
 // @name:en         Bro-Stat_Ruijie-Reyee-Stat_Max
 // @namespace       ucxn
-// @version         5.9.9.R
+// @version         5.9.9.Re
 // @description     适用于锐捷（睿易 Reyee）路由器的逐设备网速流量统计、连接数、外网延迟曲线、流量一键导出的路由器Web网页后台增强利器
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  A web admin enhancement for Ruijie / Reyee routers: per-device speed and traffic statistics, connection counts, WAN latency charting and one-click traffic export.
@@ -105,22 +105,29 @@
   (() => {
     const XP = _w.XMLHttpRequest && _w.XMLHttpRequest.prototype;
     if (!XP) return;
-    const oOpen = XP.open, oSend = XP.send;
+    const oOpen = XP.open, oSend = XP.send, oSet = XP.setRequestHeader;
     XP.open = function (m, u) {
       const s = String(u), k = /[?&]auth=([0-9a-f]+)/.exec(s);
       if (k) { const 首次 = !锐.auth; 锐.auth = k[1]; if (首次) setTimeout(锐取射频); } // 网页打开后读取一次射频信道
       this.__gegeU = s;
       return oOpen.apply(this, arguments);
     };
+    // 官方页面发请求时签名就明文挂在请求头上：记下来，send 时若请求体与我们的某条逐字节相同，就换成官方这次用的签名
+    XP.setRequestHeader = function (n, v) {
+      if (n === 'Content-Accept') this.__gegeCa = v; else if (n === 'Contents-Accept') this.__gegeCsa = v;
+      return oSet.apply(this, arguments);
+    };
     XP.send = function (b) {
       if (typeof b === 'string' && b.indexOf('"method":"ping"') !== -1 && (this.__gegeU || '').indexOf('/api/system') !== -1) {
         this.addEventListener('load', function () { 收延迟(this.responseText); });
       }
+      if (this.__gegeCsa) for (const q of Object.values(锐请求)) if (q[0] === b) { q[1] = this.__gegeCa; q[2] = this.__gegeCsa; }
       return oSend.apply(this, arguments);
     };
   })();
 
   // ======== [2] 主动取数：请求体与签名必须逐字节一致（签名只与请求体有关，与会话无关） ========
+  // 下面的签名是从 EW5100BE-PRO 官方页面抄来的初始值；官方页面一旦发出同样的请求，上面的钩子会用它实时带的签名覆盖
   const 锐请求 = {
     ov: ['{"method":"devSta.get","params":{"module":"overview","noParse":false,"async":null,"remoteIp":false,"device":"pc"}}',
       '0a02ec86281388dc9c23987f67609885', 'e29be7fc26168f4c0addfa6146da910d'],
