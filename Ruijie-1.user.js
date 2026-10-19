@@ -112,7 +112,7 @@
       this.__gegeU = s;
       return oOpen.apply(this, arguments);
     };
-    // 官方页面发请求时签名就明文挂在请求头上：记下来，send 时若请求体与我们的某条逐字节相同，就换成官方这次用的签名
+    // 官方页面发请求时签名就明文挂在请求头上：记下来，send 时交给 锐学 按模块名整条照抄
     XP.setRequestHeader = function (n, v) {
       if (n === 'Content-Accept') this.__gegeCa = v; else if (n === 'Contents-Accept') this.__gegeCsa = v;
       return oSet.apply(this, arguments);
@@ -121,39 +121,57 @@
       if (typeof b === 'string' && b.indexOf('"method":"ping"') !== -1 && (this.__gegeU || '').indexOf('/api/system') !== -1) {
         this.addEventListener('load', function () { 收延迟(this.responseText); });
       }
-      if (this.__gegeCsa) for (const q of Object.values(锐请求)) if (q[0] === b) { q[1] = this.__gegeCa; q[2] = this.__gegeCsa; }
+      if (this.__gegeCsa && (this.__gegeU || '').indexOf('/api/cmd') !== -1) try { 锐学(b, this.__gegeCa, this.__gegeCsa); } catch (e) { console.warn('[Ruijie] 官方请求解析失败', e); } // 这里抛错会连累官方请求本身，必须兜住
       return oSend.apply(this, arguments);
     };
   })();
 
-  // ======== [2] 主动取数：请求体与签名必须逐字节一致（签名只与请求体有关，与会话无关） ========
-  // 下面的签名是从 EW5100BE-PRO 官方页面抄来的初始值；官方页面一旦发出同样的请求，上面的钩子会用它实时带的签名覆盖
+  // ======== [2] 主动取数：签名绑定请求体的每一个字节（Content-Accept 随长度、Contents-Accept 随内容），与会话无关 ========
+  // 请求体就是一句 JSON 指令：method 动作 + module 模块；cmdArr 是把几条指令打包，返回数组，一条一格。
+  // 下面三条及其签名抄自 EW5100BE-PRO 官方页面，作初始值；m 是要的模块，i 是它在返回数组里的位置（-1 表示单条请求，返回本身就是结果）
   const 锐请求 = {
-    ov: ['{"method":"devSta.get","params":{"module":"overview","noParse":false,"async":null,"remoteIp":false,"device":"pc"}}',
-      '0a02ec86281388dc9c23987f67609885', 'e29be7fc26168f4c0addfa6146da910d'],
-    ul: ['{"method":"cmdArr","params":{"device":"pc","params":[{"method":"devSta.get","params":{"module":"user_list","noParse":true,"async":null,"remoteIp":false,"data":{"devType":"all","dataType":"timely"}}},{"method":"acConfig.get","params":{"module":"wirelessMacFilter","noParse":false,"async":null,"remoteIp":false}}]}}',
-      'b3011dc5550b351d6ef7935602aa6b40', '23241979c5f2f63c22b3d59ec531e44e'],
-    // 官方页面「设备列表」同款请求：user_list+flow+port_status+ap_list，仅取第 4 项 ap_list（射频信道/占用/底噪），用不到的几项不解析
-    ap: ['{"method":"cmdArr","params":{"device":"pc","params":[{"method":"devSta.get","params":{"module":"user_list","noParse":true,"async":null,"remoteIp":false,"data":{"devType":"all","dataType":"timely"}}},{"method":"devSta.get","params":{"module":"flow","noParse":true,"async":null,"remoteIp":false,"data":{"func":"interface_info"}}},{"method":"devSta.get","params":{"module":"port_status","noParse":true,"async":null,"remoteIp":false}},{"method":"devSta.get","params":{"module":"ap_list","noParse":true,"async":null,"remoteIp":false}}]}}',
-      '0cfc3dc6fb02046b214b396eb0b20b71', 'a6daf4986b6f0869804ee5587d7e6d2b']
+    ov: { m: 'overview', i: -1, body: '{"method":"devSta.get","params":{"module":"overview","noParse":false,"async":null,"remoteIp":false,"device":"pc"}}',
+      ca: '0a02ec86281388dc9c23987f67609885', csa: 'e29be7fc26168f4c0addfa6146da910d' },
+    ul: { m: 'user_list', i: 0, body: '{"method":"cmdArr","params":{"device":"pc","params":[{"method":"devSta.get","params":{"module":"user_list","noParse":true,"async":null,"remoteIp":false,"data":{"devType":"all","dataType":"timely"}}},{"method":"acConfig.get","params":{"module":"wirelessMacFilter","noParse":false,"async":null,"remoteIp":false}}]}}',
+      ca: 'b3011dc5550b351d6ef7935602aa6b40', csa: '23241979c5f2f63c22b3d59ec531e44e' },
+    // 官方页面「设备列表」同款请求：user_list+flow+port_status+ap_list，只取 ap_list（射频信道/占用）
+    ap: { m: 'ap_list', i: 3, body: '{"method":"cmdArr","params":{"device":"pc","params":[{"method":"devSta.get","params":{"module":"user_list","noParse":true,"async":null,"remoteIp":false,"data":{"devType":"all","dataType":"timely"}}},{"method":"devSta.get","params":{"module":"flow","noParse":true,"async":null,"remoteIp":false,"data":{"func":"interface_info"}}},{"method":"devSta.get","params":{"module":"port_status","noParse":true,"async":null,"remoteIp":false}},{"method":"devSta.get","params":{"module":"ap_list","noParse":true,"async":null,"remoteIp":false}}]}}',
+      ca: '0cfc3dc6fb02046b214b396eb0b20b71', csa: 'a6daf4986b6f0869804ee5587d7e6d2b' }
   };
+  // 学官方请求：同一条请求体只刷新签名；含同一模块的其它官方请求整条记作候选（只留最短的，免得每秒轮询大请求），
+  // 当前这条失败了才换上候选。同一机型上硬编码那条一直成功，就永远不会被换掉
+  function 锐学(b, ca, csa) {
+    const j = JSON.parse(b), 子 = j.method === 'cmdArr' ? j.params.params : [j];
+    for (const q of Object.values(锐请求)) {
+      if (q.body === b) { q.ca = ca; q.csa = csa; }
+      else {
+        const i = 子.findIndex(s => s.method === 'devSta.get' && s.params?.module === q.m);
+        if (i < 0 || (q.备 && b.length > q.备.body.length)) continue;
+        q.备 = { body: b, ca, csa, i: j.method === 'cmdArr' ? i : -1 };
+        if (q.坏) Object.assign(q, q.备);
+      }
+      if (q.坏 && q.m === 'ap_list') setTimeout(锐取射频); // 射频不在每秒循环里：上次失败、这次拿到可用的签名或候选，就补读一次
+    }
+  }
+  const 锐飞行 = Object.create(null); // 几条需求抄到同一条请求时，同一时刻只发一次
   async function 锐取(k) {
-    const [body, ca, csa] = 锐请求[k];
-    const r = await fetch(`/cgi-bin/luci/api/cmd?auth=${锐.auth}`, {
-      method: 'POST', credentials: 'same-origin', body,
-      headers: { 'Content-Type': 'application/json;charset=UTF-8', 'Content-Accept': ca, 'Contents-Accept': csa }
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    if (j.code !== 0) throw new Error('code ' + j.code);
-    return j.data;
+    const q = 锐请求[k], { body, i } = q; // 发出时就固定位置：等待期间学到新候选、q 被换掉，也不会取错格
+    try {
+      const j = await (锐飞行[body] ??= fetch(`/cgi-bin/luci/api/cmd?auth=${锐.auth}`, {
+        method: 'POST', credentials: 'same-origin', body,
+        headers: { 'Content-Type': 'application/json;charset=UTF-8', 'Content-Accept': q.ca, 'Contents-Accept': q.csa }
+      }).then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).finally(() => delete 锐飞行[body]));
+      if (j.code !== 0) throw new Error('code ' + j.code);
+      q.坏 = !1;
+      return i < 0 ? j.data : j.data[i];
+    } catch (e) { q.坏 = !0; if (q.备) Object.assign(q, q.备); throw e; }
   }
   // 射频信道：只在「网页打开后」与「每次点开面板」各读一次，不进 1 秒循环。channel 形如 "auto-6,auto-60"，与 band/chutil/channf 按逗号逐项对应
   async function 锐取射频() {
     if (!锐.auth || 锐.射频取中) return;
     锐.射频取中 = !0;
     try {
-      const a = (await 锐取('ap'))[3]?.list?.[0];
+      const a = (await 锐取('ap'))?.list?.[0];
       if (!a) return;
       const 拆 = s => String(s || '').split(','), 取信道 = s => +s.slice(s.lastIndexOf('-') + 1), // "auto-60"→60；"36"→36
         ch = 拆(a.channel), u = 拆(a.chutil), r = {};
@@ -285,7 +303,7 @@
         记总速率图(cWU, cWD);
       }
       let cSU = 0, cSD = 0, cTot = 0;
-      const hostList = Array.isArray(ulD) ? ulD[0]?.list : null, lanValid = Array.isArray(hostList);
+      const hostList = ulD?.list, lanValid = Array.isArray(hostList);
       if (lanValid) {
         if (!锐.射频) { // ap_list 尚未读到时，用客户端自带的信道顶替
           let c24 = 锐.信道24, c5 = 锐.信道5;
@@ -983,7 +1001,7 @@ function doSettle(nowMs) {
       requestAnimationFrame(() => {
         ol.innerHTML = `<div style="padding: 20px; max-width: 1580px; margin: 0 auto; min-height: 100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container"><div class="gege-section"><div class="config-title">有线设备</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${锐.信道5 > 148 ? '5.8GHz' : '5.2GHz'}）</div>${h5.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${锐.信道5 > 148 ? '5.2GHz' : '5.8GHz'}）</div>${hX.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div>
         </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序属于“哥哥软件”系列；需持续遵守署名条款方可获得使用权，二开或发行请参阅许可证；按“原样且免费”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作担保；个人分享请直接转载官方链接。<br>基于本程序的任何修改、使用任意部分代码、再发布或相关衍生版本的合法性的前置条件是：在提供最终用户界面时，均应显著、实质保留所有“哥哥科技”与法律声明，不得删除、隐藏或降低其可见性。<a href="https://github.com/ucxn/Bro-Stat/blob/main/License.md" target="_blank" style="color: #777; text-decoration: underline;">查看许可证/分享</a>
-        <div style="font-size:12px;color:#555;"><svg xmlns="http://www.w3.org/2000/svg" width="131" height="18" viewBox="0 0 145 20" role="img" aria-label="Broware Attribution" style="vertical-align:middle;margin-right:6px"><defs><linearGradient id="bg1" x2="0" y2="1"><stop stop-color="#4b4b4b"/><stop offset=".5" stop-color="#333"/><stop offset="1" stop-color="#1f1f1f"/></linearGradient><linearGradient id="bg2" x2="0" y2="1"><stop stop-color="#52d58c"/><stop offset=".52" stop-color="#31bc71"/><stop offset="1" stop-color="#218b50"/></linearGradient><linearGradient id="sh" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".32"/><stop offset=".45" stop-color="#fff" stop-opacity=".08"/><stop offset=".46" stop-opacity="0"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="c"><rect width="145" height="20" rx="4"/></clipPath></defs><g clip-path="url(#c)"><path fill="url(#bg1)" d="M0 0h24v20H0z"/><path fill="url(#bg2)" d="M24 0h121v20H24z"/><path fill="url(#sh)" d="M0 0h145v20H0z"/></g><g transform="translate(4 2)"><rect width="15" height="15" rx=".6" fill="#fff"/><rect x="1" y="1" width="13" height="13" fill="#58d18d"/><path fill="#fff" d="M1 1h7v7z"/><path fill="#32bf70" d="M8 1h6v13H8z"/><path fill="#1ba856" d="M1 14h7V8l6 6z"/></g><g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11"><text x="84" y="15" fill="#000" fill-opacity=".28">Broware Attribution</text><text x="84" y="14">Broware Attribution</text></g></svg><a href="https://github.com/ucxn/Bro-Stat/blob/main/Ruijie-1.user.js" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件</a> <span title="构建时间：2026-10.13&#10;架构设计：哥哥科技 BroTech&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px; font-family: Consolas;">锐捷版 ${版本号}</span> | Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV19ZpB64E6D" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/users/203510" target="_blank" style="color: #666; text-decoration: none;">点击分享</a></div></div></div></div>`;
+        <div style="font-size:12px;color:#555;"><svg xmlns="http://www.w3.org/2000/svg" width="131" height="18" viewBox="0 0 145 20" role="img" aria-label="Broware Attribution" style="vertical-align:middle;margin-right:6px"><defs><linearGradient id="bg1" x2="0" y2="1"><stop stop-color="#4b4b4b"/><stop offset=".5" stop-color="#333"/><stop offset="1" stop-color="#1f1f1f"/></linearGradient><linearGradient id="bg2" x2="0" y2="1"><stop stop-color="#52d58c"/><stop offset=".52" stop-color="#31bc71"/><stop offset="1" stop-color="#218b50"/></linearGradient><linearGradient id="sh" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".32"/><stop offset=".45" stop-color="#fff" stop-opacity=".08"/><stop offset=".46" stop-opacity="0"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="c"><rect width="145" height="20" rx="4"/></clipPath></defs><g clip-path="url(#c)"><path fill="url(#bg1)" d="M0 0h24v20H0z"/><path fill="url(#bg2)" d="M24 0h121v20H24z"/><path fill="url(#sh)" d="M0 0h145v20H0z"/></g><g transform="translate(4 2)"><rect width="15" height="15" rx=".6" fill="#fff"/><rect x="1" y="1" width="13" height="13" fill="#58d18d"/><path fill="#fff" d="M1 1h7v7z"/><path fill="#32bf70" d="M8 1h6v13H8z"/><path fill="#1ba856" d="M1 14h7V8l6 6z"/></g><g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11"><text x="84" y="15" fill="#000" fill-opacity=".28">Broware Attribution</text><text x="84" y="14">Broware Attribution</text></g></svg><a href="https://github.com/ucxn/Bro-Stat/blob/main/Ruijie-1.user.js" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件</a> <span title="构建时间：2026-10.19&#15;架构设计：哥哥科技 BroTech&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px; font-family: Consolas;">锐捷版 ${版本号}</span> | Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV19ZpB64E6D" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/users/203510" target="_blank" style="color: #666; text-decoration: none;">点击分享</a></div></div></div></div>`;
       S._domRebuilt = true;});}
     catch (e) {
       requestAnimationFrame(() => {
