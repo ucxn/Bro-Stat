@@ -12,7 +12,7 @@
 [**发行版（稳定）**](https://github.com/ucxn/Bro-Stat/releases)&nbsp;**[故障排查](./.github/Install.md#故障排查)**
 
 
-[**手机 App**](https://github.com/ucxn/Bili.Libre.Speed)  ➡️ 在“我的”页选『网关诊断』，此版支持安卓，电脑请正常安装脚本。
+[**手机 App**](.github/Install.md#安卓客户端)  ➡️ 在“我的”页选『网关诊断』，此版支持安卓，电脑请正常安装脚本。
 
 [![Bilibili](https://img.shields.io/badge/Bilibili-观看演示视频-FF8EB3?style=for-the-badge&logo=bilibili&logoColor=white)](https://www.bilibili.com/video/BV19ZpB64E6D)
 
