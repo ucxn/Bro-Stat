@@ -25,14 +25,17 @@
 
 点击对应链接后，脚本管理器通常会自动弹出安装页面。
 ## 安卓客户端
-[从 GitHub 下载（推荐，最新）](https://github.com/ucxn/Bili.Libre.Speed)  
+[从 GitHub 下载（推荐，最新）](https://github.com/ucxn/Bili.Libre.Speed/releases)  
 [从 SourceForge 下载](https://sourceforge.net/projects/bilibili/files)
+
+[从 蓝奏云 下载](https://ucxn.lanzout.com/b00mqq2h5a)&emsp;密码🥦：bro
 ### 目前Android的端优化的是最好的，包括手机和平板，PC建议还是使用浏览器的路子。
 苹果如果自己有安装IPA的经验的话，可以使用APP。如果没有经验的话，则还是安装User Script的环境更简单。
 
 ***使用方法***：打开APP，**点击右下角“我的”，然后在4×3的矩阵中找到*网关管理* 即可使用。**
 > [!NOTE]
-> 出于安全、权限以及工程等各方面平衡，完整的客户端体验仅在安卓版上提供，您可以自行在网上搜索如何安装侧载来源的APK，安装以后点击“我的”页面，然后在一排金刚键当中，可以找到一个名为「网关管理」的功能。
+> 出于安全、权限以及工程等各方面平衡，完整的客户端体验仅在安卓版上提供，您可以自行在网上
+> 搜索如何安装侧载来源的APK，安装以后点击“我的”页面，然后在一排金刚键当中，可以找到一个名为「网关管理」的功能。
 > Windows 端、PC 端建议直接使用浏览器来完成任务，苹果端可以自行搜索关于 UserScript（名字就叫这个）APP的安装使用、配置教程。
 ## 故障排查
 如果浏览器直接显示了 JavaScript 源码，请检查是否已经安装并启用了兼容的用户脚本管理器。**[脚本如何安装？三方教程](https://docs.scriptcat.org/docs/use/use)**
@@ -78,7 +81,7 @@ Choose the router brand you are using:
 
 After clicking the corresponding link, your userscript manager should automatically open the installation page.
 ## App
-[Download from GitHub](https://github.com/ucxn/Bili.Libre.Speed)&nbsp;&emsp;[SourceForge](https://sourceforge.net/projects/bilibili/files)
+[Download from GitHub](https://github.com/ucxn/Bili.Libre.Speed/releases)&nbsp;&emsp;[SourceForge](https://sourceforge.net/projects/bilibili/files)
 > [!NOTE]
 > To balance security, system permissions, and engineering overhead, the full client experience is exclusively available on Android. You can easily look up how to sideload an APK online if needed. Once installed, head to the **"我的"** tab, and across the row of quick-action icons, you'll find a feature named **「网关管理」**.
 > On Windows and desktop platforms, we recommend simply using a desktop browser to get the job done. On Apple devices, you can search online for tutorials on how to install and configure the **UserScript** app (yes, that's literally what it's called).
