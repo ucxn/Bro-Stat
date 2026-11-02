@@ -327,7 +327,7 @@ function fBy(bps) {
             cS.lUT = lanNow;
           }
         }
-        if (cC.name && cC.name !== '未知设备') cS.name = cC.name;
+        if (cC.name && !cC.name.startsWith('未知设备')) cS.name = cC.name;
         cS.lU = cC.offUp;
         cS.lD = cC.offDn;
       }

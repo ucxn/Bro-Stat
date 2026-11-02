@@ -421,7 +421,7 @@ the project’s primary license are fully and continuously complied with.
           cI[m] = {
             upRate: u, dnRate: dn, iface: 有线 ? '有线' : (d.mlo ? 'MLO' : (d.band || '无线')),
             offUp: 锐计数(m + 'u', d.up, lanNow), offDn: 锐计数(m + 'd', d.down, lanNow),
-            onSec: 锐在线秒(d.onlinetime), name: d.name || hn || ("未知设备·" + m.slice(-5)), ip: d.userIp || "",
+            onT: d.onlinetime, name: d.name || hn || ("未知设备·" + m.slice(-5)), ip: d.userIp || "",
             rssi: 有线 ? 0 : (+d.rssi || 0), rate: parseInt(d.rxrate) || 0,
             conn: +d.flow_cnt || 0, ssid: d.ssid || ""
           };
@@ -429,106 +429,10 @@ the project’s primary license are fully and continuously complied with.
         });
         锐.连接比 = cTot > 0 ? 100 / cTot : 0; // 每台设备连接数占全部设备连接数之和的百分比系数
       }
-      if (lanValid) S.lastCI = cI;
-      else {
-        cI = S.lastCI || Object.create(null);
-        for (const d of Object.values(cI)) { cSU += d.upRate || 0; cSD += d.dnRate || 0; }
-      }
-      let ol = document.getElementById('gege-global-overlay'),
-        cM = Object.keys(
-          cI),
-        iD = lanValid && (window.gegeForceUIRedraw || (cM.length !== window.gegeRenderedMacs.size));
-      if (!iD && cM.length > 0) {
-        for (let i = 0; i <
-          cM.length; i++) {
-          if (!window.gegeRenderedMacs.has(cM[i])) {
-            iD = !0;
-            break;
-          }
-        }
-      }
-      if (iD) {
-        for (let m in S.cls) if (!cI[m]) {
-          let ms = lanNow - S.cls[m].lUT;
-          if (ms > CONFIG.lanRefreshInterval * 1000) ms = CONFIG.lanRefreshInterval * 1000;
-          S.cls[m].intUp += S.cls[m].upR * ms * 0.0005;
-          S.cls[m].intDn += S.cls[m].dnR * ms * 0.0005;
-          S.cls[m].upR = S.cls[m].dnR = 0;
-        }
-      }
-      if (ol && ol.style.display === 'block' && (iD || !ol.querySelector('.gege-list-item'))) {
-        bVD(ol, cI); // [解耦] 将洗净去重后的 cI 字典传给画板
-        window.gegeRenderedMacs = new Set(
-          cM);
-        window.gegeForceUIRedraw = !1;
-      }
-            if (wanValid && S.wLT === undefined) {
-        S.wLT = wanNow;
-      }
-      else if (wanValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
-        const wDt = wanNow - S.wLT;
-        /* @BroTech-Reserved wan-trapezoid-wakeup.part.js */
-        S.wLT = wanNow;
-      }
-      if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp && sp.timestamp > (typeof GM_getValue !== 'undefined' ? (GM_getValue('gege_reset_ms', 0) || 0) : 0) ? sp : {}; if(S.snap.global) { S.wTotUp = S.wTotUp === 0 ? S.snap.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? S.snap.global.wan_down || 0 : S.wTotDn; S.lTotUp = S.lTotUp === 0 ? S.snap.global.lan_integral_up || 0 : S.lTotUp; S.lTotDn = S.lTotDn === 0 ? S.snap.global.lan_integral_down || 0 : S.lTotDn; } } catch(e){console.warn(e);} S.snapLoaded = !0; }
-      for (const m in cI) {
-        const cC = cI[m];
-        const spD = (CONFIG.readSaveData === 2 && S.snap && S.snap.devices && S.snap.devices[m]) || null;
-        S.cls[m] ??= {
-          upR: cC.upRate, dnR: cC.dnRate, lUT: lanNow,
-          intUp: CONFIG.readSaveData === 3 ? cC.offUp : (spD ? (spD.integral_up || 0) : 0), intDn: CONFIG.readSaveData === 3 ? cC.offDn : (spD ? (spD.integral_down || 0) : 0),
-          uB: CONFIG.readSaveData & 1 ? 0 : (spD ? cC.offUp - (spD.up || 0) : cC.offUp),
-          dB: CONFIG.readSaveData & 1 ? 0 : (spD ? cC.offDn - (spD.down || 0) : cC.offDn),
-          oU: cC.offUp, oD: cC.offDn, name: spD?.name || cC.name || m, hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0, ifc: cC.iface
-        };
-        let cS = S.cls[m],
-          dU = cC.offUp - cS.lU,
-          dD = cC.offDn - cS.lD;
-        /* @BroTech-Reserved counter-guard-head.part.js */
-            cS.dpU && dU > cS.dpU * 0.975 && cS.dpD && dD > cS.dpD * 0.975
-        ) {
-              if (dU < cS.dpU * 1.1 || dU < cS.dpU + CONFIG.宽带最大外网上行速率 * CONFIG.lanRefreshInterval) {
-                cS.uB += cS.dpU; cS.oU += cS.dpU;
-              } else { cS.uB += dU; cS.oU += dU; }
-              /* @BroTech-Reserved counter-guard-tail.part.js */
-       else if (cS.ifc !== cC.iface) { if (CONFIG.盲漫游 !== 0) cS.aR = 1; if (CONFIG.盲漫游 === 1) cS.aR = 2;}
-       else if (cS.aR > 0) { cS.aR--; }
-       cS.ifc = cC.iface;
+      /* @BroTech-Reserved lan-state-head.part.js */
+          cS.onS = 锐在线秒(cC.onT);
 
-      if (cC.upRate > 6e8) { cSU -= cC.upRate; cC.upRate = 0.3; }
-        else if (cS.aR === 2) { cSU -= cC.upRate; cC.upRate = 0.2; }
-        else if (cS.aR === 1 && cC.upRate > CONFIG.宽带最大外网上行速率 * 1.2 && cC.upRate > 32e7) { cSU -= cC.upRate; cC.upRate = 0.1; }
-        if (cC.dnRate > 24e8) { cSD -= cC.dnRate; cC.dnRate = 0.3; }
-        else if (cS.aR === 2) { cSD -= cC.dnRate; cC.dnRate = 0.2; }
-        else if (cS.aR === 1 && (cC.dnRate > CONFIG.宽带最大外网下行速率 || cC.dnRate > 36e7)) { cSD -= cC.dnRate; cC.dnRate = 0.1; }
-
-        if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR || cC.offUp !== cS.lU || cC.offDn !== cS.lD) {
-          cS.onS = cC.onSec;
-
-          if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) {
-            const ms = lanNow - cS.lUT;
-          /* @BroTech-Reserved lan-trapezoid-wakeup.part.js */
-            cS.upR = cC.upRate;
-            cS.dnR = cC.dnRate;
-            cS.lUT = lanNow;
-          }
-        }
-        if (cC.name && !cC.name.startsWith('未知设备')) cS.name = cC.name;
-        cS.lU = cC.offUp;
-        cS.lD = cC.offDn;
-      }
-      if (wanValid) { S.wInstUp = cWU; S.wInstDn = cWD; }
-      if (lanValid) {
-        /* @BroTech-Reserved lan-core-integral.part.js */
-      }
-      rUI(cWU, cWD, cSU, cSD, cI);
-    }
-    catch (e) {
-      console.error("[哥哥科技] 周期采样中断:", e);
-    }
-    finally {
-      isF = !1;
-    }
+          /* @BroTech-Reserved lan-state-tail.part.js */
   }
 
   function buildCSV() {
@@ -609,77 +513,13 @@ function doSettle(nowMs) {
       };
       function rUI(wU, wD, sU, sD, cI) {
     /* @BroTech-Reserved agg-loop-official.part.js */
-    S.cSnap = {
-      timestamp: Date.now(),
-      global: {
-        wan_up: S.wTotUp, wan_down: S.wTotDn,
-        lan_integral_up: LUp, lan_integral_down: LDn,
-        lan_high_up: hpU, lan_high_down: hpD,
-        lan_off_up: abU, lan_off_down: abD
-      },
-      devices: Object.keys(S.cls).reduce((acc, k) => {
-        let s = S.cls[k], cC = cI[k];
-        acc[k] = {
-          up: Math.max(0, (s.lU || 0) - (s.uB || 0)),
-          down: Math.max(0, (s.lD || 0) - (s.dB || 0)),
-          integral_up: s.intUp || 0, integral_down: s.intDn || 0,
-          status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off",
-          name: cC?.name || s.name || k, ip: cC?.ip || "",
-          raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0
-        };
-        return acc;
-      }, {})
-    };
-    if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
-      S.haTick = ((S.haTick || 0) + 1) & 31;
-      if (S.haTick === 1) {
-        try { GM_setValue('ha_snapshot', S.cSnap); } catch(e) {console.warn(e);}}
-     let nowMs = Date.now();
-          if (nowMs >= S.Force_MS && !S._RST) {
-            doSettle(nowMs);
-          } else if (nowMs >= S.Warn_MS && !document.getElementById('gb-w-bnr')) {
-            const bd = document.getElementById('zte-geek-board');
-            if (bd) {
-              const bn = document.createElement('div'); bn.id = 'gb-w-bnr';
-              bn.style.cssText = 'background:#fff3cd;color:#856404;padding:10px 15px;margin-bottom:10px;border-radius:6px;border-left:5px solid #ffc107;font-weight:bold;font-size:13px;display:flex;justify-content:space-between;align-items:center;width:100%;box-sizing:border-box;';
-              bn.innerHTML = `<span> 统计周期即将结束，流量将在跨越边界时自动清零备份。</span><button id="gb-f-btn" style="background:#ffc107;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-weight:bold;color:#333;">立即导出并清零</button>`;
-              bd.insertBefore(bn, bd.firstChild);
-              document.getElementById('gb-f-btn').onclick = () => doSettle(Date.now());}
-          }
-    }
-    S.rTick = ((S.rTick || 0) + 1) & 7;
-    if (S.rTick === 1 || !S.cRT) {
-        S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 3); S.lwTU = S.wTotUp;
-        S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 3); S.lwTD = S.wTotDn;
+    /* @BroTech-Reserved snapshot-official.part.js */
         let rUp = calcStageRatio(S.wTotUp, LUp, hpU), rDn = calcStageRatio(S.wTotDn, LDn, hpD);
         S.cRT = `<span style="font-weight: bold;"><span style="color: ${rUp > 1.5 ? '#ff4c00' : (rUp > 1.15 ? '#FF9800' : '#4CAF50')};">${(rUp * 100).toFixed(2)}%</span>，<span style="color: ${rDn > 1.5 ? '#ff4c00' : (rDn > 1.15 ? '#FF9800' : '#4CAF50')};">${(rDn * 100).toFixed(2)}%</span></span>`;
         if (document.getElementById('gb-ratio-display')) document.getElementById('gb-ratio-display').innerHTML = S.cRT;
     }
     if (document.getElementById('gege-global-overlay')?.style.display !== 'block') return; // 锐捷版仅悬浮舱：面板收起时只记账、不碰官方页面 DOM
-        let bd = document.getElementById('zte-geek-board');
-    if (!bd) {
-      bd = document.createElement('div');
-      bd.id = 'zte-geek-board';
- let layoutHtml = '';
-        if (CONFIG.uiLayout === 1) { // 紧凑版 (驾驶舱)
-            layoutHtml = `
-                <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span><span style="margin-left: 5px;"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></span></div><div class="geek-right-box" style="font-weight: normal; color: #666;"><span style="color: #333;">0估算：</span><span id="gb-wan-zero-up"></span>，<span id="gb-wan-zero-down"></span>｜<span id="gb-wan-zero-up-cnt"></span>，<span id="gb-wan-zero-down-cnt"></span></div></div>
-                <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
-                                <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span><span style="font-weight: bold; margin-left: 5px;">WAN总计：<span class="c-up" id="gb-wan-up-vol"></span> | <span class="c-down" id="gb-wan-down-vol"></span></span></div><div class="geek-right-box">在线高精：<span style="color:#FF6700;" id="gb-cur-up-vol"></span> | <span style="color:#18A058;" id="gb-cur-down-vol"></span></div></div>
-                <div class="geek-row"><span class="geek-label">高精流量统计 -></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-int-up-vol"></span><span class="c-down geek-fixed-width" id="gb-int-down-vol"></span><span style="font-weight: normal; margin-left: 5px; color:#666;">内外网比：<span id="gb-ratio-display"></span></span></div><div class="geek-right-box" style="color: #666;">当前总计：<span style="color:#FF6700;" id="gb-abs-up-vol"></span> | <span style="color:#18A058;" id="gb-abs-down-vol"></span></div></div>`;
-        } else if (CONFIG.uiLayout === 2) { // 平铺版 (报表流)
-            layoutHtml = `
-                <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span></div><div class="geek-right-box"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></div></div>
-                <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
-                                <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span></div><div class="geek-right-box">在线高精：<span style="color:#FF6700;" id="gb-cur-up-vol"></span> | <span style="color:#18A058;" id="gb-cur-down-vol"></span></div></div>
-                <div class="geek-row"><span class="geek-label">高精流量统计 -></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-int-up-vol"></span><span class="c-down geek-fixed-width" id="gb-int-down-vol"></span></div><div class="geek-right-box" style="color: #666;">当前总计：<span style="color:#FF6700;" id="gb-abs-up-vol"></span> | <span style="color:#18A058;" id="gb-abs-down-vol"></span></div></div>
-                <div class="geek-row"><span class="geek-label">WAN总计：</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-wan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-wan-down-vol"></span></div><div class="geek-right-box"><span style="font-weight: normal;">内外网比：</span><span id="gb-ratio-display"></span></div></div>`;
-        } else { // 经典版 (0)
-            layoutHtml = `
-                <div class="geek-row"><span class="geek-label">WAN口速率</span><div class="geek-val-box" style="position:relative;"><span class="c-up geek-fixed-width" id="gb-wan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-wan-down-bytes"></span></div><div class="geek-right-box"><span class="c-up" id="gb-wan-up-bps"></span> | <span class="c-down" id="gb-wan-down-bps"></span></div></div>
-                <div class="geek-row"><span class="geek-label">局域网代数和</span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-bytes"></span><span class="c-down geek-fixed-width" id="gb-lan-down-bytes"></span></div><div class="geek-right-box">实时占比：<span class="c-up" id="gb-perc-up"></span> | <span class="c-down" id="gb-perc-down"></span></div></div>
-                                <div class="geek-row"><span class="geek-label">LAN：<span id="gege-pin-btn" class="gege-pin" title="冻结窗格">📌</span></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-lan-up-vol"></span><span class="c-down geek-fixed-width" id="gb-lan-down-vol"></span></div><div class="geek-right-box">WAN：<span class="c-up" id="gb-wan-up-vol"></span> | <span class="c-down" id="gb-wan-down-vol"></span></div></div>
-                <div class="geek-row"><span class="geek-label">高精流量统计 -></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-int-up-vol"></span><span class="c-down geek-fixed-width" id="gb-int-down-vol"></span></div><div class="geek-right-box" style="color: #666;">当前总计：<span style="color:#FF6700;" id="gb-abs-up-vol"></span> | <span style="color:#18A058;" id="gb-abs-down-vol"></span></div></div>`;
+        /* @BroTech-Reserved board-layout-official.part.js */
         }layoutHtml += `<div class="geek-row" id="gb-rj-row" style="height:auto!important;"><span class="geek-label">路由器状态</span><div class="geek-val-box"><span id="gb-rj-st" style="font-weight:bold;"></span><span>外网延迟：<b id="gb-rj-ping"></b> <span id="gb-rj-loss" style="color:#666;"></span></span><canvas id="gb-rj-pcv" style="width:180px;height:28px;display:none;"></canvas><span>连接数：<b id="gb-rj-conn"></b></span><span>在线设备：<b id="gb-rj-on"></b></span><span>射频：<b id="gb-rj-ch" style="font-weight:normal;"></b></span></div><div class="geek-right-box" style="font-weight:normal;color:#666;">CPU <span id="gb-rj-cpu"></span>｜运行 <span id="gb-rj-run"></span></div></div>`;
                 /* @BroTech-Reserved board-pin-anchor.part.js */
       if (!S.oDC || S._domRebuilt || S._lastPanelState !== iPO) {
@@ -750,8 +590,8 @@ function doSettle(nowMs) {
     try {
       let h2 = [], h5 = [], hX = [], hW = [];
       for (let m in cI) {
-        let d = cI[m], tS = fOT(d.onSec), ifc = d.iface;
-        let htm = `<div class="col-md-12 col-xs-12 config-item gege-list-item" data-gege-mac="${m}"><div class="config-item-box" style="display: flex; align-items: stretch;"><div class="col-md-5 col-xs-7 logo" style="width: 33%; display: flex; flex-direction: row; align-items: center;"><div class="dev-logo" style="width: 50px; min-width: 50px; margin-right: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center;"></div><div class="dev-intro" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; min-height: 100px;"><div style="display: flex; justify-content: space-between; align-items: baseline; width: 95%;"><div class="dev-name" style="font-weight: bold; color: #333; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; margin-right: 8px;">${escapeHTML(d.name)}</div><div class="gege-rssi" style="font-size: 12px; font-weight: bold; color: #666; font-family: Consolas; white-space: nowrap; flex-shrink: 0;"></div></div><div class="gege-online-time" style="color: #999; font-size: 12px; font-family: Consolas; margin-top: 4px;">${d.onSec > 0 ? '在线：' + tS : ''}</div><div class="gege-conn-box"><div class="gege-ratio-top"><span class="v-cn"></span><span class="v-cp"></span></div><div class="gege-conn-bar"><div class="gege-conn-bar-inner"></div></div></div></div></div><div class="col-md-4 col-xs-5 info" style="width: 27%; display: flex; flex-direction: column; padding: 0 10px; border-right: 1px solid #eee;"><div class="dev-ip" style="color: #666; font-family: Consolas;">${escapeHTML(d.ip)}</div><div class="dev-number grey" style="color: #999; font-size: 12px; font-family: Consolas;">MAC：${m}</div></div><div class="col-md-3 col-xs-12 speed" style="width: 40%; display: flex; flex-direction: column; justify-content: center; padding: 0 10px;"></div></div></div>`;
+        let d = cI[m], oS = S.cls[m]?.onS || 0, tS = fOT(oS), ifc = d.iface;
+        let htm = `<div class="col-md-12 col-xs-12 config-item gege-list-item" data-gege-mac="${m}"><div class="config-item-box" style="display: flex; align-items: stretch;"><div class="col-md-5 col-xs-7 logo" style="width: 33%; display: flex; flex-direction: row; align-items: center;"><div class="dev-logo" style="width: 50px; min-width: 50px; margin-right: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center;"></div><div class="dev-intro" style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; min-height: 100px;"><div style="display: flex; justify-content: space-between; align-items: baseline; width: 95%;"><div class="dev-name" style="font-weight: bold; color: #333; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; margin-right: 8px;">${escapeHTML(d.name)}</div><div class="gege-rssi" style="font-size: 12px; font-weight: bold; color: #666; font-family: Consolas; white-space: nowrap; flex-shrink: 0;"></div></div><div class="gege-online-time" style="color: #999; font-size: 12px; font-family: Consolas; margin-top: 4px;">${oS > 0 ? '在线：' + tS : ''}</div><div class="gege-conn-box"><div class="gege-ratio-top"><span class="v-cn"></span><span class="v-cp"></span></div><div class="gege-conn-bar"><div class="gege-conn-bar-inner"></div></div></div></div></div><div class="col-md-4 col-xs-5 info" style="width: 27%; display: flex; flex-direction: column; padding: 0 10px; border-right: 1px solid #eee;"><div class="dev-ip" style="color: #666; font-family: Consolas;">${escapeHTML(d.ip)}</div><div class="dev-number grey" style="color: #999; font-size: 12px; font-family: Consolas;">MAC：${m}</div></div><div class="col-md-3 col-xs-12 speed" style="width: 40%; display: flex; flex-direction: column; justify-content: center; padding: 0 10px;"></div></div></div>`;
         if (ifc === '有线') hW.push(htm);
         else if (ifc === '5G') h5.push(htm);
         else if (ifc === '2.4G') h2.push(htm);
