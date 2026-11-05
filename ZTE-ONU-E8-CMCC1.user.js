@@ -264,7 +264,7 @@
   function ingestWlan(r, n) {
     S.wlanInfo = r;
     const c24 = r.find(p => p.band === '2.4G')?.ch || S.ch24, c5 = r.find(p => p.band === '5G')?.ch || S.ch5;
-    if (c24 !== S.ch24 || c5 !== S.ch5 || !S.衰减) { S.ch24 = c24; S.ch5 = c5; S.衰减 = 20 * Math.log10((5000 + 5 * c5) / (2407 + 5 * c24)); } // 2.4G 的 RSSI 频率修正（dB），与锐捷版同式
+    if (c24 !== S.ch24 || c5 !== S.ch5 || !S.衰减) { S.ch24 = c24; S.ch5 = c5; S.衰减 = 20 * Math.log10((5000 + 5 * c5) / (2407 + 5 * c24)); } // 2.4G 的 RSSI 频率修正（dB）
     for (const p of r) { diffOf(S.wlanP, p.name + ':up').feed(p.rxB * 8, n); diffOf(S.wlanP, p.name + ':dn').feed(p.txB * 8, n); }
   }
 
@@ -484,9 +484,9 @@
 <div class="geek-row"><span class="geek-label">高精流量统计 -></span><div class="geek-val-box"><span class="c-up geek-fixed-width" id="gb-int-up-vol"></span><span class="c-down geek-fixed-width" id="gb-int-down-vol"></span><span style="font-weight:normal;margin-left:5px;color:#666">终端/WAN：<span id="gb-ratio-display"></span></span></div><div class="geek-right-box" style="color:#666">当前总计：<span style="color:#FF6700" id="gb-abs-up-vol"></span> | <span style="color:#18A058" id="gb-abs-down-vol"></span></div></div>`;
 
   // —— 频段命名：没有“5GHz”这个词。分组标题按主信道二分（≥149 为 5.8G），端口行按信道查表 ——
-  const 锐频段 = { 32: '5.1G', 36: '5.2G', 40: '5.2G', 44: '5.2G', 48: '5.2G', 52: '5.2G', 56: '5.3G', 60: '5.3G', 64: '5.3G', 100: '5.5G', 104: '5.5G', 108: '5.5G', 112: '5.5G', 116: '5.5G', 120: '5.6G', 124: '5.6G', 128: '5.6G', 132: '5.6G', 136: '5.6G', 140: '5.7G', 144: '5.7G', 149: '5.8G', 153: '5.8G', 157: '5.8G', 161: '5.8G', 165: '5.8G', 184: '4.9G', 188: '4.9G', 192: '4.9G', 196: '4.9G' };
+  const 猫频段 = { 32: '5.1G', 36: '5.2G', 40: '5.2G', 44: '5.2G', 48: '5.2G', 52: '5.2G', 56: '5.3G', 60: '5.3G', 64: '5.3G', 100: '5.5G', 104: '5.5G', 108: '5.5G', 112: '5.5G', 116: '5.5G', 120: '5.6G', 124: '5.6G', 128: '5.6G', 132: '5.6G', 136: '5.6G', 140: '5.7G', 144: '5.7G', 149: '5.8G', 153: '5.8G', 157: '5.8G', 161: '5.8G', 165: '5.8G', 184: '4.9G', 188: '4.9G', 192: '4.9G', 196: '4.9G' };
   const 频段名 = k => k === '5G' ? (S.ch5 > 148 ? '5.8G' : '5.2G') : '2.4G';
-  const 端口频段 = p => p.band === '5G' ? (锐频段[p.ch] || 频段名('5G')) : '2.4G';
+  const 端口频段 = p => p.band === '5G' ? (猫频段[p.ch] || 频段名('5G')) : '2.4G';
   const fOT = s => { s = +s | 0; const d = s / 86400 | 0, h = s % 86400 / 3600 | 0, m = s % 3600 / 60 | 0, c = s % 60; return d ? `${d}天${h}时${m}分${c}秒` : `${h}小时${m}分${c}秒`; };
 
   function build() {
@@ -541,7 +541,7 @@
     画总速率图(bd);
   }
 
-  // —— 原生终端卡片（华为版结构：图标与协商速率在左，上行细条在简介下，比值条与下行细条在信息栏，速率条带火花线在右） ——
+  // —— 原生终端卡片（网页结构：图标与协商速率在左，上行细条在简介下，比值条与下行细条在信息栏，速率条带火花线在右） ——
   const CARD = `<div class="config-item-box"><div class="logo"><div class="dev-logo"></div><div class="dev-intro"><div class="dev-name-row"><div class="dev-name"></div><div class="gege-rssi"></div></div><div class="gege-online-time"></div><div class="gege-up-box"><div class="t-row c-up"><span>↑ <span class="v-vol"></span></span><span class="v-pct"></span></div><div class="zte-thin-bar"><div class="zte-thin-bar-inner up"></div></div></div></div></div>
 <div class="info"><div class="dev-ip"><span></span><i></i></div><div class="gege-ratio-box"><div class="gege-ratio-top"><span class="v-port"></span><span class="v-interval" style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:normal;font-size:12.5px;opacity:.75;letter-spacing:.5px"><span class="c-up"></span><span style="color:#666;margin:0 3px">，</span><span class="c-down"></span></span><span class="v-rt-pct"></span></div><div class="gege-ratio-bar"><div class="gege-ratio-bar-inner"></div></div></div><div class="gege-down-box"><div class="t-row c-down"><span>↓ <span class="v-vol"></span></span><span class="v-pct"></span></div><div class="zte-thin-bar"><div class="zte-thin-bar-inner down"></div></div></div></div>
 <div class="speed"><div class="zte-enhance-speed"><div class="zte-bar-wrap zte-bar-up"><span class="v-val"></span><span class="v-spark"></span><span class="v-pct"></span></div><div class="zte-bar-wrap zte-bar-down"><span class="v-val"></span><span class="v-spark"></span><span class="v-pct"></span></div></div></div></div>`;
