@@ -8,8 +8,8 @@ if (dI) {
           }
           const p = hqU * inv_tot_cU;
           (cache.upVol ??= bx.querySelector('.v-vol')).textContent = fVD(cS.intUp, cC.offUp);
-          (cache.upPct ??= bx.querySelector('.v-pct')).textContent = p.toFixed(1) + '%';
-          (cache.upBar ??= bx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(p, 100) + '%';
+          const kU = (p * 10 + .5) | 0;
+          if (cache.kU !== kU) { cache.kU = kU; (cache.upPct ??= bx.querySelector('.v-pct')).textContent = p.toFixed(1) + '%'; (cache.upBar ??= bx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(p, 100) + '%'; }
         }
         
         const inf = cache.info ??= it.querySelector('.info');
@@ -50,12 +50,14 @@ if (dI) {
             tC = bR.toFixed(1) + '%';
           }
           
-          (cache.rBoxPort ??= rB.querySelector('.v-port')).textContent = CONFIG.portMap[cC.iface] || cC.iface || "未知";
+          const pt = CONFIG.portMap[cC.iface] || cC.iface || "未知";
+          if (cache.pt !== pt) { cache.pt = pt; (cache.rBoxPort ??= rB.querySelector('.v-port')).textContent = pt; }
                     (cache.rBoxUp ??= rB.querySelector('.v-interval .c-up')).textContent = '' + fSV(hqU);
           (cache.rBoxDn ??= rB.querySelector('.v-interval .c-down')).textContent = '' + fSV(hqD);
           const rtP = cache.rtPct ??= rB.querySelector('.v-rt-pct');
-          rtP.textContent = tC; rtP.style.color = tCol;
-          (cache.rBoxBar ??= rB.querySelector('.gege-ratio-bar-inner')).style.width = Math.min(bR, 100) + '%';
+          if (cache.kC !== tC || cache.kCol !== tCol) { cache.kC = tC; cache.kCol = tCol; rtP.textContent = tC; rtP.style.color = tCol; }
+          const kB = (bR * 10 + .5) | 0;
+          if (cache.kB !== kB) { cache.kB = kB; (cache.rBoxBar ??= rB.querySelector('.gege-ratio-bar-inner')).style.width = Math.min(bR, 100) + '%'; }
                     
           let dBx = cache.dBox ??= inf.querySelector('.gege-down-box');
           if (!dBx) {
@@ -66,8 +68,8 @@ if (dI) {
           }
           const dp = (cC.offDn || 0) * inv_tOD;
           (cache.dBoxVol ??= dBx.querySelector('.v-vol')).textContent = fVD(cS.intDn, cC.offDn);
-                    (cache.dBoxPct ??= dBx.querySelector('.v-pct')).textContent = dp.toFixed(1) + '%';
-          (cache.dBoxBar ??= dBx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(dp, 100) + '%';
+          const kD = (dp * 10 + .5) | 0;
+          if (cache.kD !== kD) { cache.kD = kD; (cache.dBoxPct ??= dBx.querySelector('.v-pct')).textContent = dp.toFixed(1) + '%'; (cache.dBoxBar ??= dBx.querySelector('.zte-thin-bar-inner')).style.width = Math.min(dp, 100) + '%'; }
         }
         
         const sp = cache.speed ??= it.querySelector('.speed');
@@ -85,10 +87,8 @@ if (dI) {
               bU = cache.bU ??= enh.querySelector('.zte-bar-up'),
               bD = cache.bD ??= enh.querySelector('.zte-bar-down');
           
-          bU.style.setProperty('--p-up', Math.min(pu, 100) + '%');
-          (cache.bUVal ??= bU.querySelector('.v-val')).textContent = `🔼 ${fBy(cC.upRate)}`;
-          (cache.bUPct ??= bU.querySelector('.v-pct')).textContent = pu.toFixed(1) + '%';
-          
-          bD.style.setProperty('--p-down', Math.min(pd, 100) + '%');
-          (cache.bDVal ??= bD.querySelector('.v-val')).textContent = `🔽 ${fBy(cC.dnRate)}`;
-          (cache.bDPct ??= bD.querySelector('.v-pct')).textContent = pd.toFixed(1) + '%';
+          const kPU = (pu * 10 + .5) | 0, kPD = (pd * 10 + .5) | 0;
+          if (cache.kPU !== kPU) { cache.kPU = kPU; bU.style.setProperty('--p-up', Math.min(pu, 100) + '%'); (cache.bUPct ??= bU.querySelector('.v-pct')).textContent = pu.toFixed(1) + '%'; }
+          if (cache.rU !== cC.upRate) { cache.rU = cC.upRate; (cache.bUVal ??= bU.querySelector('.v-val')).textContent = `🔼 ${fBy(cC.upRate)}`; }
+          if (cache.kPD !== kPD) { cache.kPD = kPD; bD.style.setProperty('--p-down', Math.min(pd, 100) + '%'); (cache.bDPct ??= bD.querySelector('.v-pct')).textContent = pd.toFixed(1) + '%'; }
+          if (cache.rD !== cC.dnRate) { cache.rD = cC.dnRate; (cache.bDVal ??= bD.querySelector('.v-val')).textContent = `🔽 ${fBy(cC.dnRate)}`; }
