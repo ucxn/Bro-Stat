@@ -367,7 +367,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
 
   /* @BroTech-Reserved csv-settle-head.part.js */
     GM_setValue('ha_snapshot', { timestamp: nowMs, global: {}, devices: {} }); _saved = null; S.cSnap = null;
-    S.wTotUp = S.wTotDn = 0; // 内存原地清零
+    S.wTotUp = S.wTotDn  = S.lwTU = S.lwTD = 0; // 内存原地清零
     for (let k in S.cls) { let s = S.cls[k]; s.intUp = s.intDn = 0; s.hU.fill(0); s.hD.fill(0); } // 内存原地清零底表
   }
 

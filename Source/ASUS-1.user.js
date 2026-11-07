@@ -439,7 +439,7 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
 function doSettle(nowMs) {
     /* @BroTech-Reserved settle-export.part.js */
     GM_setValue('ha_snapshot', { timestamp: nowMs, global: {}, devices: {} }); S.cSnap = null;
-    S.wLedgerUp = S.wLedgerDn = S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn = 0;
+    S.wLedgerUp = S.wLedgerDn = S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn  = S.wZEU = S.wZED = S.wZEUC = S.wZEDC = S.lwTU = S.lwTD = 0;
     S.bWU = S.oWU; S.bWD = S.oWD; S.dTU = S.dTD = 0;
     S.lwTU = S.lwTD = S.aWu = S.aWd = 0;
     S.wZEU = S.wZED = S.wZEUC = S.wZEDC = 0;
@@ -455,10 +455,10 @@ function doSettle(nowMs) {
   /* @BroTech-Reserved stage-ratio.part.js */
   const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
   function getSpark(ringArr, headIdx, maxVal, minVal = 0) {
-    let s = "";
+    let s = "", k = 7 / maxVal;
     for (let i = 30; i--; ) {
       let v = ringArr[(headIdx - i) & 63];
-      s += SPRK[v < minVal ? 0 : Math.min(7, Math.max(1, ((v / maxVal) * 7) | 0))];
+      s += SPRK[v < minVal ? 0 : Math.min(7, Math.max(1, (v * k) | 0))];
     }
     return s;
   }
