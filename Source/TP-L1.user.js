@@ -441,7 +441,7 @@ async function rSD() {
 
   /* @BroTech-Reserved csv-settle-head.part.js */
     GM_setValue('ha_snapshot', { timestamp: nowMs, global: {}, devices: {} }); _saved = null; S.cSnap = null;
-        S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn = 0; // 内存原地清零
+        S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn  = S.lwTU = S.lwTD = 0; // 内存原地清零
     for (let k in S.cls) { let s = S.cls[k]; s.intUp = s.intDn = 0; s.uB = s.oU = s.lU; s.dB = s.oD = s.lD; s.hU.fill(0); s.hD.fill(0); } // 内存原地清零底表
   }
 

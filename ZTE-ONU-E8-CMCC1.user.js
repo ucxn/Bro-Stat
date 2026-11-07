@@ -218,7 +218,8 @@
     gem: {}, lock: null, wanName: '', wanUp: 0, wanDn: 0, wanIntU: new Integ(CONFIG.refreshInterval * CONFIG.ponEvery), wanIntD: new Integ(CONFIG.refreshInterval * CONFIG.ponEvery), wanRawU: 0, wanRawD: 0,
     devs: new Map(), nodes: [], list: [], lanP: {}, wlanP: {}, lanInfo: [], wlanInfo: [],
     topoN: 0, ch24: 6, ch5: 60, 衰减: 0, isPinned: false,
-    总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0, wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity
+    总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0, wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity,
+    cool: false, coolUntil: 0, keepAt: 0, reloadOfficial: false, timer: 0, cdT: 0, 图表拖: null, 图表待画: 0 // 运行中才赋值的也一次写全，S 形状从头到尾不变
   };
   const diffOf = (store, key) => store[key] ??= new Diff();
 
@@ -350,7 +351,7 @@
 #bro-ont-ov .geek-label{width:110px;color:#333;font-weight:bold}#bro-ont-ov .geek-val-box{flex:1;display:flex;gap:15px;margin-left:10px}#bro-ont-ov .geek-fixed-width{display:inline-block;width:120px}#bro-ont-ov .geek-right-box{text-align:right;min-width:220px;font-weight:bold}
 #bro-ont-ov .c-up{color:#ff4c00}#bro-ont-ov .c-down{color:#0059fa}
 #bro-ont-ov .gege-pin{cursor:pointer;font-size:11px;filter:grayscale(100%);opacity:.5;transition:transform .2s;margin-left:2px}#bro-ont-ov .gege-pin.active{filter:none;opacity:1;transform:scale(1.1)}
-#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size}
+#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;left:max(520px,52%);top:2px;width:clamp(320px,30%,650px);height:112px}
 #gege-speed-chart canvas{display:block;width:100%;height:100%}
 #gege-speed-chart .gege-chart-head,#gege-speed-chart .gege-chart-foot{position:absolute;left:clamp(28px,8%,36px);right:8px;display:flex;align-items:center;pointer-events:none;font:bold clamp(9px,2.1cqw,11px) system-ui,sans-serif;white-space:nowrap;overflow:hidden}
 #gege-speed-chart .gege-chart-head{top:2px;color:#111;gap:8px}
@@ -413,7 +414,7 @@
   const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
   function getSpark(ringArr, headIdx, maxVal) {
     let s = '';
-    for (let i = 16; i--;) { const v = ringArr[(headIdx - i) & 31]; s += SPRK[v > 0 ? Math.min(7, Math.max(1, ((v / maxVal) * 7) | 0)) : 0]; }
+    const k = 7 / maxVal; for (let i = 16; i--;) { const v = ringArr[(headIdx - i) & 31]; s += SPRK[v > 0 ? Math.min(7, Math.max(1, (v * k) | 0)) : 0]; }
     return s;
   }
 
@@ -424,16 +425,14 @@
     box = document.createElement('div'); box.id = 'gege-speed-chart';
     box.innerHTML = '<canvas></canvas><div class="gege-chart-head"><b data-gc="meta"></b><span data-gc="range"></span></div><div class="gege-chart-foot"><span class="gc-up" data-gc="up"></span><span class="gc-down" data-gc="down"></span><span class="gc-extra" data-gc="extra"></span></div><div class="gege-chart-resize" title="缩放"></div>';
     bd.appendChild(box);
-    const bw = bd.clientWidth || 1500, w = Math.max(320, Math.min(650, bw * .30));
-    box.style.left = Math.max(520, bw * .52) + 'px'; box.style.top = '2px'; box.style.width = w + 'px'; box.style.height = '112px';
     const 起手 = (e, 模式) => { e.preventDefault(); S.图表拖 = { 模式, x: e.clientX, y: e.clientY, l: box.offsetLeft, t: box.offsetTop, w: box.offsetWidth, h: box.offsetHeight }; box.setPointerCapture?.(e.pointerId); };
     box.addEventListener('pointerdown', e => { if (!e.target.classList.contains('gege-chart-resize')) 起手(e, '拖'); });
     box.querySelector('.gege-chart-resize').addEventListener('pointerdown', e => 起手(e, '缩'));
     box.addEventListener('pointermove', e => {
       const g = S.图表拖; if (!g) return;
       if (g.模式 === '拖') { box.style.left = (g.l + e.clientX - g.x) + 'px'; box.style.top = (g.t + e.clientY - g.y) + 'px'; }
-      else { box.style.width = Math.max(260, g.w + e.clientX - g.x) + 'px'; box.style.height = Math.max(88, g.h + e.clientY - g.y) + 'px'; }
-      if (!S.图表待画) { S.图表待画 = 1; requestAnimationFrame(() => { S.图表待画 = 0; 画总速率图(bd); }); }
+      else { box.style.width = Math.max(260, g.w + e.clientX - g.x) + 'px'; box.style.height = Math.max(88, g.h + e.clientY - g.y) + 'px';
+        if (!S.图表待画) { S.图表待画 = 1; requestAnimationFrame(() => { S.图表待画 = 0; 画总速率图(bd); }); } } // 拖动只挪位置，画布不变不重画
     });
     box.addEventListener('pointerup', () => S.图表拖 = null); box.addEventListener('pointercancel', () => S.图表拖 = null); box.addEventListener('lostpointercapture', () => S.图表拖 = null);
     return box;
@@ -448,8 +447,10 @@
     for (let k = 0; k < n; k++) { const j = (st + k) & 8191, u = S.总上行图[j], d = S.总下行图[j]; if (u > ym) ym = u; if (d > ym) ym = d; su += u; sd += d; }
     x.fillStyle = 'rgba(255,255,255,.58)'; x.strokeStyle = 'rgba(0,89,250,.88)'; x.lineWidth = 1.5; x.beginPath(); x.roundRect ? x.roundRect(.5, .5, W - 1, H - 1, 8) : x.rect(.5, .5, W - 1, H - 1); x.fill(); x.stroke();
     x.setLineDash([4, 4]); x.strokeStyle = 'rgba(0,89,250,.45)'; x.lineWidth = 1;
-    for (let i = 5; i--;) { const y = t + gh * i / 4; x.beginPath(); x.moveTo(l, y); x.lineTo(W - r, y); x.stroke(); }
-    for (let i = 7; i--;) { const xx = l + gw * i / 6; x.beginPath(); x.moveTo(xx, t); x.lineTo(xx, H - b); x.stroke(); }
+    x.beginPath(); // 网格合成一条路径一次描边
+    for (let i = 5; i--;) { const y = t + gh * i * .25; x.moveTo(l, y); x.lineTo(W - r, y); }
+    for (let i = 7; i--;) { const xx = l + gw * i / 6; x.moveTo(xx, t); x.lineTo(xx, H - b); }
+    x.stroke();
     x.setLineDash([]);
     const li = (S.总图点数 - 1) & 8191, au = n ? su / n : 0, ad = n ? sd / n : 0;
     (box._gcMeta ??= box.querySelector('[data-gc="meta"]')).textContent = `采样:${CONFIG.refreshInterval * CONFIG.ponEvery}s  点:${S.总图点数}`;

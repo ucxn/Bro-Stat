@@ -230,7 +230,11 @@ const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&q
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
     lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: undefined,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
-    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
+    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
+    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变。靠 ??= 或 === undefined 判断的给 undefined，会写小数的给 0
+    wLT: undefined, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
+    lTU: undefined, lTD: undefined, dWU: 0, dWD: 0, dTU: 0, dTD: 0, zCU: 0, zCD: 0, _qosAdj: 0,
+    rTick: 0, haTick: 0, cRT: '', oDC: null, _domRebuilt: !1, snap: undefined, snapLoaded: !1
   };
   window.__gIsF = !1;
   const 版本号 = (typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号';
@@ -412,7 +416,8 @@ async function rSD() {
             uB: 有累计 && !(CONFIG.readSaveData & 1) ? (spD ? cC.offUp - (spD.up || 0) : cC.offUp) : 0,
             dB: 有累计 && !(CONFIG.readSaveData & 1) ? (spD ? cC.offDn - (spD.down || 0) : cC.offDn) : 0,
             lU: 有累计 ? cC.offUp : undefined, lD: 有累计 ? cC.offDn : undefined, aR: !1, dpU: 0, dpD: 0,
-            oU: 有累计 ? cC.offUp : 0, oD: 有累计 ? cC.offDn : 0, name: spD?.name || cC.name || m, hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0, ifc: cC.iface // 真实流量与环形缓冲
+            oU: 有累计 ? cC.offUp : 0, oD: 有累计 ? cC.offDn : 0, name: spD?.name || cC.name || m, hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0, ifc: cC.iface,
+            onS: 0, lOS: undefined, zEU: 0, zED: 0, zUC: 0, zDC: 0, haOff: undefined // 真实流量与环形缓冲
           };
         } else {
           let 有累计 = 有累计MAC.has(m);
@@ -488,17 +493,20 @@ async function rSD() {
 function doSettle(nowMs) {
     /* @BroTech-Reserved settle-export.part.js */
     GM_setValue('ha_snapshot', { timestamp: nowMs, global: {}, devices: {} }); S.snap = {}; S.cSnap = null;
-    S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn = S.lTotUp = S.lTotDn = 0; S.lLT = performance.now(); // 内存原地清零
+    S.wTotUp = S.wTotDn = S.w2TotUp = S.w2TotDn = S.lTotUp = S.lTotDn  = S.wZEU = S.wZED = S.wZEUC = S.wZEDC = S.lwTU = S.lwTD = 0; S.lLT = performance.now(); // 内存原地清零
     for (let k in S.cls) { let s = S.cls[k]; s.intUp = s.intDn = 0; s.uB = s.oU = s.lU; s.dB = s.oD = s.lD; s.hU.fill(0); s.hD.fill(0); } // 内存原地清零底表
   }
 
   /* @BroTech-Reserved stage-ratio.part.js */
   const SPRK = [' ', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+  // 设备卡片缓存（it._gege）的模板：每张卡片从它复制，所有卡片共用一个隐藏类；数值键给 -1、字符串键给 undefined，保证第一帧的比较一定成立
+  const GC = { bD: undefined, bDPct: undefined, bDSpk: undefined, bDVal: undefined, bU: undefined, bUPct: undefined, bUSpk: undefined, bUVal: undefined, dBox: undefined, dBoxBar: undefined, dBoxPct: undefined, dBoxVol: undefined, devIntro: undefined, enh: undefined, info: undefined, ipNode: undefined, rBox: undefined, rBoxBar: undefined, rBoxDn: undefined, rBoxPort: undefined, rBoxUp: undefined, rtPct: undefined, speed: undefined, timeNode: undefined, upBar: undefined, upBox: undefined, upPct: undefined, upVol: undefined, zBadge: undefined,
+    kU: -1, kB: -1, kD: -1, kPU: -1, kPD: -1, rU: -1, rD: -1, kC: undefined, kCol: undefined, pt: undefined };
   function getSpark(ringArr, headIdx, maxVal, minVal = 0) {
-    let s = "";
+    let s = "", k = 7 / maxVal;
     for (let i = 27; i--; ) {
       let v = ringArr[(headIdx - i) & 63];
-      s += SPRK[v < minVal ? 0 : Math.min(7, Math.max(1, ((v / maxVal) * 7) | 0))];
+      s += SPRK[v < minVal ? 0 : Math.min(7, Math.max(1, (v * k) | 0))];
     }
     return s;
   }
@@ -718,7 +726,7 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
         const cC = cI[m] || { upRate: 0, dnRate: 0, iface: "", offUp: 0, offDn: 0 },
               cS = S.cls[m] || { intUp: 0, intDn: 0, onS: 0 };
         
-        let cache = it._gege || (it._gege = {});
+        let cache = it._gege || (it._gege = { ...GC });
         let hqU = Math.max(0, (cS.lU || 0) - (cS.uB || 0)),
         hqD = Math.max(0, (cS.lD || 0) - (cS.dB || 0));
                         let tN = cache.timeNode ??= it.querySelector('.gege-online-time');
