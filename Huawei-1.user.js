@@ -1094,7 +1094,6 @@ async function eBET(fW = !0) {
       }
     }, 12000);
   };
-  setTimeout(tKA, 2000);
   setInterval(tKA, 216000);
   window.addEventListener('load', () => {
         if (CONFIG.injectMode === 3 || (CONFIG.injectMode === 1 && +(window.location.hostname.slice(window.location.hostname.lastIndexOf('.') + 1)) < 6)) {

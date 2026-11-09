@@ -219,7 +219,7 @@
     devs: new Map(), nodes: [], list: [], lanP: {}, wlanP: {}, lanInfo: [], wlanInfo: [],
     topoN: 0, ch24: 6, ch5: 60, 衰减: 0, isPinned: false,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0, wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity,
-    cool: false, coolUntil: 0, keepAt: 0, reloadOfficial: false, timer: 0, cdT: 0, 图表拖: null, 图表待画: 0 // 运行中才赋值的也一次写全，S 形状从头到尾不变
+    cool: false, coolUntil: 0, keepAt: Date.now(), reloadOfficial: false, timer: 0, cdT: 0, 图表拖: null, 图表待画: 0 // 运行中才赋值的也一次写全，S 形状从头到尾不变
   };
   const diffOf = (store, key) => store[key] ??= new Diff();
 
@@ -314,7 +314,7 @@
     if (S.busy) S.reloadOfficial = true; else reloadOfficial();
   }
   function reloadOfficial() { // 官方内容页重新加载一次，拿到当前有效的令牌（顶栏 top.gch 不带令牌，不用管）
-    S.reloadOfficial = false; S.keepAt = 0; // 重载后是新页面、新定时器，下次打开面板第一轮就续期
+    S.reloadOfficial = false; S.keepAt = Date.now(); // 重载后是新页面、新定时器，从此刻起重新计时，打开面板的第一轮不续期
     const f = document.getElementById('mainFrame');
     if (f?.contentWindow) f.contentWindow.location.href = f.contentWindow.location.href;
   }
