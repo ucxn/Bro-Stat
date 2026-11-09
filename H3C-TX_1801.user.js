@@ -961,7 +961,6 @@ if (!window.gegeBActivated) {
       }
     }, 12000);
   };
-  setTimeout(tKA, 2000);
   setInterval(tKA, 720000);
   const _initUI = () => {
     if (CONFIG.injectMode === 3 || (CONFIG.injectMode === 1 && +(window.location.hostname.slice(window.location.hostname.lastIndexOf('.') + 1)) < 6)) {
