@@ -17,4 +17,4 @@ S.cSnap = {
           integral_down: s.intDn || 0,
           status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off",
           name: cC?.name || s.name || k,
-          ip: cC?.ip || "",
+          ip: s.ip,

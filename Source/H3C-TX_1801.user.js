@@ -206,7 +206,7 @@ let _saved = null;
     wTotUp: _saved?.global?.wan_up || 0,
     wTotDn: _saved?.global?.wan_down || 0,
     cls: {}, isPinned: !0,
-    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
+    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: 0, wLT: 0,
     hasW2: !1, is5G_149: !1,
     无线缓存: Object.create(null), 无线请求中: !1, 端口状态: Object.create(null), 端口请求中: !1, 端口已取: !1, 端口小齿轮: 0, 半双工色轮: 0, DOM缓存: null, DOM已重建: !1, 面板状态: null, HA小齿轮: 0, 包数据可用: !1, RSSI频率修正: undefined,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
@@ -478,7 +478,7 @@ const ts = Date.now();
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
       }
       const gDt = (S.lt !== 0) ? (lanNow - S.lt) * 0.001 : 0;
-      if (hasWanRate && S.wLT === undefined) {
+      if (hasWanRate && !S.wLT) {
         S.wLT = wanNow;
       }
       else if (hasWanRate && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
@@ -494,12 +494,12 @@ const ts = Date.now();
           intUp: _saved?.devices?.[m]?.integral_up || 0,
           intDn: _saved?.devices?.[m]?.integral_down || 0,
           包上总: _saved?.devices?.[m]?.packet_up || 0, 包下总: _saved?.devices?.[m]?.packet_down || 0, 上次包上: cC.包上, 上次包下: cC.包下,
-          onS: cC.onSec, lOS: cC.onSec, name: _saved?.devices?.[m]?.name || cC.name || m, hU: new Float64Array(32), hD: new Float64Array(32), hIdx: 0
+          onS: cC.onSec, lOS: cC.onSec, name: _saved?.devices?.[m]?.name || cC.name || m, ip: cC.ip || '', hU: new Float64Array(32), hD: new Float64Array(32), hIdx: 0
         };
         let cS = S.cls[m],
           dU = cC.offUp - cS.lU,
           dD = cC.offDn - cS.lD;
-        if (cC.name && cC.name !== '未知设备') cS.name = cC.name;
+        if (cC.name && cC.name !== '未知设备') cS.name = cC.name; if (cC.ip) cS.ip = cC.ip;
         if (dU < 0 || dD < 0) {
           if (dU < 0) {
             cS.uB += dU;
@@ -588,7 +588,7 @@ const ts = Date.now();
     if (typeof GM_setValue !== 'undefined' && !((S.HA小齿轮 = ((S.HA小齿轮 || 0) + 1) & 1023))) {
       try {
         let cln = {};
-        for (let k in S.cls) { let s = S.cls[k], cC = cI[k]; cln[k] = { up: s.intUp || 0, down: s.intDn || 0, integral_up: s.intUp || 0, integral_down: s.intDn || 0, packet_up: s.包上总 || 0, packet_down: s.包下总 || 0, status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off", name: cC?.name || s.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 }; }
+        for (let k in S.cls) { let s = S.cls[k], cC = cI[k]; cln[k] = { up: s.intUp || 0, down: s.intDn || 0, integral_up: s.intUp || 0, integral_down: s.intDn || 0, packet_up: s.包上总 || 0, packet_down: s.包下总 || 0, status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off", name: cC?.name || s.name || k, ip: s.ip, raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 }; }
         GM_setValue('ha_snapshot', {
                 timestamp: Date.now(),
       global: {

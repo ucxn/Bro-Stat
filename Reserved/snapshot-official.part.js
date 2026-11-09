@@ -13,7 +13,7 @@ S.cSnap = {
           down: Math.max(0, (s.lD || 0) - (s.dB || 0)),
           integral_up: s.intUp || 0, integral_down: s.intDn || 0,
           status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off",
-          name: cC?.name || s.name || k, ip: cC?.ip || "",
+          name: cC?.name || s.name || k, ip: s.ip,
           raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0
         };
         return acc;

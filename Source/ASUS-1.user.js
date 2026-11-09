@@ -203,10 +203,10 @@ the project’s primary license are fully and continuously complied with.
     wTotDn: 0,
     wLedgerUp: 0, wLedgerDn: 0, // 官方增量账本；显示层的保护逻辑不回写事实源
     cls: {}, isPinned: !0,
-    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
+    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: 0,
     hasW2: !1, is5G_149: !1, oWU:0, Warn_MS: 0, Force_MS: 0, _RST: !1,
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
-    lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: undefined,
+    lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: 0,
     DOM缓存: null, DOM容器: null, 有线统一PHY: 0, 主节点MAC: '', 端口请求中: !1,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
@@ -265,7 +265,6 @@ the project’s primary license are fully and continuously complied with.
   const st = document.createElement('style');
   st.innerHTML = `/* @BroTech-Reserved style-panel.part.js */
     .t-row,.zte-enhance-speed{font-family:Consolas;}
-    @media (max-width:768px){.config-item-box{position:relative!important}.dev-ip{top:0!important;right:0!important}}
     #zte-geek-board{transition:color 0s cubic-bezier(0.21733,0.21733,0.31185,0.25216);}
     .gege-phy-rate { font:10px/1.08 Consolas,monospace;color:#777;text-align:center;white-space:nowrap;margin-top:-1px; }
     .gege-phy-rate .phy-up { color:#ff4c00 }

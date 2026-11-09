@@ -31,7 +31,7 @@ if (lanValid) S.lastCI = cI;
           cM);
         window.gegeForceUIRedraw = !1;
       }
-            if (wanValid && S.wLT === undefined) {
+            if (wanValid && !S.wLT) {
         S.wLT = wanNow;
       }
       else if (wanValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
@@ -48,7 +48,7 @@ if (lanValid) S.lastCI = cI;
           intUp: CONFIG.readSaveData === 3 ? cC.offUp : (spD ? (spD.integral_up || 0) : 0), intDn: CONFIG.readSaveData === 3 ? cC.offDn : (spD ? (spD.integral_down || 0) : 0),
           uB: CONFIG.readSaveData & 1 ? 0 : (spD ? cC.offUp - (spD.up || 0) : cC.offUp), 
           dB: CONFIG.readSaveData & 1 ? 0 : (spD ? cC.offDn - (spD.down || 0) : cC.offDn),
-          oU: cC.offUp, oD: cC.offDn, name: spD?.name || cC.name || m, hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0, ifc: cC.iface
+          oU: cC.offUp, oD: cC.offDn, name: spD?.name || cC.name || m, ip: cC.ip || '', hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0, ifc: cC.iface
         };
         let cS = S.cls[m],
           dU = cC.offUp - cS.lU,

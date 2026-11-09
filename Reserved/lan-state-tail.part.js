@@ -6,7 +6,7 @@ if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) {
             cS.lUT = lanNow;
           }
         }
-        if (cC.name && !cC.name.startsWith('未知设备')) cS.name = cC.name;
+        if (cC.name && !cC.name.startsWith('未知设备')) cS.name = cC.name; if (cC.ip) cS.ip = cC.ip;
         cS.lU = cC.offUp;
         cS.lD = cC.offDn;
       }

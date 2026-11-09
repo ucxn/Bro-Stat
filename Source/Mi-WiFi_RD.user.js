@@ -225,14 +225,14 @@ const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&q
     wTotUp: 0,
     wTotDn: 0,
     cls: {}, isPinned: !0,
-    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
+    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: 0,
     hasW2: !1, is5G_149: !1, oWU:0, Warn_MS: 0, Force_MS: 0, _RST: !1,
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
-    lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: undefined,
+    lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: 0,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
     // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变。靠 ??= 或 === undefined 判断的给 undefined，会写小数的给 0
-    wLT: undefined, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
+    wLT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
     lTU: undefined, lTD: undefined, dWU: 0, dWD: 0, dTU: 0, dTD: 0, zCU: 0, zCD: 0, _qosAdj: 0,
     rTick: 0, haTick: 0, cRT: '', oDC: null, _domRebuilt: !1, snap: undefined, snapLoaded: !1
   };
@@ -283,7 +283,6 @@ function fBy(bps) {
   const st = document.createElement('style');
   st.innerHTML = `/* @BroTech-Reserved style-panel.part.js */
     .t-row,.zte-enhance-speed{font-family:Consolas;}
-    @media (max-width:768px){.config-item-box{position:relative!important}.dev-ip{top:0!important;right:0!important}}
     #zte-geek-board{transition:color 0s cubic-bezier(0.21733,0.21733,0.31185,0.25216);}
     `;
   document.head.
@@ -396,7 +395,7 @@ async function rSD() {
       /* @BroTech-Reserved rsd-redraw-gate.part.js */
       }
       const gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
-      if (wanRateValid && S.wLT === undefined) { S.wLT = n; }
+      if (wanRateValid && !S.wLT) { S.wLT = n; }
       else if (wanRateValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
         const wDt = n - S.wLT;
         /* @BroTech-Reserved wan-trapezoid-wakeup.part.js */
@@ -416,7 +415,7 @@ async function rSD() {
             uB: 有累计 && !(CONFIG.readSaveData & 1) ? (spD ? cC.offUp - (spD.up || 0) : cC.offUp) : 0,
             dB: 有累计 && !(CONFIG.readSaveData & 1) ? (spD ? cC.offDn - (spD.down || 0) : cC.offDn) : 0,
             lU: 有累计 ? cC.offUp : undefined, lD: 有累计 ? cC.offDn : undefined, aR: !1, dpU: 0, dpD: 0,
-            oU: 有累计 ? cC.offUp : 0, oD: 有累计 ? cC.offDn : 0, name: spD?.name || cC.name || m, hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0, ifc: cC.iface,
+            oU: 有累计 ? cC.offUp : 0, oD: 有累计 ? cC.offDn : 0, name: spD?.name || cC.name || m, ip: cC.ip || '', hU: new Float64Array(64), hD: new Float64Array(64), hIdx: 0, ifc: cC.iface,
             onS: 0, lOS: undefined, zEU: 0, zED: 0, zUC: 0, zDC: 0, haOff: undefined // 真实流量与环形缓冲
           };
         } else {
@@ -454,7 +453,7 @@ async function rSD() {
           }
           if (cC.upRate !== cS.upR || cC.dnRate !== cS.dnR) 本轮刷新接口.add(cC.iface);
         }
-        if (cC.name && cC.name !== '未知') cS.name = cC.name;
+        if (cC.name && cC.name !== '未知') cS.name = cC.name; if (cC.ip) cS.ip = cC.ip;
         if (cS.lOS !== cC.onSec) { cS.onS = cC.onSec; cS.lOS = cC.onSec; }
         else { cS.onS = (cS.onS || cC.onSec || 0) + gDt; }
       }
@@ -551,7 +550,7 @@ for (let k in S.cls) {
           up: Math.max(0, (s.lU || 0) - (s.uB || 0)), down: Math.max(0, (s.lD || 0) - (s.dB || 0)),
           integral_up: s.intUp || 0, integral_down: s.intDn || 0,
           status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off",
-          name: cC?.name || s.name || k, ip: cC?.ip || "", raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0
+          name: cC?.name || s.name || k, ip: s.ip, raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0
         };
         return acc;
       }, {})
@@ -788,6 +787,8 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
     b.onclick = () => window.gegeTogglePanel();
     document.body.appendChild(b);
   };
+  // 手机上会被强制跳到 PC 版后台，页面按桌面宽度排版，面板的手机样式不生效；面板打开时把视口切成手机宽度、禁止缩到 1 倍以下、锁住底下的 PC 页面，关上再还原
+  const mVp = matchMedia('(pointer:coarse)').matches && (document.querySelector('meta[name=viewport]') || document.head.appendChild(Object.assign(document.createElement('meta'), { name: 'viewport' }))), mVpC = mVp && mVp.content;
   window.gegeTogglePanel = function (fS = null) {
     let o = document.getElementById('gege-global-overlay'),
       iCO = o && o.style.display === 'block',
@@ -797,6 +798,7 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
     if (!tS) {
       if (mM) mM.classList.remove('active'); // 失去高亮
       if (o) o.style.display = 'none';
+      if (mVp) { mVp.content = mVpC; document.documentElement.style.overflow = ''; }
       return;
     }
     
@@ -812,6 +814,7 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
       document.body.appendChild(o);
     }
     o.style.display = 'block';
+    if (mVp) { mVp.content = 'width=device-width,initial-scale=1,minimum-scale=1'; document.documentElement.style.overflow = 'hidden'; o.style.top = '0'; }
 if (!window.gegeBActivated) {
       window.gegeBActivated = !0;
       clearTimeout(window.gegeMasterTimer);

@@ -214,7 +214,7 @@ let _saved = null;
     wTotUp: _saved?.global?.wan_up || 0,
     wTotDn: _saved?.global?.wan_down || 0,
     cls: {}, isPinned: !0,
-    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
+    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: 0, wLT: 0,
     hasW2: !1, is5G_149: !1,
     Warn_MS: 0, Force_MS: 0, _RST: !1,
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
@@ -330,7 +330,7 @@ async function rSD() {
       if (wanValid) S.hasW2 = !!(dW.network.wan_status_2?.ipaddr && dW.network.wan_status_2.ipaddr !== "0.0.0.0");
       if (wanValid && S.hasW2) {
         let u2 = (+dW.network.wan_status_2.up_speed || 0) * 8000, d2 = (+dW.network.wan_status_2.down_speed || 0) * 8000;
-        if (S.w2LT === undefined) S.w2LT = wanNow;
+        if (!S.w2LT) S.w2LT = wanNow;
         else if (S.w2U !== u2 || S.w2D !== d2) {
           let dt = wanNow - S.w2LT;
           if (S.w2U > 0) S.w2TotUp += (S.w2U + u2) * dt * 0.0005; else if (u2 > 0) S.w2TotUp += u2 * 0.5 * CONFIG.wanRefreshInterval;
@@ -376,7 +376,7 @@ async function rSD() {
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
       }
       const gDt = (S.lt !== 0) ? (lanNow - S.lt) * 0.001 : 0;
-            if (wanValid && S.wLT === undefined) {
+            if (wanValid && !S.wLT) {
         S.wLT = wanNow;
       }
       else if (wanValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
@@ -393,7 +393,7 @@ async function rSD() {
             upR: cC.upRate, dnR: cC.dnRate, lUT: lanNow, aR: 0,
             intUp: _saved?.devices?.[m]?.integral_up || 0,
             intDn: _saved?.devices?.[m]?.integral_down || 0,
-            onS: cC.onSec, lOS: cC.onSec, name: _saved?.devices?.[m]?.name || cC.name || m, hU: new Float64Array(128), hD: new Float64Array(128), hIdx: 0, ifc: cC.iface
+            onS: cC.onSec, lOS: cC.onSec, name: _saved?.devices?.[m]?.name || cC.name || m, ip: cC.ip || '', hU: new Float64Array(128), hD: new Float64Array(128), hIdx: 0, ifc: cC.iface
           };
         } else {
           let dU = cC.offUp - cS.lU, dD = cC.offDn - cS.lD;
@@ -412,7 +412,7 @@ async function rSD() {
           if (cS.lOS !== cC.onSec) { cS.onS = cC.onSec; cS.lOS = cC.onSec; }
           else { cS.onS = (cS.onS || cC.onSec || 0) + gDt; }
         }
-        if (cC.name && cC.name !== '未知设备') cS.name = cC.name;
+        if (cC.name && cC.name !== '未知设备') cS.name = cC.name; if (cC.ip) cS.ip = cC.ip;
         cS.lU = cC.offUp;
         cS.lD = cC.offDn;
       }

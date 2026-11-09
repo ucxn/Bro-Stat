@@ -197,7 +197,7 @@ let _saved = null;
   }
 
   const S = {
-    lt: 0, wInstUp: 0, wInstDn: 0,
+    lt: 0, wInstUp: 0, wInstDn: 0, wLT: 0,
     wTotUp: _saved?.global?.wan_up || 0,
     wTotDn: _saved?.global?.wan_down || 0,
     cls: {}, isPinned: !0, pI: null,
@@ -300,7 +300,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
         bVD(ol, cI); window.gegeRenderedMacs = new Set(cM); window.gegeForceUIRedraw = !1;
       }
       const gDt = S.lt ? (now - S.lt) * 0.001 : 0;
-      if (wanValid && S.wLT === undefined) S.wLT = now;
+      if (wanValid && !S.wLT) S.wLT = now;
       else if (wanValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
         const wDt = now - S.wLT;
         /* @BroTech-Reserved wan-trapezoid-wakeup.part.js */
@@ -313,7 +313,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
         if (!cS) cS = S.cls[m] = {
           upR: cC.upRate, dnR: cC.dnRate, lUT: now, aR: 0,
           intUp: _saved?.devices?.[m]?.integral_up || 0, intDn: _saved?.devices?.[m]?.integral_down || 0,
-          onS: cC.onSec, lOS: cC.onSec, name: _saved?.devices?.[m]?.name || cC.name || m,
+          onS: cC.onSec, lOS: cC.onSec, name: _saved?.devices?.[m]?.name || cC.name || m, ip: cC.ip || '',
           hU: new Float64Array(128), hD: new Float64Array(128), hIdx: 0, ifc: cC.iface
         };
         else {
@@ -327,7 +327,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
           if (cS.lOS !== cC.onSec) { cS.onS = cC.onSec; cS.lOS = cC.onSec; }
           else cS.onS = (cS.onS || cC.onSec || 0) + gDt;
         }
-        if (cC.name && cC.name !== '未知设备') cS.name = cC.name;
+        if (cC.name && cC.name !== '未知设备') cS.name = cC.name; if (cC.ip) cS.ip = cC.ip;
       }
       for (const m in cI) {
         const cC = cI[m];

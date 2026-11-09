@@ -1,4 +1,4 @@
-if (S.lLT === undefined) S.lLT = lanNow;
+if (!S.lLT) S.lLT = lanNow;
         else if (cSU !== S.lInstU || cSD !== S.lInstD) {
           const lDt = lanNow - S.lLT;
           if (S.lInstU > 0) S.lTotUp += (S.lInstU + cSU) * lDt * 0.0005; else if (cSU > 0) S.lTotUp += cSU * 0.5 * CONFIG.lanRefreshInterval;

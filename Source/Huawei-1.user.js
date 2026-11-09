@@ -198,11 +198,11 @@ the project’s primary license are fully and continuously complied with.
     wTotUp: 0,
     wTotDn: 0,
     cls: {}, isPinned: !0,
-    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: undefined,
+    w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: 0, wLT: 0,
     hasW2: !1, is5G_149: null, 信道24: undefined, 信道5: undefined, fI: 0, RSSI频率修正: undefined,
     _domRebuilt: !1, _lastPanelState: null, oDC: null, Warn_MS: 0, Force_MS: 0, _RST: !1,
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
-    lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: undefined,
+    lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: 0,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
   };
@@ -260,7 +260,6 @@ function fBy(bps) {
   const st = document.createElement('style');
   st.innerHTML = `/* @BroTech-Reserved style-panel.part.js */
     .t-row,.zte-enhance-speed{font-family:Consolas;}
-    @media (max-width:768px){.config-item-box{position:relative!important}.dev-ip{top:0!important;right:0!important}}
     `;document.
   head.
   appendChild(st);
