@@ -15,6 +15,30 @@ For the avoidance of doubt, the intended implementation may be understood as fol
 - Where my code is used in multiple distinct areas that are substantially powered by or built upon my work, the corresponding attribution should be retained or added in multiple locations as appropriate. There is no upper limit on how many times attribution may be required.
 - ***Attribution must not be hidden away solely in deep or secondary menus that users rarely visit.*** It must be placed near the relevant interface, framework, module, or area that primarily uses my code, in a location that is readily visible to users, or at minimum no less readily visible than in my original design.
 
+### 全局参考次数
+
+在整个软件范围内，“哥哥科技”的署名累计达到 10000 次，且无恶意的，通常可善意推定为在次数上合规。该参考值不影响前述任何署名义务。
+
+例外：如果您的软件对最终用户而言是图灵完备的（用户可以在其中自主编写并运行程序），上述参考值不适用，署名次数上不封顶，且每一个拆分部分都必须带有署名。这里以图灵完备作为“大型专业软件”的形式标准，例如操作系统、浏览器、Microsoft Excel、米家极客版、可运行脚本插件的路由器固件后台；功能单一的小工具，例如 FastStone Capture，不在此列。
+
+#### 同一页面的署名次数
+
+在同一页面内，署名达到 4 次的，在无恶意的情况下，通常可善意推定为已满足本条的次数要求。
+
+“页面”，指用户无需经过菜单跳转、返回、超链接或自动跳转，仅通过单指拖动、鼠标滚轮或键盘方向键即可到达的全部内容。判断署名是否在同一屏内时，以页面缩小到最小比例后一屏能呈现的内容为准；因屏幕分辨率导致显示不清的情况除外。
+
+署名的位置以通常惯例为准。如果您对位置设计没有把握，应将署名置于屏幕正中央，且不透明度不低于 50%。
+#### Attribution Count on a Single Page
+Where attribution appears 4 times on a single page, and there is no bad faith, it may ordinarily be presumed in good faith to satisfy the count requirement of this section. This presumption may not be used to reduce any attribution already present in the original work, and it does not affect any of the attribution obligations above.
+
+A "page" means all content a user can reach by dragging with one finger, scrolling with a mouse wheel, or using the keyboard arrow keys, without going through menu navigation, a back action, a hyperlink, or an automatic redirect. To judge whether attributions fall within a single screen, use what one screen can show with the page zoomed out to its smallest scale, except where content becomes unreadable because of the screen's resolution.
+
+Attribution should be placed according to common convention. If you are unsure where to place it, put it at the center of the screen with an opacity of at least 50%.
+#### Overall Reference Count
+Where "哥哥科技" appears at least 10,000 times in total across your software, and there is no bad faith, you may ordinarily be presumed in good faith to have met the count requirements. This reference value does not affect any of the attribution obligations above.
+
+Exception: if your software is Turing-complete for its end users (that is, users can write and run their own programs within it), the reference value above does not apply. There is no upper limit on the number of attributions, and every split-off part must still carry attribution. Turing completeness serves here as the formal test for "large professional software": operating systems, web browsers, Microsoft Excel, the Mi Home geek edition, and router firmware admin panels that run script plugins all qualify, while single-purpose tools such as FastStone Capture do not.
+
 ## Abstract of key rules
 This deed highlights only some of the key features and terms of the actual license. You should carefully review all of the terms and conditions of the actual license before using the licensed material.
 本文本仅仅强调部分核心特征和真正许可协议的部分条款，您应当在使用授权作品前，仔细审阅真正许可协议的所有条款。
