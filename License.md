@@ -16,6 +16,8 @@ Regardless of the licensing path chosen, use of this project is additionally sub
 [快速查看简要版 See the Simplified Summary](Copyright.md)
 # 哥哥科技许可证
 ## 哥哥科技显著署名附加条款
+「20261117」
+
 Regardless of the license used, the author's prominent attribution must be retained.<br>
 必须保留对作者 **“哥哥科技”** 的显著署名。
 
@@ -25,9 +27,9 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 **『哥哥科技』**
 
-实施删除、篡改、遮蔽、隐藏、替换、改写、缩写、截断、弱化、降低可见性、降低显著性或误导性呈现。
+实施删除、篡改、遮蔽、隐藏、替换、改写、缩写、截断、弱化、降低可见性、降低显著性、误导性呈现、移出可视区域、延迟加载/默认折叠、限时或附条件显示；或以任何其他方式，使其以非原定的名称、形式或显著程度呈现。
 
-“哥哥科技”四个汉字原则上必须原样保留。`BroTech`、`Bro-Tech`、GitHub 用户名、项目名称、仓库链接或其他英文、拉丁字符形式，仅可作为补充署名，不得用于替代“哥哥科技”。
+“哥哥科技”四个汉字必须原样保留。`BroTech`、`Bro-Tech`、GitHub 用户名、项目名称、仓库链接或其他英文、拉丁字符形式，仅可作为补充署名，不得用于替代“哥哥科技”。
 
 即使目标运行环境、显示设备、编程语言或其他技术环境无法正常显示中文，凡能够保存 Unicode、UTF-8、GB 18030 或其他能够表示该字面量的源码、许可证文本、元数据或其他载体中，仍必须原样保留“哥哥科技”。
 
@@ -60,7 +62,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 服务原则上应当以含有明确物理成本的线下服务为主，但不得以附带安装调试该脚本为由收取任何附加费用；不得以本程序的取得、复制、安装、配置、调试、更新、维护或者排错为对价；<br>若在线平台收取关于本程序的附加费用、**尤其是以任何方式修改了署名**，视为掩盖实质上为分发该软件所收取的倒卖费用。
 
-最简单的方式是直接分享官方GitHub或B站链接，否则在任何情况下，您有义务保证所有显式或潜在的名字完全不会被 *移除、篡改或者误导性呈现*，非原版分发情况下，若署名因包括但不限于显示、或一切原因造成的出现任何问题，责任由您自行承担。<br>
+最简单的合规方式是直接分享官方GitHub或B站链接，否则在任何情况下，您有义务保证所有显式或潜在的名字完全不会被 *移除、篡改或者误导性呈现*，非原版分发情况下，若署名因包括但不限于显示、或一切原因造成的出现任何问题，责任由您自行承担。<br>
 无论如何、任何情况下均严格禁止移除任何作者的任何名字，否则将本软件本身源码或可执行产物打包倒卖，或作为售卖的商品的赠品将被视为恶意、受到追究（最不能接受、危害最大的就是移除“哥哥”的名字，任何情况下均不可弱化署名）。
 
 本项目已适配的路由器品牌的官方原版、原厂固件开发者可以自行先行集成该程序，但是必须保留署名；署名具体的方式可以和相应公司官方商榷是否有更加合理的许可。
@@ -94,9 +96,9 @@ Under no circumstances may:
 
 **『哥哥科技』**
 
-as presented in any form in the end-user interface, be subjected to Removal, Alteration, Obscuration, Concealment, Replacement, Rewording, Abbreviation, Truncation, Attenuation, Reduction of Visibility, Reduction of Prominence, or Misleading Presentation.
+as presented in any form in the end-user interface, be subjected to Removal, Alteration, Obscuration, Concealment, Replacement, Rewording, Abbreviation, Truncation, Attenuation, Reduction of Visibility, Reduction of Prominence, Misleading Presentation, Removal from the Visible Area, Deferred Loading, Default Collapse, Time-Limited or Conditional Display, or Presentation by any other means under a name, in a form, or at a degree of prominence other than as originally provided.
 
-The four Chinese characters “哥哥科技” must, in principle, be retained exactly as written. `BroTech`, `Bro-Tech`, the GitHub username, project name, repository link, or any other English or Latin-character representation may be used only as supplementary attribution and must not replace “哥哥科技”.
+The four Chinese characters “哥哥科技” must be retained exactly as written in all cases. `BroTech`, `Bro-Tech`, the GitHub username, project name, repository link, or any other English or Latin-character representation may be used only as supplementary attribution and must not replace “哥哥科技”.
 
 Even if the target runtime environment, display device, programming language, or other technical environment cannot properly display Chinese, “哥哥科技” must still be retained exactly as written in all source code, license texts, metadata, or other media capable of preserving that literal text using Unicode, UTF-8, GB 18030, or any other suitable encoding.
 
@@ -155,7 +157,7 @@ If you must modify the source code, for example by adding substantial features o
 #### On the English Name and Pinyin
 The recommended English name for 哥哥科技 is BroTech. Pinyin is not a substitute for an English translation, so please don't refer to 哥哥科技 with a romanization such as "Gege Keji"; "gege" used on its own is not covered by this. On a matter of taste, I would also rather not see a program cluttered with needless pinyin.
 
-Whether BroTech or any other spelling, a Latin-script form may only supplement “哥哥科技”; it can never replace any attribution requirement. Except where the technical-limitation provisions of the main license allow it and their accompanying obligations have been fulfilled, any attribution not given as “哥哥科技” is deemed non-compliant.
+Whether BroTech or any other spelling, a Latin-script form may only supplement “哥哥科技”; it can never replace any attribution requirement. Regardless of whether the technical-limitation provisions of the main license allow it and their accompanying obligations have been fulfilled, any attribution not given as “哥哥科技” is deemed non-compliant.
 
 哥哥科技 2026 © Bro-Tech. All rights reserved.
 

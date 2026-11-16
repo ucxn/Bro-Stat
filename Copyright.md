@@ -25,13 +25,13 @@ For the avoidance of doubt, the intended implementation may be understood as fol
 
 在同一页面内，显著署名达到8-10次，或署名非常显著达到4~5次的，在无故意篡改的情况下，通常可善意推定为已满足本条的次数要求。
 
-“页面”，指用户无需经过菜单跳转、返回、超链接或自动跳转，仅通过单指拖动、鼠标滚轮或键盘方向键即可到达的全部内容。判断署名是否在同一屏内时，以页面缩小到最小比例后一屏能呈现的内容为准；因屏幕分辨率导致显示不清的情况除外。
+“页面”，指用户无需经过菜单跳转、返回、超链接或自动跳转，仅通过单指拖动、鼠标滚轮或键盘方向键即可到达的全部内容。判断署名是否在同一屏内时，以页面缩小到最小比例后一屏能呈现的内容为准；（此条仅用于解释何为页面，但是绝对不允许故意将署名与程序的正常运行部分的编辑距离或画面距离故意远远分开之类的流氓行为）。
 
 署名的位置以通常惯例为准。如果您对位置设计没有把握，应将署名置于屏幕正中央，且不透明度不低于 50%。
 #### Attribution Count on a Single Page
 Within a single page, featuring 8 to 10 prominent attributions—or 4 to 5 highly prominent ones—will, assuming no bad faith, generally be presumed in good faith to satisfy the frequency requirements of this clause.
 
-A "page" means all content a user can reach by dragging with one finger, scrolling with a mouse wheel, or using the keyboard arrow keys, without going through menu navigation, a back action, a hyperlink, or an automatic redirect. To judge whether attributions fall within a single screen, use what one screen can show with the page zoomed out to its smallest scale, except where content becomes unreadable because of the screen's resolution.
+A "page" means all content a user can reach by dragging with one finger, scrolling with a mouse wheel, or using the keyboard arrow keys, without going through menu navigation, a back action, a hyperlink, or an automatic redirect. To judge whether attributions fall within a single screen, use what one screen can show with the page zoomed out to its smallest scale, regardless of whether the content becomes unreadable because of the screen's resolution (This provision is solely for defining what constitutes a page, and under no circumstances permits bad-faith tactics such as deliberately separating the attribution from the normal operating parts of the program by a vast edit distance or visual distance).
 
 Attribution should be placed according to common convention. If you are unsure where to place it, put it at the center of the screen with an opacity of at least 50%.
 #### Overall Reference Count
