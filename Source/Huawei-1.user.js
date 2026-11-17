@@ -571,14 +571,6 @@ function doSettle(nowMs) {
     o.style.display = 'block';
     gVp(!0);
     if (gVpMeta) o.style.top = '0';
-    // Reserved 的样式在 ≤768px 时把图表卡(#gege-speed-chart)改成通栏、占位、只能竖向滚动的“固定”样式；
-    // 这里只在华为脚本里把它改回悬浮：脱离文档流、可任意拖动/缩放，默认缩在右上角（拖动后以内联 left/top 为准）
-    if (!document.getElementById('gege-hw-chart-float')) {
-      const st = document.createElement('style');
-      st.id = 'gege-hw-chart-float';
-      st.textContent = '@media (max-width:768px){#gege-global-overlay #gege-speed-chart{position:absolute;left:auto;right:8px;top:6px;width:min(64%,260px);height:88px;margin:0;touch-action:none}}';
-      document.head.appendChild(st);
-    }
 
 if (!window.gegeBActivated) {
       window.gegeBActivated = !0;

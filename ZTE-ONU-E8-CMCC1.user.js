@@ -351,7 +351,7 @@
 #bro-ont-ov .geek-label{width:110px;color:#333;font-weight:bold}#bro-ont-ov .geek-val-box{flex:1;display:flex;gap:15px;margin-left:10px}#bro-ont-ov .geek-fixed-width{display:inline-block;width:120px}#bro-ont-ov .geek-right-box{text-align:right;min-width:220px;font-weight:bold}
 #bro-ont-ov .c-up{color:#ff4c00}#bro-ont-ov .c-down{color:#0059fa}
 #bro-ont-ov .gege-pin{cursor:pointer;font-size:11px;filter:grayscale(100%);opacity:.5;transition:transform .2s;margin-left:2px}#bro-ont-ov .gege-pin.active{filter:none;opacity:1;transform:scale(1.1)}
-#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;left:max(520px,52%);top:2px;width:clamp(320px,30%,650px);height:112px}
+#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;left:max(520px,52%);top:2px;width:clamp(320px,30%,650px);height:112px} @media (max-width:768px){#gege-speed-chart{left:10px;top:2px;width:clamp(180px,calc(100% - 20px),320px);height:96px}}
 #gege-speed-chart canvas{display:block;width:100%;height:100%}
 #gege-speed-chart .gege-chart-head,#gege-speed-chart .gege-chart-foot{position:absolute;left:clamp(28px,8%,36px);right:8px;display:flex;align-items:center;pointer-events:none;font:bold clamp(9px,2.1cqw,11px) system-ui,sans-serif;white-space:nowrap;overflow:hidden}
 #gege-speed-chart .gege-chart-head{top:2px;color:#111;gap:8px}
