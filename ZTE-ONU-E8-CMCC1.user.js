@@ -290,7 +290,7 @@
     // 面板全屏盖住官方页，用户不会去点它，5 分钟一到就会弹“页面超时”并带着早已作废的令牌提交，光猫回 400。
     // 采样期间每 200 秒替官方页调用一次它自己的续期函数 callbackfuncReset，让这个定时器永远走不到头
     // （后台标签页定时器被降频到每分钟一次时，最长间隔约 260 秒，仍在 300 秒以内）
-    if (Date.now() - S.keepAt >= 200000) { document.getElementById('mainFrame')?.contentWindow?.callbackfuncReset?.(); S.keepAt = Date.now(); }
+    if (Date.now() - S.keepAt > 200000) { document.getElementById('mainFrame')?.contentWindow?.callbackfuncReset?.(); S.keepAt = Date.now(); }
     try {
       const go = () => S.run && !S.cool; // 关面板或本轮已出错：剩下的页面一个都不再拉（每拉一页光猫都会换发令牌）
       await run('topo', async () => { const { t, n } = await getPage('topo_t'); ingestTopo(parseTopo(t), n); });

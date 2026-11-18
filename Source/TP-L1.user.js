@@ -473,7 +473,7 @@ async function rSD() {
         return acc;
       }, {})
     };
-    S.rTick = ((S.rTick || 0) + 1) & 3;
+    S.rTick = (S.rTick + 1) & 3;
     if (S.rTick === 1 || !S.cRT) {
       for (let k in S.cls) {
         let s = S.cls[k], cC = cI[k];
@@ -483,7 +483,7 @@ async function rSD() {
 /* @BroTech-Reserved ha-quick-report.part.js */
       }
       if (typeof GM_setValue !== 'undefined') {
-        S.haTick = ((S.haTick || 0) + 1) & 63;
+        S.haTick = (S.haTick + 1) & 63;
         if (S.haTick === 1) {
           try { GM_setValue('ha_snapshot', S.cSnap); } catch(e) {console.warn(e);}
         }

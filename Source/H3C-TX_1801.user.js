@@ -608,7 +608,7 @@ const ts = Date.now();
         });
       } catch(e) {console.warn(e);}
     }
-     S.rTick = ((S.rTick || 0) + 1) & 7;
+     S.rTick = (S.rTick + 1) & 7;
     if (S.rTick === 1 || !S.cRT) {
         刷无线信息(Date.now());
         S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 3); S.lwTU = S.wTotUp;
@@ -692,10 +692,10 @@ const ts = Date.now();
         setText('#gb-lan-down-vol', `🔽 ${fV(LDn)}`);
         setText('#gb-wan-up-vol', `🔼 ${fV(S.wTotUp)}`);
         setText('#gb-wan-down-vol', `🔽 ${fV(S.wTotDn)}`);
-        setText('#gb-sowan-up-vol', `🔼 ${fV(S.dTU || 0)}`);
-        setText('#gb-sowan-down-vol', `🔽 ${fV(S.dTD || 0)}`);
-        setText('#gb-owan-up-vol', `🔼 ${fV(S.oWU || 0)}`);
-        setText('#gb-owan-down-vol', `🔽 ${fV(S.oWD || 0)}`);
+        setText('#gb-sowan-up-vol', `🔼 ${fV(S.dTU)}`);
+        setText('#gb-sowan-down-vol', `🔽 ${fV(S.dTD)}`);
+        setText('#gb-owan-up-vol', `🔼 ${fV(S.oWU)}`);
+        setText('#gb-owan-down-vol', `🔽 ${fV(S.oWD)}`);
         { let 包线 = bd.querySelector('#gb-packet-line'); if (包线) { 包线.style.display = S.包数据可用 ? 'inline' : 'none'; if (S.包数据可用) 包线.innerHTML = `<span style="color:#666;">本次包数：</span><span style="color:#ff4c00;">↑ ${Math.round(包上总)}包，${包上总 ? fSV(LUp / 包上总) : '0B'}/包</span><span style="color:#666; margin:0 6px;">|</span><span style="color:#0059fa;">↓ ${Math.round(包下总)}包，${包下总 ? fSV(LDn / 包下总) : '0B'}/包</span><span style="color:#4CAF50; margin-left:8px;">${格式化包比(计算包比(包上总, 包下总))}</span>`; } }
                 画总速率图(bd);
         let pb = bd.querySelector('#gb-pwan-bps-container'), pv = bd.querySelector('#gb-pwan-vol-container');

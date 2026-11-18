@@ -2,7 +2,7 @@
 // @name            华硕路由器增强 ASUS/ROG 路由器 WiFi 后台插件
 // @name:en         Bro-Stat-ASUS for ROG/TUF Router
 // @namespace       ucxn
-// @version         5.9.V
+// @version         5.9.W
 // @description     适用于华硕/TUF/ASUS/ROG路由器的网页端网速查看和显示优化的增强脚本插件
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  An enhanced script plugin for viewing and optimizing internet speed on the web interface of ASUS/TUF/ROG routers

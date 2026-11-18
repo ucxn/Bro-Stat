@@ -20,7 +20,7 @@ S.cSnap = {
       }, {})
     };
     if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
-      S.haTick = ((S.haTick || 0) + 1) & 31;   
+      S.haTick = (S.haTick + 1) & 31;   
       if (S.haTick === 1) {
         try { GM_setValue('ha_snapshot', S.cSnap); } catch(e) {console.warn(e);}}
      let nowMs = Date.now();
@@ -36,7 +36,7 @@ S.cSnap = {
               document.getElementById('gb-f-btn').onclick = () => doSettle(Date.now());}
           }
     }
-    S.rTick = ((S.rTick || 0) + 1) & 7;
+    S.rTick = (S.rTick + 1) & 7;
     if (S.rTick === 1 || !S.cRT) {
         S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 3); S.lwTU = S.wTotUp;
         S.aWd = (S.wTotDn - (S.lwTD || S.wTotDn)) / (CONFIG.wanRefreshInterval << 3); S.lwTD = S.wTotDn;

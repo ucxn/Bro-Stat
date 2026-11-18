@@ -357,8 +357,8 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
       }
       const gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
       // 保留原有 0 估算诊断；WAN 总量已经由官方累计增量更新，避免重复积分。
-      if (S.wInstUp === 0 && cWU > 0) { S.wZEU = (S.wZEU || 0) + cWU * 0.5 * CONFIG.wanRefreshInterval; S.wZEUC = (S.wZEUC || 0) + 1; }
-      if (S.wInstDn === 0 && cWD > 0) { S.wZED = (S.wZED || 0) + cWD * 0.5 * CONFIG.wanRefreshInterval; S.wZEDC = (S.wZEDC || 0) + 1; }
+      if (S.wInstUp === 0 && cWU > 0) { S.wZEU += cWU * 0.5 * CONFIG.wanRefreshInterval; S.wZEUC++; }
+      if (S.wInstDn === 0 && cWD > 0) { S.wZED += cWD * 0.5 * CONFIG.wanRefreshInterval; S.wZEDC++; }
       for (const m in cI) {
         const cC = cI[m];
         S.cls[m] ??= {
@@ -477,7 +477,7 @@ function doSettle(nowMs) {
   function rUI(wU, wD, sU, sD, cI) {
     /* @BroTech-Reserved agg-loop-official.part.js */
 
-S.rTick = ((S.rTick || 0) + 1) & 3;
+S.rTick = (S.rTick + 1) & 3;
         S.cSnap = {
       timestamp: Date.now(),
       global: { wan_up: S.wTotUp, wan_down: S.wTotDn, lan_integral_up: LUp, lan_integral_down: LDn, lan_high_up: hpU, lan_high_down: hpD, lan_off_up: abU, lan_off_down: abD },
@@ -488,7 +488,7 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
       }, {})
     };
     if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
-      S.haTick = ((S.haTick || 0) + 1) & 63;
+      S.haTick = (S.haTick + 1) & 63;
       if (S.haTick === 1) {
         try { GM_setValue('ha_snapshot', S.cSnap); } catch(e) {console.warn(e);}
     }
@@ -630,8 +630,8 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
         bd.querySelector('#gb-wan-down-vol').textContent = `🔽 ${fV(S.wTotDn)}`;
         画总速率图(bd);
         let owU = bd.querySelector('#gb-owan-up-vol'), owD = bd.querySelector('#gb-owan-down-vol');
-        if (owU) owU.textContent = `🔼 ${fV(S.oWU || 0)}`;
-        if (owD) owD.textContent = `🔽 ${fV(S.oWD || 0)}`;
+        if (owU) owU.textContent = `🔼 ${fV(S.oWU)}`;
+        if (owD) owD.textContent = `🔽 ${fV(S.oWD)}`;
                 bd.querySelector('#gb-int-up-vol').textContent = `🔼 ${fV(hpU)}`;
         bd.querySelector('#gb-int-down-vol').textContent = `🔽 ${fV(hpD)}`;
         bd.querySelector('#gb-abs-up-vol').textContent = `🔼 ${fV(abU)}`;

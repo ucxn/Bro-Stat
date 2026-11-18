@@ -411,7 +411,7 @@ async function rSD(wantWan = !0, wantLan = !0) {
       }, {})
     };
     if (wanTick) {
-      S.rTick = ((S.rTick || 0) + 1) & 3;
+      S.rTick = (S.rTick + 1) & 3;
       if (S.rTick === 1 || !S.cRT) {
         for (let k in S.cls) {
           let s = S.cls[k], cC = cI[k];

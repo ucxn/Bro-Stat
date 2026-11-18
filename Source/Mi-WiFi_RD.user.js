@@ -518,7 +518,7 @@ function doSettle(nowMs) {
       curHpD = 0,
       tot_cU = 0;
 
-S.rTick = ((S.rTick || 0) + 1) & 7;  //内外网比消除抖动
+S.rTick = (S.rTick + 1) & 7;  //内外网比消除抖动
 for (let k in S.cls) {
       let s = S.cls[k], cC = cI[k];
             let cU = Math.max(0, (s.lU || 0) - (s.uB || 0));
@@ -551,7 +551,7 @@ for (let k in S.cls) {
       }, {})
     };
 if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
-  S.haTick = ((S.haTick || 0) + 1) & 31;
+  S.haTick = (S.haTick + 1) & 31;
       if (S.haTick === 1) {
         try { GM_setValue('ha_snapshot', S.cSnap); } catch(e) {console.warn(e);}
     }}
@@ -685,8 +685,8 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
         bd.querySelector('#gb-wan-down-vol').textContent = `🔽 ${fV(S.wTotDn)}`;
         画总速率图(bd);
         let owU = bd.querySelector('#gb-owan-up-vol'), owD = bd.querySelector('#gb-owan-down-vol');
-        if (owU) owU.textContent = `🔼 ${fV(S.oWU || 0)}`;
-        if (owD) owD.textContent = `🔽 ${fV(S.oWD || 0)}`;
+        if (owU) owU.textContent = `🔼 ${fV(S.oWU)}`;
+        if (owD) owD.textContent = `🔽 ${fV(S.oWD)}`;
                 bd.querySelector('#gb-int-up-vol').textContent = `🔼 ${fV(hpU)}`;
         bd.querySelector('#gb-int-down-vol').textContent = `🔽 ${fV(hpD)}`;
         bd.querySelector('#gb-abs-up-vol').textContent = `🔼 ${fV(abU)}`;
