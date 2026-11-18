@@ -213,8 +213,8 @@ let _saved = null;
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
     // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变
-    aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, oWU: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
-    dTU: 0, dTD: 0, lMacHash: '', lastCI: null, rTick: 0, cRT: '', runT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0
+    aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, oWU: 0, oWD: 0, bWU: -1, bWD: -1, lRU: -1, lRD: -1, dTU: 0, dTD: 0,
+    lMacHash: '', lastCI: null, rTick: 0, cRT: '', runT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0
   };
 
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
@@ -379,8 +379,7 @@ const ts = Date.now();
       // 官方累计与高精积分响应无效处理
       if (hasWanBytes) {
         S.oWU = (+wB_m[1] || 0) * 8; S.oWD = (+wB_m[2] || 0) * 8;
-        if (S.bWU === undefined) S.bWU = S.oWU;
-        if (S.bWD === undefined) S.bWD = S.oWD;
+        if (S.bWU < 0) { S.bWU = S.oWU; S.bWD = S.oWD; }
         if (S.oWU < S.lRU) S.bWU = S.lRU = S.oWU;
         if (S.oWD < S.lRD) S.bWD = S.lRD = S.oWD;
         S.lRU = S.oWU; S.lRD = S.oWD;

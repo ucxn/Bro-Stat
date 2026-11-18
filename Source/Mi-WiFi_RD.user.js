@@ -232,10 +232,9 @@ const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&q
     lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: 0,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
-    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变。靠 ??= 或 === undefined 判断的给 undefined，会写小数的给 0
-    wLT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
-    lTU: undefined, lTD: undefined, dWU: 0, dWD: 0, dTU: 0, dTD: 0, zCU: 0, zCD: 0, _qosAdj: 0,
-    rTick: 0, haTick: 0, cRT: '', oDC: null, _domRebuilt: !1, snap: undefined, snapLoaded: !1, calcTime: null
+    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变。原先靠 ??= 或 === undefined 判断的给 undefined，会写小数的给 0；高频数值用 -1 哨兵防退化为 Tagged
+    wLT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: -1, bWD: -1, lRU: -1, lRD: -1, lTU: -1, lTD: -1, dWU: 0, dWD: 0, 
+    dTU: 0, dTD: 0, zCU: 0, zCD: 0, rTick: 0, haTick: 0, cRT: '', oDC: null, _domRebuilt: !1, snap: undefined, snapLoaded: !1, calcTime: null
   };
   window.__gIsF = !1;
   const 版本号 = (typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号';
@@ -332,13 +331,9 @@ async function rSD() {
       // === 🔪 小米专属微分引擎 (求导测速 + 基准线锚定) ===
       if (wanCounterValid) {
         S.oWU = (+counterWs.upload || 0) * 8; S.oWD = (+counterWs.download || 0) * 8;
-        S.bWU ??= S.oWU; S.bWD ??= S.oWD;
-        S.lRU ??= S.oWU; S.lRD ??= S.oWD;
-        S.lTU ??= n; S.lTD ??= n; // 上下行独立时间戳
-        S.zCU ??= 0; S.zCD ??= 0;
-        S.dWU ??= 0; S.dWD ??= 0;
-
+        if (S.lTU < 0) { S.bWU = S.lRU = S.oWU; S.bWD = S.lRD = S.oWD; S.lTU = S.lTD = n; } // 首次初始化，-1 哨兵保持数值槽位
         // 仅在收到真实官方累计量时，才把回退解释为路由器计数器清零。
+
         if (S.oWU < S.lRU) { S.bWU = S.lRU = S.oWU; S.lTU = n; S.dWU = S.zCU = 0; }
         if (S.oWD < S.lRD) { S.bWD = S.lRD = S.oWD; S.lTD = n; S.dWD = S.zCD = 0; }
         if (S.oWU > S.lRU) {
@@ -360,7 +355,6 @@ async function rSD() {
       } else if (rateWs) {
         // 兼容未知固件：只有累计字节不可用时，才允许官方瞬时速率接管。
         cWU = (+rateWs.upspeed || 0) * 8; cWD = (+rateWs.downspeed || 0) * 8;
-        S.dTU ??= 0; S.dTD ??= 0;
         wanRateValid = !0;
       }
 

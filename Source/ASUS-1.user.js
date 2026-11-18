@@ -202,7 +202,7 @@ the project’s primary license are fully and continuously complied with.
     wInstDn: 0,
     wTotUp: 0,
     wTotDn: 0,
-    wLedgerUp: 0, wLedgerDn: 0, // 官方增量账本；显示层的保护逻辑不回写事实源
+    wLedgerUp: 0, wLedgerDn: 0, // 原厂增量账本；显示层的保护逻辑不回写元数据
     cls: {}, isPinned: !0,
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: 0,
     hasW2: !1, is5G_149: !1, oWU:0, Warn_MS: 0, Force_MS: 0, _RST: !1,
@@ -212,8 +212,7 @@ the project’s primary license are fully and continuously complied with.
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
     // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变
-    wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
-    lTU: undefined, lTD: undefined, dWU: 0, dWD: 0, dTU: 0, dTD: 0, zCU: 0, zCD: 0, _qosAdj: 0,
+    wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: -1, bWD: -1, lRU: -1, lRD: -1, lTU: -1, lTD: -1, dWU: 0, dWD: 0, dTU: 0, dTD: 0, zCU: 0, zCD: 0,
     rTick: 0, haTick: 0, cRT: '', snapLoaded: !1, calcTime: null
   };
   window.__gIsF = !1;
@@ -316,11 +315,7 @@ async function rSD() {
       }
 
       S.oWU = (+rT[0] || 0) * 8; S.oWD = (+rT[1] || 0) * 8; 
-      S.bWU ??= S.oWU; S.bWD ??= S.oWD;
-      S.lRU ??= S.oWU; S.lRD ??= S.oWD;
-      S.lTU ??= n; S.lTD ??= n; 
-      S.zCU ??= 0; S.zCD ??= 0;
-      S.dWU ??= 0; S.dWD ??= 0;
+      if (S.lTU < 0) { S.bWU = S.lRU = S.oWU; S.bWD = S.lRD = S.oWD; S.lTU = S.lTD = n; }
       // WAN 沿用官方累计差值：直接续接本周期账本，计数器回退时保留已累计的量。
       S.wTotUp = (S.wLedgerUp += Math.max(0, S.oWU - S.lRU)); S.wTotDn = (S.wLedgerDn += Math.max(0, S.oWD - S.lRD));
       
