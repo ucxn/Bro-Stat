@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name            小米路由器增强 Mi-Stat_Max
-// @name:en         MiWiFi-Stat_Max
+// @name            小米路由器增强 Mi-Stat_Max 小米路由器 WiFi 米家 后台网页 增强 脚本 插件 数学统计 分析
+// @name:en         MiWiFi-Stat_Max Xiaomi Router RD
 // @namespace       ucxn
-// @version         5.9.9.Y
+// @version         5.9.Z
 // @description     小米路由器增强组件 - 设备网速一键查看、WAN网速计算，设备流量统计与大屏查看
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  Xiaomi Router Enhancement Module—One-click device speed check, WAN speed calculation, device traffic statistics, and large-screen viewing

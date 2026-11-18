@@ -3,7 +3,7 @@
 // @name:en         Bro-Stat-TP Link
 // @name            TP and Multi-brand Concumer / Home Router Enhancement
 // @namespace       ucxn
-// @version         5.9.9.o
+// @version         5.9.9.P
 // @description     适用于TP-LINK普联+几乎所有家用消费级硬路由的网速显示和流量微积分统计工具
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  A tool for displaying internet speeds and tracking data usage statistics, compatible with nearly all TP-LINK + Multi brand home gateways
