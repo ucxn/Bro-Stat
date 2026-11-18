@@ -60,7 +60,8 @@
     calcMode: 1,          // 终端比值条文案：1 上行/下行倍数模式，0 上行占总和比例模式
     ratioThreshold: 7,    // （仅 calcMode=0 时有效）上传占比报警阈值（%）
     errorCooldown: 60,    // 任何一页读取失败（被拒、登录过期、页面不对），本轮立即收手，静候 N 秒后自动重试，不用手动刷新
-    autoStart: false      // true：页面加载后自动开始采样；false：首次点开悬浮球才开始
+    autoStart: false,     // true：页面加载后自动开始采样；false：首次点开悬浮球才开始
+    WAN速率序列自动导出: 0 // 0: 关闭 | 1: 每 8192 个采样点（约 34.1 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
   };
 
   // ======== [1] 工具 ========
@@ -221,6 +222,7 @@
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0, wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity,
     cool: false, coolUntil: 0, keepAt: Date.now(), reloadOfficial: false, timer: 0, cdT: 0, 图表拖: null, 图表待画: 0 // 运行中才赋值的也一次写全，S 形状从头到尾不变
   };
+  let wu = '', wa;
   const diffOf = (store, key) => store[key] ??= new Diff();
 
   function ingestPon(ports, n) {
@@ -238,8 +240,9 @@
     const g = S.gem[S.wanName];
     S.wanUp = g.up.rate; S.wanDn = g.dn.rate; S.wanRawU = g.txB; S.wanRawD = g.rxB;
     S.wanIntU.feed(S.wanUp, n); S.wanIntD.feed(S.wanDn, n);
-    const u = S.wanUp, d = S.wanDn, i = S.总图点数 & 8191; // 总速率图：8192 点环形缓冲（原生同款）
-    S.总上行图[i] = u; S.总下行图[i] = d; S.总图点数++;
+    const u = S.wanUp, d = S.wanDn, c = S.总图点数, i = c & 8191; // 总速率图：8192 点环形缓冲（原生同款）
+    if (!i && c && CONFIG.WAN速率序列自动导出) { const a = wa ||= document.createElement('a'), t = Date.now(); wu && URL.revokeObjectURL(wu); a.href = wu = URL.createObjectURL(new Blob([`\uFEFF时间戳毫秒,${t}\n采样间隔秒,${CONFIG.refreshInterval * CONFIG.ponEvery}\n上行bit/s,${S.总上行图.join()}\n下行bit/s,${S.总下行图.join()}`], {type: 'text/csv;charset=utf-8;'})); a.download = `哥哥科技_WAN速率序列_${t}.csv`; a.click(); }
+    S.总上行图[i] = u; S.总下行图[i] = d; S.总图点数 = c + 1;
     if (u > S.wMaxU) S.wMaxU = u; if (d > S.wMaxD) S.wMaxD = d;
     if (u > 0 && u < S.wMinU) S.wMinU = u; if (d > 0 && d < S.wMinD) S.wMinD = d;
   }

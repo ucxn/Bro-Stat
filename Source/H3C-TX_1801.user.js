@@ -185,6 +185,7 @@ the project’s primary license are fully and continuously complied with.
     ratioThreshold: 7, // (仅calcMode=0时有效) 上传占比报警阈值(%)
     lanRefreshInterval: 3, // LAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
     wanRefreshInterval: 3, // 【新增】WAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
+    WAN速率序列自动导出: 0, // 0: 关闭 | 1: 每 8192 个采样点（约 6.8 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
     portMap: {
       "eth1": "网口 1",
       "eth2": "网口 2",
@@ -210,7 +211,10 @@ let _saved = null;
     hasW2: !1, is5G_149: !1,
     无线缓存: Object.create(null), 无线请求中: !1, 端口状态: Object.create(null), 端口请求中: !1, 端口已取: !1, 端口小齿轮: 0, 半双工色轮: 0, DOM缓存: null, DOM已重建: !1, 面板状态: null, HA小齿轮: 0, 包数据可用: !1, RSSI频率修正: undefined,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
-    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
+    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
+    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变
+    aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, oWU: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
+    dTU: 0, dTD: 0, lMacHash: '', lastCI: null, rTick: 0, cRT: '', runT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0
   };
 
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;

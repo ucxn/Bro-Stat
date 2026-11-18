@@ -178,6 +178,7 @@ the project’s primary license are fully and continuously complied with.
     报告时间: -1080, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: 0, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
+    WAN速率序列自动导出: 0, // 0: 关闭 | 1: 每 8192 个采样点（约 2.3 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
     盲漫游: undefined, //是否拦截漫游可能产生的异常高网速
     portMap: {
       "wire": "有线",
@@ -206,7 +207,9 @@ let _saved = null;
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
-    wDue: 0, lDue: 0, haDue: 0
+    wDue: 0, lDue: 0, haDue: 0,
+    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变
+    hasW2: !1, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, lastCI: null, rTick: 0, cRT: '', calcTime: null
   };
 
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;

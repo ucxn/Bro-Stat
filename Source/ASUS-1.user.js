@@ -177,6 +177,7 @@ the project’s primary license are fully and continuously complied with.
     报告时间: -600, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: 1, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
+    WAN速率序列自动导出: 0, // 0: 关闭 | 1: 每 8192 个采样点（约 6.8 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
     '2.4G信道': 6, // RSSI 百分比频率补偿：默认与下方 5G 信道组合约等于原 7.2dB
     '5.2|8G信道': 116, // 华硕固件分支繁多，暂由用户按实际工作信道自由复写
     portMap: {
@@ -209,7 +210,11 @@ the project’s primary license are fully and continuously complied with.
     lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: 0,
     DOM缓存: null, DOM容器: null, 有线统一PHY: 0, 主节点MAC: '', 端口请求中: !1,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
-    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
+    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
+    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变
+    wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
+    lTU: undefined, lTD: undefined, dWU: 0, dWD: 0, dTU: 0, dTD: 0, zCU: 0, zCD: 0, _qosAdj: 0,
+    rTick: 0, haTick: 0, cRT: '', snapLoaded: !1, calcTime: null
   };
   window.__gIsF = !1;
 

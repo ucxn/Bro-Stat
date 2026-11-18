@@ -177,6 +177,7 @@ the project’s primary license are fully and continuously complied with.
     报告时间: 720, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: +1020, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
+    WAN速率序列自动导出: 0, // 0: 关闭 | 1: 每 8192 个采样点（约 6.8 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
     盲漫游: undefined, //也就是无线交换机（AP/有线桥接）模式，无线设备被主路由识别为有线设备则设置1
     portMap: {
       "eth1": "网口 ",
@@ -234,7 +235,7 @@ const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&q
     // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变。靠 ??= 或 === undefined 判断的给 undefined，会写小数的给 0
     wLT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
     lTU: undefined, lTD: undefined, dWU: 0, dWD: 0, dTU: 0, dTD: 0, zCU: 0, zCD: 0, _qosAdj: 0,
-    rTick: 0, haTick: 0, cRT: '', oDC: null, _domRebuilt: !1, snap: undefined, snapLoaded: !1
+    rTick: 0, haTick: 0, cRT: '', oDC: null, _domRebuilt: !1, snap: undefined, snapLoaded: !1, calcTime: null
   };
   window.__gIsF = !1;
   const 版本号 = (typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号';
