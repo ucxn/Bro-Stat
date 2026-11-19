@@ -2,7 +2,7 @@
 // @name            锐捷睿易路由器增强 Reyee 网页 增强 脚本 插件 网速 流量 连接数 延迟 数学统计 分析
 // @name:en         Bro-Stat_Ruijie-Reyee-Stat_Max
 // @namespace       ucxn
-// @version         5.9.R
+// @version         6.0.R
 // @description     适用于锐捷（睿易 Reyee）路由器的逐设备网速流量统计、连接数、外网延迟曲线、流量一键导出的路由器Web网页后台增强利器
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  A web admin enhancement for Ruijie / Reyee routers: per-device speed and traffic statistics, connection counts, WAN latency charting and one-click traffic export.

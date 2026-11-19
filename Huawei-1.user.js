@@ -2,7 +2,7 @@
 // @name            华为路由器增强 WiFi 智慧生活 网页 增强 脚本 插件 数学统计 分析
 // @name:en         Bro-Stat_HUAWEI_Max
 // @namespace       ucxn
-// @version         6.1
+// @version         6.1.0
 // @description     适用于华为路由器的RSSI显示、网速统计分析、流量一键查看的路由器Web网页后台增强利器
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  A powerful tool for enhancing the web-based admin interface of Huawei routers, featuring RSSI display, network speed statistics and analysis, and one-click traffic viewing.

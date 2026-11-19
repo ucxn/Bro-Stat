@@ -2,7 +2,7 @@
 // @name            中兴光猫增强 ZTE-Stat-ONT
 // @name:en         ONT-Stat-ZTE
 // @namespace       ucxn
-// @version         5.9.E
+// @version         6.0.E8
 // @description     适用于中兴光猫（E8 / gch 老式界面）的网速与流量增强：外网速率由 PON 口累计字节求导，无线终端逐设备实时速率与积分，LAN口 / Wi-Fi 口流量对比。不知道是否支持电信光猫。
 // @description:en  Speed and traffic enhancement for ZTE ONU/ONT gateways (legacy E8/gch UI): WAN speed differentiated from PON byte counters, per-terminal Wi-Fi rate integration, LAN / Wi-Fi port traffic comparison.
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
@@ -63,6 +63,7 @@
     autoStart: false,     // true：页面加载后自动开始采样；false：首次点开悬浮球才开始
     WAN速率序列自动导出: 0 // 0: 关闭 | 1: 每 8192 个采样点（约 34.1 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
   };
+  if (typeof GM_getValue === 'function') for (const g of ['采样', '容错', '告警']) for (const k in CONFIG) { let v = GM_getValue(g + '.' + k); if (v == null || v === '') continue; if (typeof v === 'string') v = v.split('：')[0].trim(); const d = CONFIG[k], n = typeof v === 'boolean' ? +v : parseFloat(v); CONFIG[k] = typeof d === 'boolean' ? !!v : k === 'wanMinBytes' ? (Number.isNaN(n) ? d : n * 1e6) : typeof d === 'number' ? (Number.isNaN(n) ? d : n) : v; }
 
   // ======== [1] 工具 ========
   const $ = (s, r = document) => r.querySelector(s);
@@ -656,3 +657,88 @@
   _w.__BRO_ONT__ = { S, CONFIG, start, render, Diff, Integ }; // 供控制台调试
   if (document.body) build(); else document.addEventListener('DOMContentLoaded', build);
 })();
+
+/* ==UserConfig==
+采样:
+  autoStart:
+    title: "进入主页自动启动"
+    description: "开启后打开光猫主页立即开始轮询；关闭则首次点开悬浮球才启动"
+    type: checkbox
+    default: false
+  refreshInterval:
+    title: "拓扑采样间隔"
+    description: "无线终端拓扑页采样间隔；光猫性能偏弱，不建议低于 3 秒"
+    type: number
+    default: 5
+    min: 1
+    unit: "秒"
+  ponEvery:
+    title: "PON 计数器倍频"
+    description: "每 N 个快周期读一次 PON 计数器（默认 3×5s = 15s）"
+    type: number
+    default: 3
+    min: 1
+    unit: "周期"
+  slowEvery:
+    title: "慢速清单倍频"
+    description: "每 N 个快周期读一次 LAN / Wi-Fi 端口与清单（默认 6×5s = 30s）"
+    type: number
+    default: 6
+    min: 1
+    unit: "周期"
+  WAN速率序列自动导出:
+    title: "WAN 速率序列导出"
+    description: "开启后每 8192 个采样点（默认约 34.1 小时）自动下载一份速率序列；需在浏览器里允许本站自动下载"
+    type: checkbox
+    default: false
+容错:
+  zeroGrace:
+    title: "归零宽限次数"
+    description: "计数器连续 N 次无增长才判定速率为 0"
+    type: number
+    default: 3
+    min: 1
+    unit: "次"
+  wanMinBytes:
+    title: "外网口判定门槛"
+    description: "GEMPORT 累计收发总量达到此值即锁定为外网口，支持小数"
+    type: number
+    default: 100
+    min: 0
+    unit: "MB"
+  errorCooldown:
+    title: "异常冷却时间"
+    description: "任一页面读取失败后立即收手静候的秒数，冷却后自动重试"
+    type: number
+    default: 60
+    min: 5
+    unit: "秒"
+告警:
+  calcMode:
+    title: "上下行显示"
+    description: "上行与下行的比较方式"
+    type: select
+    default: "1：上行/下行倍数"
+    values: ["0：上行占总和比例", "1：上行/下行倍数"]
+  ratioExtremeUp:
+    title: "极端上传"
+    description: "上行/下行倍数超过此值判为极端上传（10 即 >1000%）"
+    type: number
+    default: 10
+  ratioWarnUp:
+    title: "重度上传警告"
+    description: "上行/下行比值超过此值警告（0.12 即 >12%）"
+    type: number
+    default: 0.12
+  ratioExtremeDown:
+    title: "极端下载"
+    description: "上行/下行比值低于此值判为极端下载（0.01 即 <1%）"
+    type: number
+    default: 0.01
+  ratioThreshold:
+    title: "上传占比报警"
+    description: "仅「上下行显示」选占比模式时有效"
+    type: number
+    default: 7
+    unit: "%"
+==/UserConfig== */

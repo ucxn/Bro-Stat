@@ -190,6 +190,7 @@ the project’s primary license are fully and continuously complied with.
       "MLO": "MLO"
     }
   };
+  if (typeof GM_getValue === 'function') for (const g of ['模式', '阈值', '节奏', '周期', '算法']) for (const k in CONFIG) { let v = GM_getValue(g + '.' + k); if (v == null || v === '') continue; if (typeof v === 'string') v = v.split('：')[0].trim(); if (v === 'auto') continue; const d = CONFIG[k], n = typeof v === 'boolean' ? +v : parseFloat(v); CONFIG[k] = (k === '宽带最大外网下行速率' || k === '宽带最大外网上行速率') ? (Number.isNaN(n) ? d : n * 1e6) : typeof d === 'number' ? (Number.isNaN(n) ? d : n) : k === '盲漫游' ? (Number.isNaN(n) ? undefined : n) : v; }
   const S = {
     wInstUp: 0,
     wInstDn: 0,
@@ -680,3 +681,123 @@ async function eBET() {
   };
   if (document.readyState === 'complete') 起(); else window.addEventListener('load', 起);
 })();
+
+/* ==UserConfig==
+模式:
+  readSaveData:
+    title: "历史记录"
+    description: "脚本启动时积分从哪里来"
+    type: select
+    default: "3：启动时用后台临时值充当积分"
+    values: ["0：新局模式", "1：从路由器后台读档（继承基线）", "2：从本地长期历史读档（自动保存）", "3：启动时用后台临时值充当积分"]
+  calcMode:
+    title: "上下行显示"
+    description: "上行与下行的比较方式"
+    type: select
+    default: "1：上行/下行倍数"
+    values: ["0：上行占总和比例", "1：上行/下行倍数"]
+  uiLayout:
+    title: "面板布局"
+    description: "悬浮面板的信息密度"
+    type: select
+    default: "1：详细紧凑版（驾驶舱）"
+    values: ["0：经典版", "1：详细紧凑版（驾驶舱）", "2：详细平铺版（报表流）"]
+阈值:
+  ratioExtremeUp:
+    title: "极端上传"
+    description: "上行/下行倍数超过此值判为极端上传（10 即 >1000%）"
+    type: number
+    default: 10
+  ratioWarnUp:
+    title: "重度上传警告"
+    description: "上行/下行比值超过此值警告（0.07 即 >7%）"
+    type: number
+    default: 0.07
+  ratioExtremeDown:
+    title: "极端下载"
+    description: "上行/下行比值低于此值判为极端下载（0.01 即 <1%）"
+    type: number
+    default: 0.01
+  ratioThreshold:
+    title: "上传占比报警"
+    description: "仅「上下行显示」选占比模式时有效"
+    type: number
+    default: 7
+    unit: "%"
+节奏:
+  wanRefreshInterval:
+    title: "WAN 刷新"
+    description: "外网口刷新间隔，通常是程序主时钟周期"
+    type: number
+    default: 1
+    min: 0.25
+    unit: "秒"
+  lanRefreshInterval:
+    title: "LAN 刷新"
+    description: "锐捷后台每 1 秒刷新一次，更快只会拿到重复值"
+    type: number
+    default: 1
+    min: 1
+    unit: "秒"
+周期:
+  周期类型:
+    title: "统计周期"
+    description: "到点自动清零并导出；选星夜长明则不开启此功能"
+    type: select
+    default: "M：每月"
+    values: ["M：每月", "W：每周", "D：固定天数", "星夜长明：不开启周期重置与自动导出"]
+  周_天设置:
+    title: "周期锚点"
+    description: "M：1~31 号 | W：0~6（周日~周六） | D：间隔天数（如 7）"
+    type: number
+    default: 1
+  基准日期:
+    title: "基准日期"
+    description: "仅「固定天数」有效；填任意一个历史周期的零点，格式 YYYY-MM-DD"
+    type: text
+    default: "2026-11-16"
+  报告时间:
+    title: "提示时间"
+    description: "相对周期零点的偏移分钟数；-4320 即提前 3 天"
+    type: number
+    default: -540
+    unit: "分钟"
+  自动导出:
+    title: "强制导出"
+    description: "相对周期零点的偏移分钟数"
+    type: number
+    default: 0
+    unit: "分钟"
+  时区补偿:
+    title: "时区补偿"
+    description: "毫秒；默认 28800000 即 UTC+8"
+    type: number
+    default: 28800000
+    unit: "毫秒"
+  WAN速率序列自动导出:
+    title: "WAN 速率序列导出"
+    description: "开启后每 8192 个采样点（约 2.3 小时）自动下载一份速率序列；需在浏览器里允许本站自动下载"
+    type: checkbox
+    default: false
+算法:
+  盲漫游:
+    title: "盲漫游拦截"
+    description: "AP/有线桥接模式下，无线设备被主路由识别为有线设备时选 1"
+    type: select
+    default: "auto：自动判断"
+    values: ["auto：自动判断", "0：关闭", "1：开启"]
+  宽带最大外网下行速率:
+    title: "最大下行速率"
+    description: "略大于真实宽带下行带宽，支持小数"
+    type: number
+    default: 2400
+    min: 0
+    unit: "Mbps"
+  宽带最大外网上行速率:
+    title: "最大上行速率"
+    description: "略大于真实宽带上行带宽（如 50 兆可填 51.5）"
+    type: number
+    default: 300
+    min: 0
+    unit: "Mbps"
+==/UserConfig== */

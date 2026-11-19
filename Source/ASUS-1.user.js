@@ -191,6 +191,8 @@ the project’s primary license are fully and continuously complied with.
     }
   };
 
+  if (typeof GM_getValue === 'function') for (const g of ['模式', '阈值', '节奏', '周期', '无线']) for (const k in CONFIG) { let v = GM_getValue(g + '.' + k); if (v == null || v === '') continue; if (typeof v === 'string') v = v.split('：')[0].trim(); const d = CONFIG[k], n = typeof v === 'boolean' ? +v : parseFloat(v); CONFIG[k] = typeof d === 'number' ? (Number.isNaN(n) ? d : n) : v; }
+
   const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
   function escapeHTML(str) {
     return str ? String(str).replace(/[&<>'"]/g, m => ESC_MAP[m]) : '';
@@ -801,3 +803,121 @@ if (!window.gegeBActivated) {
   };
   if (document.readyState === 'complete') _initUI(); else window.addEventListener('load', _initUI);
 })();
+
+/* ==UserConfig==
+模式:
+  readSaveData:
+    title: "历史记录"
+    description: "脚本启动时积分从哪里来"
+    type: select
+    default: "3：启动时用后台临时值充当积分"
+    values: ["0：新局模式", "1：从路由器后台读档（继承基线）", "2：从本地长期历史读档（自动保存）", "3：启动时用后台临时值充当积分"]
+  calcMode:
+    title: "上下行显示"
+    description: "上行与下行的比较方式"
+    type: select
+    default: "1：上行/下行倍数"
+    values: ["0：上行占总和比例", "1：上行/下行倍数"]
+  uiLayout:
+    title: "面板布局"
+    description: "悬浮面板的信息密度"
+    type: select
+    default: "1：详细紧凑版（驾驶舱）"
+    values: ["0：经典版", "1：详细紧凑版（驾驶舱）", "2：详细平铺版（报表流）"]
+  injectMode:
+    title: "UI 注入"
+    description: "面板显示在哪里"
+    type: select
+    default: "3：默认模式"
+    values: ["0：原生侧边栏", "1：仅悬浮舱", "2：智能选一", "3：默认模式"]
+阈值:
+  ratioExtremeUp:
+    title: "极端上传"
+    description: "上行/下行倍数超过此值判为极端上传（10 即 >1000%）"
+    type: number
+    default: 10
+  ratioWarnUp:
+    title: "重度上传警告"
+    description: "上行/下行比值超过此值警告（0.12 即 >12%）"
+    type: number
+    default: 0.12
+  ratioExtremeDown:
+    title: "极端下载"
+    description: "上行/下行比值低于此值判为极端下载（0.01 即 <1%）"
+    type: number
+    default: 0.01
+  ratioThreshold:
+    title: "上传占比报警"
+    description: "仅「上下行显示」选占比模式时有效"
+    type: number
+    default: 7
+    unit: "%"
+节奏:
+  wanRefreshInterval:
+    title: "WAN 刷新"
+    description: "外网口刷新间隔，通常是程序主时钟周期"
+    type: number
+    default: 3
+    min: 0.25
+    unit: "秒"
+  lanRefreshInterval:
+    title: "LAN 刷新"
+    description: "局域网刷新间隔，用于补偿评估 0 到唤醒期间的流量"
+    type: number
+    default: 3
+    min: 0.5
+    unit: "秒"
+周期:
+  周期类型:
+    title: "统计周期"
+    description: "到点自动清零并导出；选磐石则不开启此功能"
+    type: select
+    default: "M：每月"
+    values: ["M：每月", "W：每周", "D：固定天数", "磐石：不开启周期重置与自动导出"]
+  周_天设置:
+    title: "周期锚点"
+    description: "M：1~31 号 | W：0~6（周日~周六） | D：间隔天数（如 7）"
+    type: number
+    default: 1
+  基准日期:
+    title: "基准日期"
+    description: "仅「固定天数」有效；填任意一个历史周期的零点，格式 YYYY-MM-DD"
+    type: text
+    default: "2026-10-08"
+  报告时间:
+    title: "提示时间"
+    description: "相对周期零点的偏移分钟数；-4320 即提前 3 天"
+    type: number
+    default: -600
+    unit: "分钟"
+  自动导出:
+    title: "强制导出"
+    description: "相对周期零点的偏移分钟数"
+    type: number
+    default: 1
+    unit: "分钟"
+  时区补偿:
+    title: "时区补偿"
+    description: "毫秒；默认 28800000 即 UTC+8"
+    type: number
+    default: 28800000
+    unit: "毫秒"
+  WAN速率序列自动导出:
+    title: "WAN 速率序列导出"
+    description: "开启后每 8192 个采样点（约 6.8 小时）自动下载一份速率序列；需在浏览器里允许本站自动下载"
+    type: checkbox
+    default: false
+无线:
+  '2.4G信道':
+    title: "2.4G 工作信道"
+    description: "用于 RSSI 百分比频率补偿，按路由器实际工作信道填写（1~13）"
+    type: number
+    default: 6
+    min: 1
+  '5.2|8G信道':
+    title: "5G 工作信道"
+    description: "华硕固件分支繁多，按实际 5.2G / 5.8G 信道填写（32~177）"
+    type: number
+    default: 116
+    min: 32
+==/UserConfig== */

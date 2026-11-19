@@ -196,6 +196,8 @@ the project’s primary license are fully and continuously complied with.
       "wl2": "5.8G"
     }
   };
+  
+  if (typeof GM_getValue === 'function') for (const g of ['模式', '阈值', '节奏']) for (const k in CONFIG) { let v = GM_getValue(g + '.' + k); if (v == null || v === '') continue; if (typeof v === 'string') v = v.split('：')[0].trim(); const d = CONFIG[k], n = typeof v === 'boolean' ? +v : parseFloat(v); CONFIG[k] = typeof d === 'number' ? (Number.isNaN(n) ? d : n) : v; }
 
 let _saved = null;
   if (CONFIG.readSaveData === 1 && typeof GM_getValue !== 'undefined') {
@@ -566,9 +568,9 @@ const ts = Date.now();
   }
   /* @BroTech-Reserved stage-ratio.part.js */
   function rUI(wU, wD, sU, sD, cI) {
-    S.端口小齿轮 = ((S.端口小齿轮 || 0) + 1) & 63;
+    S.端口小齿轮 = ((S.端口小齿轮) + 1) & 63;
     if (S.端口小齿轮 === 1 || !S.端口已取) 刷端口信息(Date.now());
-    S.半双工色轮 = ((S.半双工色轮 || 0) + 1) & 7;
+    S.半双工色轮 = ((S.半双工色轮) + 1) & 7;
     let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0, 包上总 = 0, 包下总 = 0;
     for (let k in S.cls) {
       let s = S.cls[k];
@@ -588,7 +590,7 @@ const ts = Date.now();
         curHpD += sessD;
       }
     }
-    if (typeof GM_setValue !== 'undefined' && !((S.HA小齿轮 = ((S.HA小齿轮 || 0) + 1) & 1023))) {
+    if (typeof GM_setValue !== 'undefined' && !((S.HA小齿轮 = ((S.HA小齿轮) + 1) & 1023))) {
       try {
         let cln = {};
         for (let k in S.cls) { let s = S.cls[k], cC = cI[k]; cln[k] = { up: s.intUp || 0, down: s.intDn || 0, integral_up: s.intUp || 0, integral_down: s.intDn || 0, packet_up: s.包上总 || 0, packet_down: s.包下总 || 0, status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off", name: cC?.name || s.name || k, ip: s.ip, raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 }; }
@@ -816,3 +818,79 @@ const ts = Date.now();
       }).catch(e => { S.RSSI频率修正 = 7.2; console.warn("[H3C] 5G信道探测异常:", e); });
     /* @BroTech-Reserved panel-boot.part.js */
 })();
+
+/* ==UserConfig==
+模式:
+  readSaveData:
+    title: "历史记录"
+    description: "脚本启动时积分从哪里来"
+    type: select
+    default: "0：新局模式（打开网页此刻归零）"
+    values: ["0：新局模式（打开网页此刻归零）", "1：读档模式（继承本次历史量）"]
+  forceMeshMode:
+    title: "Mesh 探测"
+    description: "常规模式下不出拓扑数据时可开启增强探测"
+    type: select
+    default: "0：关闭 / 常规"
+    values: ["0：关闭 / 常规", "1：启用增强探测"]
+  calcMode:
+    title: "上下行显示"
+    description: "上行与下行的比较方式"
+    type: select
+    default: "1：上行/下行倍数"
+    values: ["0：上行占总和比例", "1：上行/下行倍数"]
+  uiLayout:
+    title: "面板布局"
+    description: "悬浮面板的信息密度"
+    type: select
+    default: "2：详细平铺版（报表流）"
+    values: ["0：经典版", "1：详细紧凑版（驾驶舱）", "2：详细平铺版（报表流）"]
+  injectMode:
+    title: "UI 注入"
+    description: "面板显示在哪里"
+    type: select
+    default: "3：强制模式"
+    values: ["1：优先，10 秒悬浮舱（D）", "3：强制模式"]
+阈值:
+  ratioExtremeUp:
+    title: "极端上传"
+    description: "上行/下行倍数超过此值判为极端上传（10 即 >1000%）"
+    type: number
+    default: 10
+  ratioWarnUp:
+    title: "重度上传警告"
+    description: "上行/下行比值超过此值警告（0.07 即 >7%）"
+    type: number
+    default: 0.07
+  ratioExtremeDown:
+    title: "极端下载"
+    description: "上行/下行比值低于此值判为极端下载（0.01 即 <1%）"
+    type: number
+    default: 0.01
+  ratioThreshold:
+    title: "上传占比报警"
+    description: "仅「上下行显示」选占比模式时有效"
+    type: number
+    default: 7
+    unit: "%"
+节奏:
+  wanRefreshInterval:
+    title: "WAN 刷新"
+    description: "外网口刷新间隔，通常是程序主时钟周期"
+    type: number
+    default: 3
+    min: 0.25
+    unit: "秒"
+  lanRefreshInterval:
+    title: "LAN 刷新"
+    description: "局域网刷新间隔，用于补偿评估 0 到唤醒期间的流量"
+    type: number
+    default: 3
+    min: 0.5
+    unit: "秒"
+  WAN速率序列自动导出:
+    title: "WAN 速率序列导出"
+    description: "开启后每 8192 个采样点（约 6.8 小时）自动下载一份速率序列；需在浏览器里允许本站自动下载"
+    type: checkbox
+    default: false
+==/UserConfig== */
