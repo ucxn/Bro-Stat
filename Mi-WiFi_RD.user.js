@@ -49,6 +49,7 @@
     报告时间: 720, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: +1020, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
+    WAN速率序列自动导出: 0, // 0: 关闭 | 1: 每 8192 个采样点（约 6.8 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
     盲漫游: undefined, //也就是无线交换机（AP/有线桥接）模式，无线设备被主路由识别为有线设备则设置1
     portMap: {
       "eth1": "网口 ",
@@ -60,6 +61,7 @@
       "wl2": "访客"
     }
   };
+  if (typeof GM_getValue === 'function') for (const g of ['模式', '阈值', '节奏', '周期']) for (const k in CONFIG) { let v = GM_getValue(g + '.' + k); if (v == null || v === '') continue; if (typeof v === 'string') v = v.split('：')[0].trim(); if (v === 'auto') continue; const d = CONFIG[k], n = typeof v === 'boolean' ? +v : parseFloat(v); CONFIG[k] = typeof d === 'number' ? (Number.isNaN(n) ? d : n) : k === '盲漫游' ? (Number.isNaN(n) ? undefined : n) : v; }
 
     if (location.pathname.includes('main.html')) {
     const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
@@ -103,10 +105,9 @@ const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&q
     lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: 0,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
     wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
-    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变。靠 ??= 或 === undefined 判断的给 undefined，会写小数的给 0
-    wLT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: undefined, bWD: undefined, lRU: undefined, lRD: undefined,
-    lTU: undefined, lTD: undefined, dWU: 0, dWD: 0, dTU: 0, dTD: 0, zCU: 0, zCD: 0, _qosAdj: 0,
-    rTick: 0, haTick: 0, cRT: '', oDC: null, _domRebuilt: !1, snap: undefined, snapLoaded: !1
+    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变。原先靠 ??= 或 === undefined 判断的给 undefined，会写小数的给 0；高频数值用 -1 哨兵防退化为 Tagged
+    wLT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: -1, bWD: -1, lRU: -1, lRD: -1, lTU: -1, lTD: -1, dWU: 0, dWD: 0, 
+    dTU: 0, dTD: 0, zCU: 0, zCD: 0, rTick: 0, haTick: 0, cRT: '', oDC: null, _domRebuilt: !1, snap: undefined, snapLoaded: !1, calcTime: null
   };
   window.__gIsF = !1;
   const 版本号 = (typeof GM_info !== 'undefined' && GM_info.script?.version) || '环境不支持获取版本号';
@@ -232,13 +233,9 @@ async function rSD() {
       // === 🔪 小米专属微分引擎 (求导测速 + 基准线锚定) ===
       if (wanCounterValid) {
         S.oWU = (+counterWs.upload || 0) * 8; S.oWD = (+counterWs.download || 0) * 8;
-        S.bWU ??= S.oWU; S.bWD ??= S.oWD;
-        S.lRU ??= S.oWU; S.lRD ??= S.oWD;
-        S.lTU ??= n; S.lTD ??= n; // 上下行独立时间戳
-        S.zCU ??= 0; S.zCD ??= 0;
-        S.dWU ??= 0; S.dWD ??= 0;
-
+        if (S.lTU < 0) { S.bWU = S.lRU = S.oWU; S.bWD = S.lRD = S.oWD; S.lTU = S.lTD = n; } // 首次初始化，-1 哨兵保持数值槽位
         // 仅在收到真实官方累计量时，才把回退解释为路由器计数器清零。
+
         if (S.oWU < S.lRU) { S.bWU = S.lRU = S.oWU; S.lTU = n; S.dWU = S.zCU = 0; }
         if (S.oWD < S.lRD) { S.bWD = S.lRD = S.oWD; S.lTD = n; S.dWD = S.zCD = 0; }
         if (S.oWU > S.lRU) {
@@ -260,7 +257,6 @@ async function rSD() {
       } else if (rateWs) {
         // 兼容未知固件：只有累计字节不可用时，才允许官方瞬时速率接管。
         cWU = (+rateWs.upspeed || 0) * 8; cWD = (+rateWs.downspeed || 0) * 8;
-        S.dTU ??= 0; S.dTD ??= 0;
         wanRateValid = !0;
       }
 
@@ -320,9 +316,9 @@ async function rSD() {
       else if (wanRateValid && (cWU !== S.wInstUp || cWD !== S.wInstDn)) {
         const wDt = n - S.wLT;
         if (S.wInstUp > 0) { S.wTotUp += (S.wInstUp + cWU) * wDt * 0.0005; }
-        else if (cWU > 0) { const wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU = (S.wZEU || 0) + wEU; S.wZEUC = (S.wZEUC || 0) + 1; }
+        else if (cWU > 0) { const wEU = cWU * 0.5 * CONFIG.wanRefreshInterval; S.wTotUp += wEU; S.wZEU += wEU; S.wZEUC++; }
         if (S.wInstDn > 0) { S.wTotDn += (S.wInstDn + cWD) * wDt * 0.0005; }
-        else if (cWD > 0) { const wED = cWD * 0.5 * CONFIG.wanRefreshInterval; S.wTotDn += wED; S.wZED = (S.wZED || 0) + wED; S.wZEDC = (S.wZEDC || 0) + 1; }
+        else if (cWD > 0) { const wED = cWD * 0.5 * CONFIG.wanRefreshInterval; S.wTotDn += wED; S.wZED += wED; S.wZEDC++; }
         S.wLT = n;
       }
       if (CONFIG.readSaveData === 2 && !S.snapLoaded) { try { let sp = typeof GM_getValue !== 'undefined' ? GM_getValue('ha_snapshot') : null; S.snap = sp && sp.timestamp > (typeof GM_getValue !== 'undefined' ? (GM_getValue('gege_reset_ms', 0) || 0) : 0) ? sp : {}; if(S.snap.global) { S.wTotUp = S.wTotUp === 0 ? S.snap.global.wan_up || 0 : S.wTotUp; S.wTotDn = S.wTotDn === 0 ? S.snap.global.wan_down || 0 : S.wTotDn; S.lTotUp = S.lTotUp === 0 ? S.snap.global.lan_integral_up || 0 : S.lTotUp; S.lTotDn = S.lTotDn === 0 ? S.snap.global.lan_integral_down || 0 : S.lTotDn; } } catch(e){console.warn(e);} S.snapLoaded = !0; }
@@ -482,9 +478,11 @@ function doSettle(nowMs) {
     }
     return s;
   }
-      function 记总速率图(u, d) {
+      let wu = '', wa;
+function 记总速率图(u, d) {
         u = u || 0; d = d || 0;
         const c = S.总图点数, i = c & 8191;
+        if (!i && c && CONFIG.WAN速率序列自动导出) { const a = wa ||= document.createElement('a'), t = Date.now(); wu && URL.revokeObjectURL(wu); a.href = wu = URL.createObjectURL(new Blob([`\uFEFF时间戳毫秒,${t}\n采样间隔秒,${window.gegeBActivated ? CONFIG.wanRefreshInterval : 3}\n上行bit/s,${S.总上行图.join()}\n下行bit/s,${S.总下行图.join()}`], {type: 'text/csv;charset=utf-8;'})); a.download = `哥哥科技_WAN速率序列_${t}.csv`; a.click(); }
         S.总上行图[i] = u; S.总下行图[i] = d; S.总图点数 = c + 1;
         if (u > S.wMaxU) S.wMaxU = u; if (d > S.wMaxD) S.wMaxD = d;
         if (u > 0 && u < S.wMinU) S.wMinU = u; if (d > 0 && d < S.wMinD) S.wMinD = d;
@@ -562,7 +560,7 @@ function doSettle(nowMs) {
       curHpD = 0,
       tot_cU = 0;
 
-S.rTick = ((S.rTick || 0) + 1) & 7;  //内外网比消除抖动
+S.rTick = (S.rTick + 1) & 7;  //内外网比消除抖动
 for (let k in S.cls) {
       let s = S.cls[k], cC = cI[k];
             let cU = Math.max(0, (s.lU || 0) - (s.uB || 0));
@@ -628,7 +626,7 @@ for (let k in S.cls) {
       }, {})
     };
 if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
-  S.haTick = ((S.haTick || 0) + 1) & 31;
+  S.haTick = (S.haTick + 1) & 31;
       if (S.haTick === 1) {
         try { GM_setValue('ha_snapshot', S.cSnap); } catch(e) {console.warn(e);}
     }}
@@ -762,8 +760,8 @@ if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
         bd.querySelector('#gb-wan-down-vol').textContent = `🔽 ${fV(S.wTotDn)}`;
         画总速率图(bd);
         let owU = bd.querySelector('#gb-owan-up-vol'), owD = bd.querySelector('#gb-owan-down-vol');
-        if (owU) owU.textContent = `🔼 ${fV(S.oWU || 0)}`;
-        if (owD) owD.textContent = `🔽 ${fV(S.oWD || 0)}`;
+        if (owU) owU.textContent = `🔼 ${fV(S.oWU)}`;
+        if (owD) owD.textContent = `🔽 ${fV(S.oWD)}`;
                 bd.querySelector('#gb-int-up-vol').textContent = `🔼 ${fV(hpU)}`;
         bd.querySelector('#gb-int-down-vol').textContent = `🔽 ${fV(hpD)}`;
         bd.querySelector('#gb-abs-up-vol').textContent = `🔼 ${fV(abU)}`;
@@ -1081,3 +1079,114 @@ function iGM() {
   };
   if (document.readyState === 'complete') _initUI(); else window.addEventListener('load', _initUI);
 })();
+
+/* ==UserConfig==
+模式:
+  readSaveData:
+    title: "历史记录"
+    description: "脚本启动时积分从哪里来"
+    type: select
+    default: "0：新局模式"
+    values: ["0：新局模式", "1：从路由器后台读档（继承基线）", "2：从本地长期历史读档（自动保存）", "3：启动时用后台临时值充当积分"]
+  calcMode:
+    title: "上下行显示"
+    description: "上行与下行的比较方式"
+    type: select
+    default: "1：上行/下行倍数"
+    values: ["0：上行占总和比例", "1：上行/下行倍数"]
+  uiLayout:
+    title: "面板布局"
+    description: "悬浮面板的信息密度"
+    type: select
+    default: "1：详细紧凑版（驾驶舱）"
+    values: ["0：经典版", "1：详细紧凑版（驾驶舱）", "2：详细平铺版（报表流）"]
+  injectMode:
+    title: "UI 注入"
+    description: "面板显示在哪里"
+    type: select
+    default: "3：默认模式"
+    values: ["0：原生侧边栏", "1：仅悬浮舱", "2：智能选一", "3：默认模式"]
+  盲漫游:
+    title: "盲漫游拦截"
+    description: "AP/有线桥接模式下，无线设备被主路由识别为有线设备时选 1"
+    type: select
+    default: "auto：自动判断"
+    values: ["auto：自动判断", "0：关闭", "1：开启"]
+阈值:
+  ratioExtremeUp:
+    title: "极端上传"
+    description: "上行/下行倍数超过此值判为极端上传（10 即 >1000%）"
+    type: number
+    default: 10
+  ratioWarnUp:
+    title: "重度上传警告"
+    description: "上行/下行比值超过此值警告（0.12 即 >12%）"
+    type: number
+    default: 0.12
+  ratioExtremeDown:
+    title: "极端下载"
+    description: "上行/下行比值低于此值判为极端下载（0.01 即 <1%）"
+    type: number
+    default: 0.01
+  ratioThreshold:
+    title: "上传占比报警"
+    description: "仅「上下行显示」选占比模式时有效"
+    type: number
+    default: 7
+    unit: "%"
+节奏:
+  wanRefreshInterval:
+    title: "WAN 刷新"
+    description: "外网口刷新间隔，通常是程序主时钟周期"
+    type: number
+    default: 3
+    min: 0.25
+    unit: "秒"
+  lanRefreshInterval:
+    title: "LAN 刷新"
+    description: "局域网刷新间隔，用于补偿评估 0 到唤醒期间的流量"
+    type: number
+    default: 3
+    min: 0.5
+    unit: "秒"
+周期:
+  周期类型:
+    title: "统计周期"
+    description: "到点自动清零并导出；选永远相信则不开启此功能"
+    type: select
+    default: "W：每周"
+    values: ["M：每月", "W：每周", "D：固定天数", "永远相信：不开启周期重置与自动导出"]
+  周_天设置:
+    title: "周期锚点"
+    description: "M：1~31 号 | W：0~6（周日~周六） | D：间隔天数（如 7）"
+    type: number
+    default: 5
+  基准日期:
+    title: "基准日期"
+    description: "仅「固定天数」有效；填任意一个历史周期的零点，格式 YYYY-MM-DD"
+    type: text
+    default: "2026-09-30"
+  报告时间:
+    title: "提示时间"
+    description: "相对周期零点的偏移分钟数；-4320 即提前 3 天"
+    type: number
+    default: 720
+    unit: "分钟"
+  自动导出:
+    title: "强制导出"
+    description: "相对周期零点的偏移分钟数"
+    type: number
+    default: 1020
+    unit: "分钟"
+  时区补偿:
+    title: "时区补偿"
+    description: "毫秒；默认 28800000 即 UTC+8"
+    type: number
+    default: 28800000
+    unit: "毫秒"
+  WAN速率序列自动导出:
+    title: "WAN 速率序列导出"
+    description: "开启后每 8192 个采样点（约 6.8 小时）自动下载一份速率序列；需在浏览器里允许本站自动下载"
+    type: checkbox
+    default: false
+==/UserConfig== */
