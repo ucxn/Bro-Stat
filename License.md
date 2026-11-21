@@ -16,7 +16,7 @@ Regardless of the licensing path chosen, use of this project is additionally sub
 [快速查看简要版 See the Simplified Summary](Copyright.md)
 # 哥哥科技许可证
 ## 哥哥科技显著署名附加条款
-「20261121」
+**「20261121」**
 
 Regardless of the license used, the author's prominent attribution must be retained.<br>
 必须保留对作者 **“哥哥科技”** 的显著署名。
@@ -47,7 +47,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 ## 哥哥科技的名字优于一切
 无论本许可证其他条款如何规定，**哥哥科技显著署名要求——包括对“哥哥科技”字样的强制保留及显著显示义务——均必须严格且排他性地按照最有利于作者的方式解释。** 任何一般解释规则、技术例外或本许可证的其他条款，均不得削弱该署名要求、使其从属于其他要求，或取代该署名要求。
 
-为明确起见，整个代码空间中任何形式或实质上包含和/或显示“哥哥”、“哥哥科技”以及满足表达式 `/\bBro(?:ther)?(?:[-_ ]?Tech)?\b/i` 的，均严禁被篡改、弱化，或以非预期名称方式呈现。
+为明确起见，整个代码空间中任何形式或实质上包含和/或显示「哥哥」、「哥哥科技」以及「晚橘」、「弟弟（科技）」、「姐姐大人」等实质用来显示开发者和/或其认同之名的，以及满足表达式` /\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i `的，均严禁被篡改、弱化，或以非预期名称方式呈现。
 
 无论项目有何种规定，一旦违反该条，视为侵犯著作权，我任何明示、暗示、潜在、显式或任何其他方式的授权一律无效；***授权的终止仅剥夺您的各项许可权利，绝不免除或消灭任何既有副本、衍生作品或已分发物上继续保留显著署名的义务。***
 
@@ -125,7 +125,7 @@ Based on the actual source code of the Software and its technical characteristic
 
 *Whenever the Software is operating normally, there is no legitimate basis whatsoever for failing to display the name “哥哥科技” as required by the BroTech Prominent Attribution Requirements.*
 
-For the avoidance of doubt, anything anywhere in the entire code space that, in form or in substance, contains and/or displays “哥哥” or “哥哥科技”, or that matches the expression `/\bBro(?:ther)?(?:[-_ ]?Tech)?\b/i`, must never be altered, weakened, or presented under any name other than the one intended.
+**For the avoidance of doubt, anything anywhere in the entire codebase that, in form or in substance, contains and/or displays “哥哥”, “哥哥科技”, “晚橘”, "弟弟(科技)", "姐姐大人"**, or any name substantively used to identify the developer and/or their recognized aliases, or that matches the expressionor that matches the expression `/\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i`, must never be altered, weakened, or presented under any name other than the one intended.
 
 Regardless of anything else the project provides, any breach of this clause is deemed copyright infringement, and every authorization I have granted, whether express, implied, potential, explicit, or in any other form, becomes void.
 
