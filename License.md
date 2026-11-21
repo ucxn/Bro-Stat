@@ -16,7 +16,7 @@ Regardless of the licensing path chosen, use of this project is additionally sub
 [快速查看简要版 See the Simplified Summary](Copyright.md)
 # 哥哥科技许可证
 ## 哥哥科技显著署名附加条款
-「20261117」
+「20261121」
 
 Regardless of the license used, the author's prominent attribution must be retained.<br>
 必须保留对作者 **“哥哥科技”** 的显著署名。
@@ -41,13 +41,15 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 只要使用了我的代码，则您的作品最终用户日常实际可使用的界面中出现“哥哥科技”的次数不能比我的原始完整作品更少，署名不得仅存在于普通用户不会使用的深层菜单当中，也不能藏在和我的主要功能无关的地方。
 
+在署名所在的界面或模块内，"哥哥科技"的显著程度不低于同处出现的任何其他作者、组件或第三方的署名。署名若带有链接或点击入口，须与署名一并原样保留，其跳转目标保持不变。
+
 为免疑义，本款项下的任何终止均为立即、绝对且不可补救的，且严格不受任何宽限期、通知要求、时间流逝或任何其它条件的限制。
 ## 哥哥科技的名字优于一切
 无论本许可证其他条款如何规定，**哥哥科技显著署名要求——包括对“哥哥科技”字样的强制保留及显著显示义务——均必须严格且排他性地按照最有利于作者的方式解释。** 任何一般解释规则、技术例外或本许可证的其他条款，均不得削弱该署名要求、使其从属于其他要求，或取代该署名要求。
 
 为明确起见，整个代码空间中任何形式或实质上包含和/或显示“哥哥”、“哥哥科技”以及满足表达式 `/\bBro(?:ther)?(?:[-_ ]?Tech)?\b/i` 的，均严禁被篡改、弱化，或以非预期名称方式呈现。
 
-无论项目有何种规定，一旦违反该条，视为侵犯著作权，我任何明示、暗示、潜在、显式或任何其他方式的授权一律无效。
+无论项目有何种规定，一旦违反该条，视为侵犯著作权，我任何明示、暗示、潜在、显式或任何其他方式的授权一律无效；***授权的终止仅剥夺您的各项许可权利，绝不免除或消灭任何既有副本、衍生作品或已分发物上继续保留显著署名的义务。***
 
 根据本软件的实际源代码及其技术特性，不存在一种能够使软件的普通功能正常运行、同时又使必要署名在技术上自动消失的运行方式。只要软件的主要功能能够正常运行，且软件能够在该功能中正常显示中文文本（以删除源代码中功能描述中文的方式规避本条的，不影响此认定），即视为软件运行正常。**软件正常运行时，不存在任何正当理由可以不按照哥哥科技显著署名要求显示“哥哥科技”字样。**
 
@@ -108,6 +110,8 @@ Any redistribution, modification, porting, merging, integration, translation, co
 
 If your work uses my code, "哥哥科技" must appear in the end-user interface that people actually use day to day no fewer times than it does in my original complete work. The attribution must not live only in deep menus that ordinary users never open, nor be tucked away somewhere unrelated to my main features. Attribution must not be hidden away solely in deep or secondary menus that users rarely visit, It must at least be placed near the relevant interface, framework, module, or area that primarily uses my code.
 
+Within the interface or module where the attribution appears, "哥哥科技" must be at least as prominent as any other author, component, or third-party credit shown alongside it. Where the attribution carries a link or click-through entry, it must be kept as is together with the attribution, and its target must remain unchanged.
+
 For the avoidance of doubt, any termination under this paragraph is immediate, absolute, and non-curable, and shall operate strictly without regard to any cure period, notice requirement, lapse of time, or any other condition whatsoever.
 
 Preserving the complete literal text “哥哥科技”, together with its actual display, visibility, and prominence, is an inseparable condition of every license right granted by the author for this software.
@@ -127,7 +131,7 @@ Regardless of anything else the project provides, any breach of this clause is d
 
 ***In any extreme case in which certain provisions of this License can be satisfied but other provisions cannot, including any case in which provisions are contradictory, incompatible, or opposed to one another, the BroTech Prominent Attribution Requirements—including the mandatory preservation and prominent display of the name “哥哥科技”—shall take absolute and unconditional priority over all other provisions of this License.***
 
-**In such a case, compliance with the BroTech Prominent Attribution Requirements is the first and overriding obligation. No other provision—including any provision imposing commercial-use restrictions or requirements concerning fees or charges—shall be treated as a mandatory obligation in preference to, or at the expense of, the BroTech Prominent Attribution Requirements.**
+**In such a case, compliance with the 哥哥科技 Prominent Attribution Requirements is the first and overriding obligation. No other provision—including any provision imposing commercial-use restrictions or requirements concerning fees or charges—shall be treated as a mandatory obligation in preference to, or at the expense of, the BroTech Prominent Attribution Requirements.**
 ---
 ### Commercial Use Provisions
 *This section and the attribution section above are severable. Under all circumstances,* **the attribution provisions must be fully enforced.** *Any irreconcilable conflict arising from applicable law or between licensing provisions shall not affect the validity of other provisions that are not in conflict. Provisions may be subdivided into smaller constituent parts; a complete sentence shall not simply be treated as an indivisible whole. To the fullest extent permitted by law, an interpretation that reconciles the relevant provisions and is most favorable to the author's interests shall be adopted. I am the original author of this project in its entirety, and the addition of the foregoing supplemental terms is therefore reasonable.*
@@ -137,7 +141,7 @@ You may charge technical service fees within a customary range that both parties
 Services should, in principle, primarily consist of offline services involving identifiable physical costs. However, no additional fee may be charged on the grounds that installation or configuration of this script is included. No payment or other consideration may be charged for obtaining, copying, installing, configuring, debugging, updating, maintaining, or troubleshooting this program.<br>
 Nor may you charge any fees relating to this program on online platforms. Where an online platform charges any additional fee in connection with this program, and especially where the attribution has been altered in any way, that fee shall be deemed a disguised resale fee charged, in substance, for distributing the software.
 
-The simplest way is to share the official GitHub or Bilibili link directly. Otherwise, you are obliged in all circumstances to ensure that no name, whether shown explicitly or embedded, is ever removed, altered, or misleadingly presented. For any distribution other than the original, you alone bear responsibility for any problem with the attribution, whether it arises from display issues or from any other cause whatsoever.
+The simplest way is to share the official GitHub or Bilibili link directly. Otherwise, you are obliged in all circumstances to ensure that no name, whether shown explicitly or embedded, is ever removed, altered, or misleadingly presented. For any distribution other than the original, you alone bear responsibility for any problem with the attribution, whether it arises from display issues or from any other cause whatsoever; ***Termination of the license strips you of your license rights only. The obligation to keep the prominent attribution on every existing copy, derivative work, and distributed item shall survive any termination.***
 
 Under no circumstances may any name of any author be removed. Packaging and reselling the software itself, in source-code or executable form, or providing it as a complimentary gift accompanying a product offered for sale, shall be deemed malicious and will be pursued. (Removing 哥哥's name is the least acceptable and most harmful act of all; the attribution may never be weakened under any circumstances.)
 
