@@ -43,7 +43,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 在署名所在的界面或模块内，"哥哥科技"的显著程度不低于同处出现的任何其他作者、组件或第三方的署名。署名若带有链接或点击入口，须与署名一并原样保留，其跳转目标保持不变。
 
-为免疑义，本款项下的任何终止均为立即、绝对且不可补救的，且严格不受任何宽限期、通知要求、时间流逝或任何其它条件的限制。
+为免疑义，本款项下的任何终止均为***立即（0-day）、绝对且不可补救的***，且严格不受任何宽限期、通知要求、时间流逝或任何其它条件的限制。
 ## 哥哥科技的名字优于一切
 无论本许可证其他条款如何规定，**哥哥科技显著署名要求——包括对“哥哥科技”字样的强制保留及显著显示义务——均必须严格且排他性地按照最有利于作者的方式解释。** 任何一般解释规则、技术例外或本许可证的其他条款，均不得削弱该署名要求、使其从属于其他要求，或取代该署名要求。
 
@@ -112,7 +112,7 @@ If your work uses my code, "哥哥科技" must appear in the end-user interface 
 
 Within the interface or module where the attribution appears, "哥哥科技" must be at least as prominent as any other author, component, or third-party credit shown alongside it. Where the attribution carries a link or click-through entry, it must be kept as is together with the attribution, and its target must remain unchanged.
 
-For the avoidance of doubt, any termination under this paragraph is immediate, absolute, and non-curable, and shall operate strictly without regard to any cure period, notice requirement, lapse of time, or any other condition whatsoever.
+For the avoidance of doubt, any termination under this paragraph is ***immediate（0day）, absolute, and non-curable,*** and shall operate strictly without regard to any cure period, notice requirement, lapse of time, or any other condition whatsoever.
 
 Preserving the complete literal text “哥哥科技”, together with its actual display, visibility, and prominence, is an inseparable condition of every license right granted by the author for this software.
 
