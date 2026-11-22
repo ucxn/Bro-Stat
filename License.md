@@ -125,7 +125,7 @@ Based on the actual source code of the Software and its technical characteristic
 
 *Whenever the Software is operating normally, there is no legitimate basis whatsoever for failing to display the name “哥哥科技” as required by the BroTech Prominent Attribution Requirements.*
 
-**For the avoidance of doubt, anything anywhere in the entire codebase that, in form or in substance, contains and/or displays “哥哥”, “哥哥科技”, “晚橘”, "弟弟(科技)", "姐姐大人"**, or any name substantively used to identify the developer and/or their recognized aliases, or that matches the expressionor that matches the expression `/\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i`, must never be altered, weakened, or presented under any name other than the one intended.
+**For the avoidance of doubt, anything anywhere in the entire codebase that, in form or in substance, contains and/or displays “哥哥”, “哥哥科技”, “晚橘”, "弟弟(科技)", "姐姐大人"**, or any name substantively used to identify the developer and/or their recognized aliases, or that matches the expression `/\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i`, must never be altered, weakened, or presented under any name other than the one intended.
 
 ***In any extreme case in which certain provisions of this License can be satisfied but other provisions cannot, including any case in which provisions are contradictory, incompatible, or opposed to one another, the BroTech Prominent Attribution Requirements—including the mandatory preservation and prominent display of the name “哥哥科技”—shall take absolute and unconditional priority over all other provisions of this License.***
 

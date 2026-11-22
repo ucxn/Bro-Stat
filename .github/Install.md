@@ -29,7 +29,7 @@
 [从 SourceForge 下载](https://sourceforge.net/projects/bilibili/files)
 
 [从 蓝奏云 下载](https://ucxn.lanzout.com/b00mqq2h5a)&emsp;密码🥦：bro
-### 目前Android的端优化的是最好的，包括手机和平板，PC建议还是使用浏览器的路子。
+### 目前Android 端优化的是最好的，包括手机和平板，PC建议还是使用浏览器的路子。
 苹果如果自己有安装IPA的经验的话，可以使用APP。如果没有经验的话，则还是安装User Script的环境更简单。
 
 ***使用方法***：打开APP，**点击右下角“我的”，然后在4×3的矩阵中找到*网关管理* 即可使用。**
