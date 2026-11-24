@@ -31,7 +31,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 “哥哥科技”四个汉字必须原样保留。`BroTech`、`Bro-Tech`、GitHub 用户名、项目名称、仓库链接或其他英文、拉丁字符形式，仅可作为补充署名，不得用于替代“哥哥科技”。
 
-即使目标运行环境、显示设备、编程语言或其他技术环境无法正常显示中文，凡能够保存 Unicode、UTF-8、GB 18030 或其他能够表示该字面量的源码、许可证文本、元数据或其他载体中，仍必须原样保留“哥哥科技”。
+即使目标运行环境、显示设备、编程语言或其他技术环境无法正常显示中文，凡能够保存 Unicode、UTF-8、GB 18030 或其他能够表示该字面量的源码、许可证文本、元数据或其他载体中，仍必须原样保留“哥哥科技”。**源码、许可证文本、元数据中的保留，与最终用户界面中的署名，是两项各自独立的义务：前者照旧保留，但不能代替后者。** *仅在源码中署名而最终用户看不到的，不构成对本条署名义务的履行，**此类做法视为未署名。***
 
 如果用户可见界面因客观技术限制无法正常呈现“哥哥科技”，可以在不删除程序中实质性表达中文“哥哥科技”的前提下，追加 `BroTech`、`Bro-Tech`、作者用户名、项目链接或其他能够清楚识别作者身份的表示方式，并应通过 GitHub 或电子邮件及时告知作者。
 
@@ -48,6 +48,8 @@ Regardless of the license used, the author's prominent attribution must be retai
 无论本许可证其他条款如何规定，**哥哥科技显著署名要求——包括对“哥哥科技”字样的强制保留及显著显示义务——均必须严格且排他性地按照最有利于作者的方式解释。** 任何一般解释规则、技术例外或本许可证的其他条款，均不得削弱该署名要求、使其从属于其他要求，或取代该署名要求。
 
 为明确起见，整个代码空间中任何形式或实质上包含和/或显示「哥哥」、「哥哥科技」以及「晚橘」、「弟弟（科技）」、「姐姐大人」等实质用来显示开发者和/或其认同之名的，以及满足表达式` /\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i `的，均严禁被篡改、弱化，或以非预期名称方式呈现。
+
+**我最在意的只有一件事：市面上流通的每一个版本，都带着哥哥科技和所爱之人的名字。** 本许可证管辖的是项目本身，即源码、副本、可执行脚本及其运行时界面，以及基于它的修改、改写和翻译版本。软件运行后导出的数据，例如 CSV，属于使用者自己。
 
 根据本软件的实际源代码及其技术特性，不存在一种能够使软件的普通功能正常运行、同时又使必要署名在技术上自动消失的运行方式。只要软件的主要功能能够正常运行，且软件能够在该功能中正常显示中文文本（以删除源代码中功能描述中文的方式规避本条的，不影响此认定），即视为软件运行正常。**软件正常运行时，不存在任何正当理由可以不按照哥哥科技显著署名要求显示“哥哥科技”字样。**
 
@@ -104,6 +106,8 @@ The four Chinese characters “哥哥科技” must be retained exactly as writt
 
 Even if the target runtime environment, display device, programming language, or other technical environment cannot properly display Chinese, “哥哥科技” must still be retained exactly as written in all source code, license texts, metadata, or other media capable of preserving that literal text using Unicode, UTF-8, GB 18030, or any other suitable encoding.
 
+*Retention in source code, license text, and metadata, and attribution in the end-user interface, are two separate and independent obligations: the former must still be kept, but it cannot stand in for the latter. **Attribution that appears only in the source code, where end users cannot see it, does not satisfy the attribution obligation of this Section.***
+
 If objective technical limitations prevent a user-visible interface from properly displaying “哥哥科技”, supplementary representations such as `BroTech`, `Bro-Tech`, the author's username, the project link, or other forms that clearly identify the author may be added, provided that the program's substantive representation of the Chinese characters “哥哥科技” is not removed. The author must also be promptly notified through GitHub or email.
 
 Any redistribution, modification, porting, merging, integration, translation, conversion to another programming language, or incorporation into a Larger Work must not diminish the prominence of the original manner in which “哥哥科技” is attributed, or reduce it below the level of attribution identifying the author in the original work; **no reduction whatsoever in the degree of display is permitted, any reduction at all is prohibited, not only a significant one.**
@@ -124,6 +128,8 @@ Notwithstanding anything to the contrary in this License, the **BroTech Prominen
 Based on the actual source code of the Software and its technical characteristics, there is no technically possible mode of operation in which the Software’s ordinary functionality operates normally while the required attribution automatically disappears. Once the Software's principal functionality operates normally, and the Software is capable of displaying Chinese text normally as part of that functionality, the Software shall be deemed to be operating normally. Deleting the Chinese functional descriptions from the source code does not change this, and cannot be relied on to claim that the Software is not operating normally.
 
 *Whenever the Software is operating normally, there is no legitimate basis whatsoever for failing to display the name “哥哥科技” as required by the BroTech Prominent Attribution Requirements.*
+
+**What I care about most is one thing: every version in circulation carries the name 哥哥科技 and that of my beloved.** This license governs the program itself: its source code, executable script, its copies, and runtime interface, and any version based on it, including modifications, rewrites, and translations. Data the software exports when run, such as CSV files, belongs to the user.
 
 **For the avoidance of doubt, anything anywhere in the entire codebase that, in form or in substance, contains and/or displays “哥哥”, “哥哥科技”, “晚橘”, "弟弟(科技)", "姐姐大人"**, or any name substantively used to identify the developer and/or their recognized aliases, or that matches the expression `/\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i`, must never be altered, weakened, or presented under any name other than the one intended.
 
@@ -151,7 +157,7 @@ Developers of official, original factory firmware for router brands already supp
 
 If you cannot understand the conditions below, please consult a qualified technical adviser or lawyer. Until you do, you may only share the official link as it is.
 
-We recommend integrating this tool the way "Tualatin Toolbox" bundles the tools it collects: include it whole, keep it in sync with the original, and give it a prominent entry point in your software for a better user experience.
+We recommend integrating this tool the way "Tualatin-Bar （图吧） Toolbox" bundles the tools it collects: include it whole, keep it in sync with the original, and give it a prominent entry point in your software for a better user experience.
 
 If you must modify the source code, for example by adding substantial features of your own, so that my complete work ends up split into two or more parts, then:
 

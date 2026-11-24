@@ -53,6 +53,47 @@ Where "哥哥科技" appears at least 1,000 times in total across your software,
 
 Exception: if your software is Turing-complete for its end users (that is, users can write and run their own programs within it), the reference value above does not apply. There is no upper limit on the number of attributions, and every split-off part must still carry attribution. Turing completeness serves here as the formal test for "large professional software": operating systems, web browsers, Microsoft Excel, the Mi Home geek edition, and router firmware admin panels that run script plugins all qualify, while single-purpose tools such as FastStone Capture do not.
 
+## 适用范围与初衷（本节为说明，非许可证正文）
+
+本协议管的是本程序本身：它的副本、修改版，以及包含它的作品。
+
+我真正在意的只有一件事：市面上流通的每一个版本，都应当带着我的名字。我不允许公开世界里出现无名氏版本。署名条款就是为这件事设计的。
+
+## 与 GPL 的兼容性说明
+
+> 本节是使用指南，不是许可证正文，不增加也不减少任何权利与义务，实际权利义务以仓库中的许可证文件为准。注意：我不是律师，写这些只是为了让使用者少碰麻烦。下面的结论并非我有意设下的限制，而是我基于许可证文本和实际实践得出的经验总结。
+
+**先说原因。** <br> GPL 要求把合并后的整个作品都按 GPL 发布，并且不得在 GPL 之外对使用者再加限制。本协议带有较强的署名要求，另有收费、竞争方面的条款，在 GPL 看来都属于"额外限制"（性质上类似带广告条款的旧版 BSD 许可证，FSF 也认为它与 GPL 不兼容）。两边的要求没法同时满足，下面三条都由此而来。
+
+**1. 如果您的程序是一个 GPL 程序，那么您可能不太方便对我的程序进行代码级别的融合（字面上难以两全）。**
+
+我的代码并非专有程序，您的集成行为本身也未必违反本协议，麻烦出在 GPL 一侧：融合之后，GPL 会要求整个作品按 GPL 发布，而我的署名等条款对 GPL 来说可能会触发进一步限制之类，从而字面上不太纯洁。
+
+**2. 一种例外：版权全部在您自己手里。**<br>
+特别地，如果您的 GPL 程序从未引用过第三方 GPL 代码，
+自始至终是您本人原创，或只引用了 MIT 等宽松许可的代码，没有第三方 GPL 代码，外部贡献者也都同意您这样处理，那么没有第三方能拦着您。也就是说，所有 CopyLeft 的义务来源全部来源于作者您自己或您有权控制的部分。
+
+您可以为这次融合自行给出例外许可（类似常见的"链接例外"）。本协议允许与其他代码组成更大作品（见 APL-Bro 第 3.7 条），前提是我这一部分的条款继续得到满足。此时可以做代码级融合：我的部分按本协议，署名完整保留；您自己的部分按 GPL 加您给出的例外。整个作品不再是"纯 GPL"。
+
+不过，基于本程序的实际运行环境（浏览器里的用户脚本），代码级融合在工程上也不太方便，所以这只是理论上的可能，不代表我推荐。
+
+**3. 单纯聚合：任何许可证都可以，包括 AGPL。**
+
+GPL 把这种情形叫"聚合体"（aggregate，GPLv2 里叫 mere aggregation）：彼此独立的作品放在同一个发行包里，没有合并成一个更大的程序，GPL 不会因此扩展到其他部分，聚合也不会改变我这部分的许可。只要您的用户脚本管理器没有抹除、篡改、弱化署名的功能，且您集成的脚本与官方版本逐字节一致，署名条款通常无需担心：
+
+- 与官方逐字节一致，原样集成，署名完整；
+- 您的程序（比如用户脚本管理器）没有抹除、篡改、弱化署名的功能，包括贴牌、白标之类，也没有借汇编额外限制用户对各个作品本来拥有的权利；
+- 不违反本项目的条款，尤其是不能违反署名条款；
+- 您的程序本身没有额外的白牌限制等；
+- 与您程序的主要功能之间没有深度交互：互相不是对方的扩展，不共享内部数据结构，不在同一进程内相互调用；不是衍生作品或者深度调用；
+- 我的显著、强制、UI署名等条款仍然适用于我的那一部分。
+
+哪怕是看似严厉的 AGPL，您依然可以按照您的协议手搓一个，或者集成一个用户脚本管理器，把本程序当成给用户的快捷入口。
+
+就如同图吧工具箱或者各类网络诊断工具一样，我建议直接原样集成我的程序，并且和您程序的主要功能之间没有深度交互。
+
+**关于数据交换。** <br>本程序的导出物（如 CSV）可以交给您的程序读取。文件、管道、命令行参数是彼此独立的程序之间的通常交流方式，导出的数据属于使用者自己的数据，不含本程序的代码。文件级的数据交换属于保持距离的通信，这不构成 GPL 所说的"合并成一个更大的程序"（combined work，即衍生作品）。边界在于交流的深度：双方若交换复杂的内部数据结构，紧密到像一个程序的两个部分，就可能被视为一个更大的程序，那就回到第 1 条。
+
 ## Abstract of key rules
 This deed highlights only some of the key features and terms of the actual license. You should carefully review all of the terms and conditions of the actual license before using the licensed material.
 本文本仅仅强调部分核心特征和真正许可协议的部分条款，您应当在使用授权作品前，仔细审阅真正许可协议的所有条款。
