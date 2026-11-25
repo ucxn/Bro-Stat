@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 // ==UserScript==
 // @name            华为路由器增强 WiFi 智慧生活 网页 增强 脚本 插件 数学统计 分析
 // @name:en         Bro-Stat_HUAWEI_Max
@@ -27,6 +28,37 @@
 // @downloadURL     https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/Huawei-1.user.js
 // @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/Huawei-1.user.js
 // ==/UserScript==
+=======
+// ==UserScript==
+// @name            华为路由器增强 WiFi 智慧生活 网页 增强 脚本 插件 数学统计 分析
+// @name:en         Bro-Stat_HUAWEI_Max
+// @namespace       ucxn
+// @version         6.1.0
+// @description     适用于华为路由器的RSSI显示、网速统计分析、流量一键查看的路由器Web网页后台增强利器
+// @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
+// @description:en  A powerful tool for enhancing the web-based admin interface of Huawei routers, featuring RSSI display, network speed statistics and analysis, and one-click traffic viewing.
+// @author          哥哥科技 space.bilibili.com/501430041
+// @noframes
+// @tag             路由器 华为 网络 监控 统计 数据 可视化 极客 增强 UI HA 智能 定时 后台 消费级 硬路由 家用 流量 RSSI WiFi 测控 算法
+// @icon            https://scriptcat.org/api/v2/resource/image/PD6xhxddlUESIwAV
+// @include         /^https?:\/\/10(\.[0-9]{1,3}){3}(:\d+)?\/.*$/
+// @include         http://192.168.*.*
+// @include         http://172.16.*
+// @include         https://192.168.*.*
+// @include         https://172.16.*
+// @exclude         *://*/cgi-bin/luci*
+// @grant           GM_setValue
+// @grant           GM_getValue
+// @storageName     GBNPA_Storage
+// @source          https://github.com/ucxn/Bro-Stat
+// @supportURL      https://www.bilibili.com/video/BV1SeEb67Ep1
+// @license         哥哥软件-显著署名-哥哥科技-严格 + （完整使用-署名保留-完全 OR (部分摘录-禁止演绎-署名保护-显著-哥哥科技 OR 二次开发-署名保留/保护-显著署名-署名哥哥-署名追加) AND 相同方式共享） 
+// @note            发行版作者哥哥科技保留所有权利，源码本身公开，请前往 GitHub Source 区域获得授权部分
+// @run-at          document-start
+// @downloadURL     https://raw.githubusercontent.com/ucxn/Bro-Stat/refs/heads/main/Huawei-1.user.js
+// @updateURL       https://github.com/ucxn/Bro-Stat/raw/refs/heads/main/Huawei-1.user.js
+// ==/UserScript==
+>>>>>>> Stashed changes
 
 (function () {
   'use strict';
