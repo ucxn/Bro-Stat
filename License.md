@@ -57,7 +57,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 ***在上述情形下，履行哥哥科技显著署名要求是第一位且具有支配效力的义务。任何其他条款，包括但不限于限制商业使用的条款以及有关费用或收费的条款，均不得被视为优先于哥哥科技显著署名要求、或以牺牲该署名要求为代价而必须履行的义务。***
 
-无论项目有何种规定，一旦影响署名的呈现，授权自始无效，视为侵犯著作权！我任何明示/暗示、潜在、显式或任何其他方式的授权一律无效；***授权的终止仅剥夺各项许可权利，绝不免除或消灭任何既有副本、衍生作品或已分发物上继续保留显著署名的义务。***
+无论项目有何种规定，一旦影响署名的呈现，授权自违反之时起立即终止；未按要求署名的副本、传播和使用，自始不在授权范围之内，视为侵犯著作权！我任何明示/暗示、潜在、显式或任何其他方式的授权一律无效；***授权的终止仅剥夺各项许可权利，绝不免除或消灭任何既有副本、衍生作品或已分发物上继续保留显著署名的义务。***
 ---
 ### 商用说明条款
 *本部分和上述的署名部分是可以分割的，无论在任何情况下*，**署名条款必须完全得到执行**。*如果因为法律规定或许可条款之间产生不可调和的冲突，不得影响其他未发生冲突的条款之效力。条款的最小单位是可细分的，不应简单地以完整句子作为不可分割的整体。应当在法律允许的最大范围内，作出与作者利益最为有利且能够兼容的解释。本人系该项目的完整原作者，因此增加上述附加条款具有合理性。*
@@ -137,7 +137,7 @@ Based on the actual source code of the Software and its technical characteristic
 
 **In such a case, compliance with the 哥哥科技 Prominent Attribution Requirements is the first and overriding obligation. No other provision—including any provision imposing commercial-use restrictions or requirements concerning fees or charges—shall be treated as a mandatory obligation in preference to, or at the expense of, the BroTech Prominent Attribution Requirements.**
 
-Regardless of anything else the project provides, any breach of this clause is deemed copyright infringement, and every authorization I have granted, whether express, implied, potential, explicit, or in any other form, becomes void.
+Regardless of anything else the project provides, any breach of this clause terminates the license immediately as of the moment of the breach; any copy, distribution, or use that does not carry the attribution as required never fell within the scope of the license and is deemed copyright infringement, and no authorization I have granted, whether express, implied, potential, explicit, or in any other form, covers it.
 ---
 ### Commercial Use Provisions
 *This section and the attribution section above are severable. Under all circumstances,* **the attribution provisions must be fully enforced.** *Any irreconcilable conflict arising from applicable law or between licensing provisions shall not affect the validity of other provisions that are not in conflict. Provisions may be subdivided into smaller constituent parts; a complete sentence shall not simply be treated as an indivisible whole. To the fullest extent permitted by law, an interpretation that reconciles the relevant provisions and is most favorable to the author's interests shall be adopted. I am the original author of this project in its entirety, and the addition of the foregoing supplemental terms is therefore reasonable.*
@@ -172,3 +172,9 @@ Whether BroTech or any other spelling, a Latin-script form may only supplement �
 哥哥科技 2026 © Bro-Tech. All rights reserved.
 
 END OF LICENSE. Strict compliance with this License constitutes an absolute condition precedent to the legality of using any code from this repository.
+
+### 适用法律与管辖 / Governing Law and Jurisdiction
+
+本许可证适用中华人民共和国境内法律（不含港澳台地区法律，且不适用其冲突法规则）。因本许可证产生的争议，由最初贡献者在武汉市汉口片区（江岸区、江汉区、硚口区）的住所地或经常居住地管辖法院，即武汉市江岸区人民法院管辖；但法律对级别管辖或专属管辖另有规定的，由武汉市有管辖权的其他人民法院（包括武汉市中级人民法院）管辖。
+
+This License is governed by the laws of the People's Republic of China (excluding the laws of Hong Kong, Macao, and Taiwan, and without regard to its conflict-of-law rules). Any dispute arising from this License shall be subject to the jurisdiction of the Jiang'an District People's Court of Wuhan, being the place of domicile or habitual residence of the Initial Contributor in the Hankow area of Wuhan (Jiang'an, Jianghan, or Qiaokou District); provided that, where mandatory rules on hierarchical or exclusive jurisdiction require otherwise, the competent People's Courts located in Wuhan City (including the Wuhan Intermediate People's Court) shall have jurisdiction.
