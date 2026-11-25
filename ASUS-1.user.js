@@ -2,7 +2,7 @@
 // @name            华硕路由器增强 ASUS/ROG 路由器 WiFi 后台插件
 // @name:en         Bro-Stat-ASUS for ROG/TUF Router
 // @namespace       ucxn
-// @version         5.9.U
+// @version         6.0.g
 // @description     适用于华硕/TUF/ASUS/ROG路由器的网页端网速查看和显示优化的增强脚本插件
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  An enhanced script plugin for viewing and optimizing internet speed on the web interface of ASUS/TUF/ROG routers
@@ -53,6 +53,7 @@
     报告时间: -600, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: 1, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
+    WAN速率序列自动导出: 0, // 0: 关闭 | 1: 每 8192 个采样点（约 6.8 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
     '2.4G信道': 6, // RSSI 百分比频率补偿：默认与下方 5G 信道组合约等于原 7.2dB
     '5.2|8G信道': 116, // 华硕固件分支繁多，暂由用户按实际工作信道自由复写
     portMap: {
@@ -66,6 +67,8 @@
     }
   };
 
+  if (typeof GM_getValue === 'function') for (const g of ['模式', '阈值', '节奏', '周期', '无线']) for (const k in CONFIG) { let v = GM_getValue(g + '.' + k); if (v == null || v === '') continue; if (typeof v === 'string') v = v.split('：')[0].trim(); const d = CONFIG[k], n = typeof v === 'boolean' ? +v : parseFloat(v); CONFIG[k] = typeof d === 'number' ? (Number.isNaN(n) ? d : n) : v; }
+
   const ESC_MAP = { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' };
   function escapeHTML(str) {
     return str ? String(str).replace(/[&<>'"]/g, m => ESC_MAP[m]) : '';
@@ -77,7 +80,7 @@
     wInstDn: 0,
     wTotUp: 0,
     wTotDn: 0,
-    wLedgerUp: 0, wLedgerDn: 0, // 官方增量账本；显示层的保护逻辑不回写事实源
+    wLedgerUp: 0, wLedgerDn: 0, // 原厂增量账本；显示层的保护逻辑不回写元数据
     cls: {}, isPinned: !0,
     w2U: 0, w2D: 0, w2TotUp: 0, w2TotDn: 0, w2LT: 0,
     hasW2: !1, is5G_149: !1, oWU:0, Warn_MS: 0, Force_MS: 0, _RST: !1,
@@ -85,7 +88,10 @@
     lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: 0,
     DOM缓存: null, DOM容器: null, 有线统一PHY: 0, 主节点MAC: '', 端口请求中: !1,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
-    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
+    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
+    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变
+    wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, oWD: 0, bWU: -1, bWD: -1, lRU: -1, lRD: -1, lTU: -1, lTD: -1, dWU: 0, dWD: 0, dTU: 0, dTD: 0, zCU: 0, zCD: 0,
+    rTick: 0, haTick: 0, cRT: '', snapLoaded: !1, calcTime: null
   };
   window.__gIsF = !1;
 
@@ -168,7 +174,7 @@
     .zte-bar-wrap{position:relative;width:100%;border-radius:4px;border:1px solid;font-size:13px;font-weight:bold;overflow:hidden;padding:3px 8px;display:flex;justify-content:space-between;align-items:center;z-index:1;box-sizing:border-box;}.zte-bar-wrap span{font-size:inherit;font-weight:inherit;}.zte-bar-up{color:#ff4c00;border-color:rgba(255,76,0,0.3);}.zte-bar-down{color:#0059fa;border-color:rgba(0,89,250,0.3);}.zte-bar-up::before{content:'';position:absolute;left:0;top:0;bottom:0;z-index:-1;background:rgba(255,76,0,0.12);width:var(--p-up,0%);transition:width 0.5s;}.zte-bar-down::before{content:'';position:absolute;left:0;top:0;bottom:0;z-index:-1;background:rgba(0,89,250,0.12);width:var(--p-down,0%);transition:width 0.5s;}#config-list.gege-list-container{contain:content!important;background-color:#ffffff!important;border-radius:8px!important;border:1px solid #e0e0e0!important;padding:20px 30px!important;box-shadow:0 2px 10px rgba(0,0,0,0.02)!important;margin-top:10px!important;}.gege-section{margin-bottom:10px;}
     .gege-section:last-child{margin-bottom:0;}.gege-list-container .config-title{font-size:16px!important;font-weight:bold!important;color:#333!important;margin:15px 0 10px 0!important;padding-bottom:5px!important;}.gege-list-container .gege-section:first-child .config-title{margin-top:0!important;}.gege-empty-state{color:#999!important;font-size:14px!important;padding:0 0 15px 5px!important;border-bottom:1px solid #f0f0f0!important;margin-bottom:5px!important;}.gege-list-item{background-color:transparent!important;border-bottom:1px solid #f0f0f0!important;padding:15px 10px!important;margin-bottom:0!important;border-radius:0!important;}
     .gege-list-item:last-child{border-bottom:none!important;}#zte-geek-board{contain:layout style;background-color:transparent!important;border-left:4px solid #0059fa!important;border-radius:0!important;padding:5px 0 5px 15px!important;margin:10px 0 15px 0!important;box-shadow:none!important;border-bottom:1px solid #f0f0f0!important;font-size:14px;display:flex;flex-direction:column;gap:6px;padding-bottom:15px!important;}#gege-global-overlay #zte-geek-board.geek-frozen-pane{position:sticky!important;top:0px!important;z-index:100!important;background-color:#f3f4f5!important;margin-top:0!important;padding-top:15px!important;box-shadow:0 10px 15px -3px rgba(0,0,0,0.05)!important;border-radius:0 0 8px 8px!important;}.gege-pin{cursor:pointer;font-size:11px;filter:grayscale(100%);opacity:0.5;transition:transform 0.2s;margin-left:2px;}
-    .gege-pin.active{filter:none;opacity:1;transform:scale(1.1);}#gege-global-overlay{position:fixed;top:7.5%;right:0;bottom:0;background:#f3f4f5;z-index:9999;overflow-y:auto;padding-bottom:50px;left:0!important;border-radius:16px 16px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,0.15);transition:top 0.3s ease;}@media (max-width: 768px){.geek-right-box:has(#gb-wan-zero-up),.geek-right-box:has(#gb-cur-up-vol){display:none!important}.gege-list-item{padding:12px 10px!important}.config-item-box{position:relative!important;flex-direction:column!important;padding-bottom:0!important}.config-item .info,.config-item .logo,.config-item .speed{width:100%!important;border:none!important;padding:0!important;position:static!important}.config-item .dev-intro{min-height:auto!important;justify-content:center!important;padding-right:108px!important}.config-item .logo{padding-bottom:4px!important;position:relative!important}.gege-rssi{position:absolute!important;left:25px;top:calc(50% - 29px);transform:translate(-50%,-100%);font-size:11px!important;line-height:1.2;z-index:1}.gege-online-time{white-space:nowrap}.gege-online-time::before{content:none!important}.t-row{white-space:nowrap}.config-item .info{flex-direction:column!important;margin:0 0 6px 0!important;gap:2px!important}.dev-ip{position:absolute!important;top:0!important;right:0!important;font-size:11px!important;background:#e0e8f5;color:#0059fa!important;padding:2px 6px!important;border-radius:4px;font-weight:bold;line-height:1.2;z-index:20;width:auto!important;display:flex!important;flex-direction:column;align-items:flex-end}.dev-number{width:auto!important;margin:0!important;font-size:11px!important}.gege-via{display:block!important;font-size:10px!important;line-height:1.3!important;max-width:92px;overflow:hidden;text-overflow:ellipsis}.gege-ratio-box{width:100%!important;margin-top:2px!important;margin-bottom:0!important}.gege-down-box{width:100%!important;margin-top:2px!important}#zte-geek-board{padding:8px!important;gap:0!important;font-size:11.5px!important}.geek-row{height:auto!important;flex-wrap:wrap!important;margin-bottom:4px!important;justify-content:flex-start!important;gap:2px 6px!important;line-height:1.3!important}.geek-label{width:auto!important;min-width:60px!important;font-size:11.5px!important;flex:0 0 auto!important}.geek-val-box{width:auto!important;flex:1 1 0%!important;display:flex!important;flex-wrap:wrap!important;margin-left:0!important;gap:2px 6px!important}.geek-fixed-width{width:auto!important}.geek-right-box{width:100%!important;flex:0 0 100%!important;text-align:left!important;font-size:11.5px!important;margin-top:2px!important;margin-left:0!important}.gege-list-container{padding:8px!important}.zte-enhance-speed{gap:4px!important}}#zte-geek-board{position:relative!important;overflow:visible!important;}#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;left:max(520px,52%);top:2px;width:clamp(320px,30%,650px);height:112px;}@media (max-width:768px){#gege-speed-chart{position:relative;left:auto;top:auto;width:100%;height:96px;margin-top:4px;touch-action:pan-y}}@media (max-width:768px){.geek-val-box>span:has(#gb-wan-up-bps),.geek-right-box:has(#gb-wan-up-bps),#gb-pwan-bps-container,.geek-right-box:has(#gb-wc-pu){display:none!important}.geek-val-box>span:has(#gb-wan-up-vol),.geek-val-box>span:has(#gb-ratio-display){flex-basis:100%;margin-left:0!important}.geek-label{min-width:88px!important}.config-item .dev-intro .gege-up-box{width:auto!important;margin-right:-108px!important}.gege-up-box .t-row>span{white-space:nowrap}}#gege-speed-chart canvas{display:block;width:100%;height:100%;}.gege-chart-head,.gege-chart-foot{position:absolute;left:clamp(28px,8%,36px);right:8px;display:flex;align-items:center;pointer-events:none;font:bold clamp(9px,2.1cqw,11px) system-ui,sans-serif;white-space:nowrap;overflow:hidden;}.gege-chart-head{top:2px;color:#111;gap:8px;}.gege-chart-head [data-gc="range"]{color:#666;font-weight:normal;overflow:hidden;text-overflow:ellipsis;margin-left:auto;}.gege-chart-foot{bottom:4px;justify-content:flex-start;gap:clamp(3px,1.1cqw,12px);}.gege-chart-foot span{min-width:0;overflow:hidden;text-overflow:ellipsis;}.gc-up{color:#ff4c00;flex:0 1 auto;}.gc-down{color:#0b5;flex:0 1 auto;}.gc-extra{color:#666;text-align:right;margin-left:auto;flex:1 1 0;min-width:0;}#gege-speed-chart .gege-chart-resize{position:absolute;right:-4px;bottom:-4px;width:13px;height:13px;border-right:3px solid #0059fa;border-bottom:3px solid #0059fa;cursor:nwse-resize;border-radius:2px;}
+    .gege-pin.active{filter:none;opacity:1;transform:scale(1.1);}#gege-global-overlay{position:fixed;top:7.5%;right:0;bottom:0;background:#f3f4f5;z-index:9999;overflow-y:auto;padding-bottom:50px;left:0!important;border-radius:16px 16px 0 0;box-shadow:0 -5px 25px rgba(0,0,0,0.15);transition:top 0.3s ease;}@media (max-width: 768px){.geek-right-box:has(#gb-wan-zero-up),.geek-right-box:has(#gb-cur-up-vol){display:none!important}.gege-list-item{padding:12px 10px!important}.config-item-box{position:relative!important;flex-direction:column!important;padding-bottom:0!important}.config-item .info,.config-item .logo,.config-item .speed{width:100%!important;border:none!important;padding:0!important;position:static!important}.config-item .dev-intro{min-height:auto!important;justify-content:center!important;padding-right:108px!important}.config-item .logo{padding-bottom:4px!important;position:relative!important}.gege-rssi{position:absolute!important;left:25px;top:calc(50% - 29px);transform:translate(-50%,-100%);font-size:11px!important;line-height:1.2;z-index:1}.gege-online-time{white-space:nowrap}.gege-online-time::before{content:none!important}.t-row{white-space:nowrap}.config-item .info{flex-direction:column!important;margin:0 0 6px 0!important;gap:2px!important}.dev-ip{position:absolute!important;top:0!important;right:0!important;font-size:11px!important;background:#e0e8f5;color:#0059fa!important;padding:2px 6px!important;border-radius:4px;font-weight:bold;line-height:1.2;z-index:20;width:auto!important;display:flex!important;flex-direction:column;align-items:flex-end}.dev-number{width:auto!important;margin:0!important;font-size:11px!important}.gege-via{display:block!important;font-size:10px!important;line-height:1.3!important;max-width:92px;overflow:hidden;text-overflow:ellipsis}.gege-ratio-box{width:100%!important;margin-top:2px!important;margin-bottom:0!important}.gege-down-box{width:100%!important;margin-top:2px!important}#zte-geek-board{padding:8px!important;gap:0!important;font-size:11.5px!important}.geek-row{height:auto!important;flex-wrap:wrap!important;margin-bottom:4px!important;justify-content:flex-start!important;gap:2px 6px!important;line-height:1.3!important}.geek-label{width:auto!important;min-width:60px!important;font-size:11.5px!important;flex:0 0 auto!important}.geek-val-box{width:auto!important;flex:1 1 0%!important;display:flex!important;flex-wrap:wrap!important;margin-left:0!important;gap:2px 6px!important}.geek-fixed-width{width:auto!important}.geek-right-box{width:100%!important;flex:0 0 100%!important;text-align:left!important;font-size:11.5px!important;margin-top:2px!important;margin-left:0!important}.gege-list-container{padding:8px!important}.zte-enhance-speed{gap:4px!important}}#zte-geek-board{position:relative!important;overflow:visible!important;}#gege-speed-chart{position:absolute;z-index:25;box-sizing:border-box;cursor:move;user-select:none;touch-action:none;container-type:inline-size;left:max(520px,52%);top:2px;width:clamp(320px,30%,650px);height:112px;}@media (max-width:768px){#gege-speed-chart{left:10px;top:2px;width:clamp(180px,calc(100% - 20px),320px);height:96px}}@media (max-width:768px){.geek-val-box>span:has(#gb-wan-up-bps),.geek-right-box:has(#gb-wan-up-bps),#gb-pwan-bps-container,.geek-right-box:has(#gb-wc-pu){display:none!important}.geek-val-box>span:has(#gb-wan-up-vol),.geek-val-box>span:has(#gb-ratio-display){flex-basis:100%;margin-left:0!important}.geek-label{min-width:88px!important}.config-item .dev-intro .gege-up-box{width:auto!important;margin-right:-108px!important}.gege-up-box .t-row>span{white-space:nowrap}}#gege-speed-chart canvas{display:block;width:100%;height:100%;}.gege-chart-head,.gege-chart-foot{position:absolute;left:clamp(28px,8%,36px);right:8px;display:flex;align-items:center;pointer-events:none;font:bold clamp(9px,2.1cqw,11px) system-ui,sans-serif;white-space:nowrap;overflow:hidden;}.gege-chart-head{top:2px;color:#111;gap:8px;}.gege-chart-head [data-gc="range"]{color:#666;font-weight:normal;overflow:hidden;text-overflow:ellipsis;margin-left:auto;}.gege-chart-foot{bottom:4px;justify-content:flex-start;gap:clamp(3px,1.1cqw,12px);}.gege-chart-foot span{min-width:0;overflow:hidden;text-overflow:ellipsis;}.gc-up{color:#ff4c00;flex:0 1 auto;}.gc-down{color:#0b5;flex:0 1 auto;}.gc-extra{color:#666;text-align:right;margin-left:auto;flex:1 1 0;min-width:0;}#gege-speed-chart .gege-chart-resize{position:absolute;right:-4px;bottom:-4px;width:13px;height:13px;border-right:3px solid #0059fa;border-bottom:3px solid #0059fa;cursor:nwse-resize;border-radius:2px;}
     .t-row,.zte-enhance-speed{font-family:Consolas;}
     #zte-geek-board{transition:color 0s cubic-bezier(0.21733,0.21733,0.31185,0.25216);}
     .gege-phy-rate { font:10px/1.08 Consolas,monospace;color:#777;text-align:center;white-space:nowrap;margin-top:-1px; }
@@ -216,11 +222,7 @@ async function rSD() {
       }
 
       S.oWU = (+rT[0] || 0) * 8; S.oWD = (+rT[1] || 0) * 8; 
-      S.bWU ??= S.oWU; S.bWD ??= S.oWD;
-      S.lRU ??= S.oWU; S.lRD ??= S.oWD;
-      S.lTU ??= n; S.lTD ??= n; 
-      S.zCU ??= 0; S.zCD ??= 0;
-      S.dWU ??= 0; S.dWD ??= 0;
+      if (S.lTU < 0) { S.bWU = S.lRU = S.oWU; S.bWD = S.lRD = S.oWD; S.lTU = S.lTD = n; }
       // WAN 沿用官方累计差值：直接续接本周期账本，计数器回退时保留已累计的量。
       S.wTotUp = (S.wLedgerUp += Math.max(0, S.oWU - S.lRU)); S.wTotDn = (S.wLedgerDn += Math.max(0, S.oWD - S.lRD));
       
@@ -282,8 +284,8 @@ let cSU = 0, cSD = 0, cI = Object.create(null);
       }
       const gDt = (S.lt !== 0) ? (n - S.lt) * 0.001 : 0;
       // 保留原有 0 估算诊断；WAN 总量已经由官方累计增量更新，避免重复积分。
-      if (S.wInstUp === 0 && cWU > 0) { S.wZEU = (S.wZEU || 0) + cWU * 0.5 * CONFIG.wanRefreshInterval; S.wZEUC = (S.wZEUC || 0) + 1; }
-      if (S.wInstDn === 0 && cWD > 0) { S.wZED = (S.wZED || 0) + cWD * 0.5 * CONFIG.wanRefreshInterval; S.wZEDC = (S.wZEDC || 0) + 1; }
+      if (S.wInstUp === 0 && cWU > 0) { S.wZEU += cWU * 0.5 * CONFIG.wanRefreshInterval; S.wZEUC++; }
+      if (S.wInstDn === 0 && cWD > 0) { S.wZED += cWD * 0.5 * CONFIG.wanRefreshInterval; S.wZEDC++; }
       for (const m in cI) {
         const cC = cI[m];
         S.cls[m] ??= {
@@ -440,9 +442,11 @@ function doSettle(nowMs) {
     if (r > -85) return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff4c00" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#e0e0e0" stroke-width="7" stroke-linecap="round"/></g><text x="65" y="86" fill="#ff4c00" font-weight="900" font-size="44" font-family="sans-serif">?</text></svg>`;
     return `<svg viewBox="0 0 100 100" width="45" height="45"><g transform="translate(-15, 0)"><circle cx="50" cy="80" r="7" fill="none" stroke="#ff4c00" stroke-width="5"/><path d="M 30,58 A 28,28 0 0,1 70,58" fill="none" stroke="#ff4c00" stroke-width="7" stroke-linecap="round" opacity="0.3"/><path d="M 12,38 A 54,54 0 0,1 88,38" fill="none" stroke="#ff4c00" stroke-width="7" stroke-linecap="round" opacity="0.3"/></g><text x="65" y="80" fill="#ff4c00" font-weight="900" font-size="35" font-family="sans-serif">✖</text></svg>`;
   };
-      function 记总速率图(u, d) {
+      let wu = '', wa;
+function 记总速率图(u, d) {
         u = u || 0; d = d || 0;
         const c = S.总图点数, i = c & 8191;
+        if (!i && c && CONFIG.WAN速率序列自动导出) { const a = wa ||= document.createElement('a'), t = Date.now(); wu && URL.revokeObjectURL(wu); a.href = wu = URL.createObjectURL(new Blob([`\uFEFF时间戳毫秒,${t}\n采样间隔秒,${window.gegeBActivated ? CONFIG.wanRefreshInterval : 3}\n上行bit/s,${S.总上行图.join()}\n下行bit/s,${S.总下行图.join()}`], {type: 'text/csv;charset=utf-8;'})); a.download = `哥哥科技_WAN速率序列_${t}.csv`; a.click(); }
         S.总上行图[i] = u; S.总下行图[i] = d; S.总图点数 = c + 1;
         if (u > S.wMaxU) S.wMaxU = u; if (d > S.wMaxD) S.wMaxD = d;
         if (u > 0 && u < S.wMinU) S.wMinU = u; if (d > 0 && d < S.wMinD) S.wMinD = d;
@@ -574,7 +578,7 @@ function doSettle(nowMs) {
       ⚠️ 需要使用 HA 快速上线下线报告的用户，请删除该注释以启用该功能。*/
     }
 
-S.rTick = ((S.rTick || 0) + 1) & 3;
+S.rTick = (S.rTick + 1) & 3;
         S.cSnap = {
       timestamp: Date.now(),
       global: { wan_up: S.wTotUp, wan_down: S.wTotDn, lan_integral_up: LUp, lan_integral_down: LDn, lan_high_up: hpU, lan_high_down: hpD, lan_off_up: abU, lan_off_down: abD },
@@ -585,7 +589,7 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
       }, {})
     };
     if (typeof GM_setValue !== 'undefined' && S.rTick === 1) {
-      S.haTick = ((S.haTick || 0) + 1) & 63;
+      S.haTick = (S.haTick + 1) & 63;
       if (S.haTick === 1) {
         try { GM_setValue('ha_snapshot', S.cSnap); } catch(e) {console.warn(e);}
     }
@@ -727,8 +731,8 @@ S.rTick = ((S.rTick || 0) + 1) & 3;
         bd.querySelector('#gb-wan-down-vol').textContent = `🔽 ${fV(S.wTotDn)}`;
         画总速率图(bd);
         let owU = bd.querySelector('#gb-owan-up-vol'), owD = bd.querySelector('#gb-owan-down-vol');
-        if (owU) owU.textContent = `🔼 ${fV(S.oWU || 0)}`;
-        if (owD) owD.textContent = `🔽 ${fV(S.oWD || 0)}`;
+        if (owU) owU.textContent = `🔼 ${fV(S.oWU)}`;
+        if (owD) owD.textContent = `🔽 ${fV(S.oWD)}`;
                 bd.querySelector('#gb-int-up-vol').textContent = `🔼 ${fV(hpU)}`;
         bd.querySelector('#gb-int-down-vol').textContent = `🔽 ${fV(hpD)}`;
         bd.querySelector('#gb-abs-up-vol').textContent = `🔼 ${fV(abU)}`;
@@ -1011,3 +1015,121 @@ if (!window.gegeBActivated) {
   };
   if (document.readyState === 'complete') _initUI(); else window.addEventListener('load', _initUI);
 })();
+
+/* ==UserConfig==
+模式:
+  readSaveData:
+    title: "历史记录"
+    description: "脚本启动时积分从哪里来"
+    type: select
+    default: "3：启动时用后台临时值充当积分"
+    values: ["0：新局模式", "1：从路由器后台读档（继承基线）", "2：从本地长期历史读档（自动保存）", "3：启动时用后台临时值充当积分"]
+  calcMode:
+    title: "上下行显示"
+    description: "上行与下行的比较方式"
+    type: select
+    default: "1：上行/下行倍数"
+    values: ["0：上行占总和比例", "1：上行/下行倍数"]
+  uiLayout:
+    title: "面板布局"
+    description: "悬浮面板的信息密度"
+    type: select
+    default: "1：详细紧凑版（驾驶舱）"
+    values: ["0：经典版", "1：详细紧凑版（驾驶舱）", "2：详细平铺版（报表流）"]
+  injectMode:
+    title: "UI 注入"
+    description: "面板显示在哪里"
+    type: select
+    default: "3：默认模式"
+    values: ["0：原生侧边栏", "1：仅悬浮舱", "2：智能选一", "3：默认模式"]
+阈值:
+  ratioExtremeUp:
+    title: "极端上传"
+    description: "上行/下行倍数超过此值判为极端上传（10 即 >1000%）"
+    type: number
+    default: 10
+  ratioWarnUp:
+    title: "重度上传警告"
+    description: "上行/下行比值超过此值警告（0.12 即 >12%）"
+    type: number
+    default: 0.12
+  ratioExtremeDown:
+    title: "极端下载"
+    description: "上行/下行比值低于此值判为极端下载（0.01 即 <1%）"
+    type: number
+    default: 0.01
+  ratioThreshold:
+    title: "上传占比报警"
+    description: "仅「上下行显示」选占比模式时有效"
+    type: number
+    default: 7
+    unit: "%"
+节奏:
+  wanRefreshInterval:
+    title: "WAN 刷新"
+    description: "外网口刷新间隔，通常是程序主时钟周期"
+    type: number
+    default: 3
+    min: 0.25
+    unit: "秒"
+  lanRefreshInterval:
+    title: "LAN 刷新"
+    description: "局域网刷新间隔，用于补偿评估 0 到唤醒期间的流量"
+    type: number
+    default: 3
+    min: 0.5
+    unit: "秒"
+周期:
+  周期类型:
+    title: "统计周期"
+    description: "到点自动清零并导出；选磐石则不开启此功能"
+    type: select
+    default: "M：每月"
+    values: ["M：每月", "W：每周", "D：固定天数", "磐石：不开启周期重置与自动导出"]
+  周_天设置:
+    title: "周期锚点"
+    description: "M：1~31 号 | W：0~6（周日~周六） | D：间隔天数（如 7）"
+    type: number
+    default: 1
+  基准日期:
+    title: "基准日期"
+    description: "仅「固定天数」有效；填任意一个历史周期的零点，格式 YYYY-MM-DD"
+    type: text
+    default: "2026-10-08"
+  报告时间:
+    title: "提示时间"
+    description: "相对周期零点的偏移分钟数；-4320 即提前 3 天"
+    type: number
+    default: -600
+    unit: "分钟"
+  自动导出:
+    title: "强制导出"
+    description: "相对周期零点的偏移分钟数"
+    type: number
+    default: 1
+    unit: "分钟"
+  时区补偿:
+    title: "时区补偿"
+    description: "毫秒；默认 28800000 即 UTC+8"
+    type: number
+    default: 28800000
+    unit: "毫秒"
+  WAN速率序列自动导出:
+    title: "WAN 速率序列导出"
+    description: "开启后每 8192 个采样点（约 6.8 小时）自动下载一份速率序列；需在浏览器里允许本站自动下载"
+    type: checkbox
+    default: false
+无线:
+  '2.4G信道':
+    title: "2.4G 工作信道"
+    description: "用于 RSSI 百分比频率补偿，按路由器实际工作信道填写（1~13）"
+    type: number
+    default: 6
+    min: 1
+  '5.2|8G信道':
+    title: "5G 工作信道"
+    description: "华硕固件分支繁多，按实际 5.2G / 5.8G 信道填写（32~177）"
+    type: number
+    default: 116
+    min: 32
+==/UserConfig== */

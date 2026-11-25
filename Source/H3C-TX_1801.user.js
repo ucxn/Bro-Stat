@@ -185,6 +185,7 @@ the project’s primary license are fully and continuously complied with.
     ratioThreshold: 7, // (仅calcMode=0时有效) 上传占比报警阈值(%)
     lanRefreshInterval: 3, // LAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
     wanRefreshInterval: 3, // 【新增】WAN口刷新时间(秒)，用于精准补偿0到唤醒时的瞬时流量
+    WAN速率序列自动导出: 0, // 0: 关闭 | 1: 每 8192 个采样点（约 6.8 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
     portMap: {
       "eth1": "网口 1",
       "eth2": "网口 2",
@@ -195,6 +196,8 @@ the project’s primary license are fully and continuously complied with.
       "wl2": "5.8G"
     }
   };
+  
+  if (typeof GM_getValue === 'function') for (const g of ['模式', '阈值', '节奏']) for (const k in CONFIG) { let v = GM_getValue(g + '.' + k); if (v == null || v === '') continue; if (typeof v === 'string') v = v.split('：')[0].trim(); const d = CONFIG[k], n = typeof v === 'boolean' ? +v : parseFloat(v); CONFIG[k] = typeof d === 'number' ? (Number.isNaN(n) ? d : n) : v; }
 
 let _saved = null;
   if (CONFIG.readSaveData === 1 && typeof GM_getValue !== 'undefined') {
@@ -210,7 +213,10 @@ let _saved = null;
     hasW2: !1, is5G_149: !1,
     无线缓存: Object.create(null), 无线请求中: !1, 端口状态: Object.create(null), 端口请求中: !1, 端口已取: !1, 端口小齿轮: 0, 半双工色轮: 0, DOM缓存: null, DOM已重建: !1, 面板状态: null, HA小齿轮: 0, 包数据可用: !1, RSSI频率修正: undefined,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
-    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
+    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
+    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变
+    aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, oWU: 0, oWD: 0, bWU: -1, bWD: -1, lRU: -1, lRD: -1, dTU: 0, dTD: 0,
+    lMacHash: '', lastCI: null, rTick: 0, cRT: '', runT: 0, wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0
   };
 
   const _w = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window;
@@ -375,8 +381,7 @@ const ts = Date.now();
       // 官方累计与高精积分响应无效处理
       if (hasWanBytes) {
         S.oWU = (+wB_m[1] || 0) * 8; S.oWD = (+wB_m[2] || 0) * 8;
-        if (S.bWU === undefined) S.bWU = S.oWU;
-        if (S.bWD === undefined) S.bWD = S.oWD;
+        if (S.bWU < 0) { S.bWU = S.oWU; S.bWD = S.oWD; }
         if (S.oWU < S.lRU) S.bWU = S.lRU = S.oWU;
         if (S.oWD < S.lRD) S.bWD = S.lRD = S.oWD;
         S.lRU = S.oWU; S.lRD = S.oWD;
@@ -563,9 +568,9 @@ const ts = Date.now();
   }
   /* @BroTech-Reserved stage-ratio.part.js */
   function rUI(wU, wD, sU, sD, cI) {
-    S.端口小齿轮 = ((S.端口小齿轮 || 0) + 1) & 63;
+    S.端口小齿轮 = ((S.端口小齿轮) + 1) & 63;
     if (S.端口小齿轮 === 1 || !S.端口已取) 刷端口信息(Date.now());
-    S.半双工色轮 = ((S.半双工色轮 || 0) + 1) & 7;
+    S.半双工色轮 = ((S.半双工色轮) + 1) & 7;
     let LUp = 0, LDn = 0, hpU = 0, hpD = 0, curHpU = 0, curHpD = 0, 包上总 = 0, 包下总 = 0;
     for (let k in S.cls) {
       let s = S.cls[k];
@@ -585,7 +590,7 @@ const ts = Date.now();
         curHpD += sessD;
       }
     }
-    if (typeof GM_setValue !== 'undefined' && !((S.HA小齿轮 = ((S.HA小齿轮 || 0) + 1) & 1023))) {
+    if (typeof GM_setValue !== 'undefined' && !((S.HA小齿轮 = ((S.HA小齿轮) + 1) & 1023))) {
       try {
         let cln = {};
         for (let k in S.cls) { let s = S.cls[k], cC = cI[k]; cln[k] = { up: s.intUp || 0, down: s.intDn || 0, integral_up: s.intUp || 0, integral_down: s.intDn || 0, packet_up: s.包上总 || 0, packet_down: s.包下总 || 0, status: cC ? (CONFIG.portMap[cC.iface] || cC.iface || "未知接口") : "off", name: cC?.name || s.name || k, ip: s.ip, raw_up: cC?.offUp || 0, raw_down: cC?.offDn || 0 }; }
@@ -605,7 +610,7 @@ const ts = Date.now();
         });
       } catch(e) {console.warn(e);}
     }
-     S.rTick = ((S.rTick || 0) + 1) & 7;
+     S.rTick = (S.rTick + 1) & 7;
     if (S.rTick === 1 || !S.cRT) {
         刷无线信息(Date.now());
         S.aWu = (S.wTotUp - (S.lwTU || S.wTotUp)) / (CONFIG.wanRefreshInterval << 3); S.lwTU = S.wTotUp;
@@ -689,10 +694,10 @@ const ts = Date.now();
         setText('#gb-lan-down-vol', `🔽 ${fV(LDn)}`);
         setText('#gb-wan-up-vol', `🔼 ${fV(S.wTotUp)}`);
         setText('#gb-wan-down-vol', `🔽 ${fV(S.wTotDn)}`);
-        setText('#gb-sowan-up-vol', `🔼 ${fV(S.dTU || 0)}`);
-        setText('#gb-sowan-down-vol', `🔽 ${fV(S.dTD || 0)}`);
-        setText('#gb-owan-up-vol', `🔼 ${fV(S.oWU || 0)}`);
-        setText('#gb-owan-down-vol', `🔽 ${fV(S.oWD || 0)}`);
+        setText('#gb-sowan-up-vol', `🔼 ${fV(S.dTU)}`);
+        setText('#gb-sowan-down-vol', `🔽 ${fV(S.dTD)}`);
+        setText('#gb-owan-up-vol', `🔼 ${fV(S.oWU)}`);
+        setText('#gb-owan-down-vol', `🔽 ${fV(S.oWD)}`);
         { let 包线 = bd.querySelector('#gb-packet-line'); if (包线) { 包线.style.display = S.包数据可用 ? 'inline' : 'none'; if (S.包数据可用) 包线.innerHTML = `<span style="color:#666;">本次包数：</span><span style="color:#ff4c00;">↑ ${Math.round(包上总)}包，${包上总 ? fSV(LUp / 包上总) : '0B'}/包</span><span style="color:#666; margin:0 6px;">|</span><span style="color:#0059fa;">↓ ${Math.round(包下总)}包，${包下总 ? fSV(LDn / 包下总) : '0B'}/包</span><span style="color:#4CAF50; margin-left:8px;">${格式化包比(计算包比(包上总, 包下总))}</span>`; } }
                 画总速率图(bd);
         let pb = bd.querySelector('#gb-pwan-bps-container'), pv = bd.querySelector('#gb-pwan-vol-container');
@@ -813,3 +818,79 @@ const ts = Date.now();
       }).catch(e => { S.RSSI频率修正 = 7.2; console.warn("[H3C] 5G信道探测异常:", e); });
     /* @BroTech-Reserved panel-boot.part.js */
 })();
+
+/* ==UserConfig==
+模式:
+  readSaveData:
+    title: "历史记录"
+    description: "脚本启动时积分从哪里来"
+    type: select
+    default: "0：新局模式（打开网页此刻归零）"
+    values: ["0：新局模式（打开网页此刻归零）", "1：读档模式（继承本次历史量）"]
+  forceMeshMode:
+    title: "Mesh 探测"
+    description: "常规模式下不出拓扑数据时可开启增强探测"
+    type: select
+    default: "0：关闭 / 常规"
+    values: ["0：关闭 / 常规", "1：启用增强探测"]
+  calcMode:
+    title: "上下行显示"
+    description: "上行与下行的比较方式"
+    type: select
+    default: "1：上行/下行倍数"
+    values: ["0：上行占总和比例", "1：上行/下行倍数"]
+  uiLayout:
+    title: "面板布局"
+    description: "悬浮面板的信息密度"
+    type: select
+    default: "2：详细平铺版（报表流）"
+    values: ["0：经典版", "1：详细紧凑版（驾驶舱）", "2：详细平铺版（报表流）"]
+  injectMode:
+    title: "UI 注入"
+    description: "面板显示在哪里"
+    type: select
+    default: "3：强制模式"
+    values: ["1：优先，10 秒悬浮舱（D）", "3：强制模式"]
+阈值:
+  ratioExtremeUp:
+    title: "极端上传"
+    description: "上行/下行倍数超过此值判为极端上传（10 即 >1000%）"
+    type: number
+    default: 10
+  ratioWarnUp:
+    title: "重度上传警告"
+    description: "上行/下行比值超过此值警告（0.07 即 >7%）"
+    type: number
+    default: 0.07
+  ratioExtremeDown:
+    title: "极端下载"
+    description: "上行/下行比值低于此值判为极端下载（0.01 即 <1%）"
+    type: number
+    default: 0.01
+  ratioThreshold:
+    title: "上传占比报警"
+    description: "仅「上下行显示」选占比模式时有效"
+    type: number
+    default: 7
+    unit: "%"
+节奏:
+  wanRefreshInterval:
+    title: "WAN 刷新"
+    description: "外网口刷新间隔，通常是程序主时钟周期"
+    type: number
+    default: 3
+    min: 0.25
+    unit: "秒"
+  lanRefreshInterval:
+    title: "LAN 刷新"
+    description: "局域网刷新间隔，用于补偿评估 0 到唤醒期间的流量"
+    type: number
+    default: 3
+    min: 0.5
+    unit: "秒"
+  WAN速率序列自动导出:
+    title: "WAN 速率序列导出"
+    description: "开启后每 8192 个采样点（约 6.8 小时）自动下载一份速率序列；需在浏览器里允许本站自动下载"
+    type: checkbox
+    default: false
+==/UserConfig== */

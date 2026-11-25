@@ -16,7 +16,7 @@ Regardless of the licensing path chosen, use of this project is additionally sub
 [快速查看简要版 See the Simplified Summary](Copyright.md)
 # 哥哥科技许可证
 ## 哥哥科技显著署名附加条款
-「20261117」
+**「20261121」**
 
 Regardless of the license used, the author's prominent attribution must be retained.<br>
 必须保留对作者 **“哥哥科技”** 的显著署名。
@@ -31,7 +31,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 “哥哥科技”四个汉字必须原样保留。`BroTech`、`Bro-Tech`、GitHub 用户名、项目名称、仓库链接或其他英文、拉丁字符形式，仅可作为补充署名，不得用于替代“哥哥科技”。
 
-即使目标运行环境、显示设备、编程语言或其他技术环境无法正常显示中文，凡能够保存 Unicode、UTF-8、GB 18030 或其他能够表示该字面量的源码、许可证文本、元数据或其他载体中，仍必须原样保留“哥哥科技”。
+即使目标运行环境、显示设备、编程语言或其他技术环境无法正常显示中文，凡能够保存 Unicode、UTF-8、GB 18030 或其他能够表示该字面量的源码、许可证文本、元数据或其他载体中，仍必须原样保留“哥哥科技”。**源码、许可证文本、元数据中的保留，与最终用户界面中的署名，是两项各自独立的义务：前者照旧保留，但不能代替后者。** *仅在源码中署名而最终用户看不到的，不构成对本条署名义务的履行，**此类做法视为未署名。***
 
 如果用户可见界面因客观技术限制无法正常呈现“哥哥科技”，可以在不删除程序中实质性表达中文“哥哥科技”的前提下，追加 `BroTech`、`Bro-Tech`、作者用户名、项目链接或其他能够清楚识别作者身份的表示方式，并应通过 GitHub 或电子邮件及时告知作者。
 
@@ -41,19 +41,23 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 只要使用了我的代码，则您的作品最终用户日常实际可使用的界面中出现“哥哥科技”的次数不能比我的原始完整作品更少，署名不得仅存在于普通用户不会使用的深层菜单当中，也不能藏在和我的主要功能无关的地方。
 
-为免疑义，本款项下的任何终止均为立即、绝对且不可补救的，且严格不受任何宽限期、通知要求、时间流逝或任何其它条件的限制。
+在署名所在的界面或模块内，"哥哥科技"的显著程度不低于同处出现的任何其他作者、组件或第三方的署名。署名若带有链接或点击入口，须与署名一并原样保留，其跳转目标保持不变。
+
+为免疑义，本款项下的任何终止均为***立即（0-day）、绝对且不可补救的***，且严格不受任何宽限期、通知要求、时间流逝或任何其它条件的限制。
 ## 哥哥科技的名字优于一切
 无论本许可证其他条款如何规定，**哥哥科技显著署名要求——包括对“哥哥科技”字样的强制保留及显著显示义务——均必须严格且排他性地按照最有利于作者的方式解释。** 任何一般解释规则、技术例外或本许可证的其他条款，均不得削弱该署名要求、使其从属于其他要求，或取代该署名要求。
 
-为明确起见，整个代码空间中任何形式或实质上包含和/或显示“哥哥”、“哥哥科技”以及满足表达式 `/\bBro(?:ther)?(?:[-_ ]?Tech)?\b/i` 的，均严禁被篡改、弱化，或以非预期名称方式呈现。
+为明确起见，整个代码空间中任何形式或实质上包含和/或显示「哥哥」、「哥哥科技」以及「晚橘」、「弟弟（科技）」、「姐姐大人」等实质用来显示开发者和/或其认同之名的，以及满足表达式` /\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i `的，均严禁被篡改、弱化，或以非预期名称方式呈现。
 
-无论项目有何种规定，一旦违反该条，视为侵犯著作权，我任何明示、暗示、潜在、显式或任何其他方式的授权一律无效。
+**我最在意的只有一件事：市面上流通的每一个版本，都带着哥哥科技和所爱之人的名字。** 本许可证管辖的是项目本身，即源码、副本、可执行脚本及其运行时界面，以及基于它的修改、改写和翻译版本。软件运行后导出的数据，例如 CSV，属于使用者自己。
 
 根据本软件的实际源代码及其技术特性，不存在一种能够使软件的普通功能正常运行、同时又使必要署名在技术上自动消失的运行方式。只要软件的主要功能能够正常运行，且软件能够在该功能中正常显示中文文本（以删除源代码中功能描述中文的方式规避本条的，不影响此认定），即视为软件运行正常。**软件正常运行时，不存在任何正当理由可以不按照哥哥科技显著署名要求显示“哥哥科技”字样。**
 
 **在任何极端情形下，如果本许可证的某些条款能够得到履行，而其他条款无法同时得到履行，包括不同条款之间存在矛盾、不相容或直接对立的情形，哥哥科技显著署名要求——包括对“哥哥科技”字样的强制保留及显著显示义务——均对本许可证的其他一切条款享有绝对且无条件的优先地位。**
 
 ***在上述情形下，履行哥哥科技显著署名要求是第一位且具有支配效力的义务。任何其他条款，包括但不限于限制商业使用的条款以及有关费用或收费的条款，均不得被视为优先于哥哥科技显著署名要求、或以牺牲该署名要求为代价而必须履行的义务。***
+
+无论项目有何种规定，一旦影响署名的呈现，授权自违反之时起立即终止；未按要求署名的副本、传播和使用，自始不在授权范围之内，视为侵犯著作权！我任何明示/暗示、潜在、显式或任何其他方式的授权一律无效；***授权的终止仅剥夺各项许可权利，绝不免除或消灭任何既有副本、衍生作品或已分发物上继续保留显著署名的义务。***
 ---
 ### 商用说明条款
 *本部分和上述的署名部分是可以分割的，无论在任何情况下*，**署名条款必须完全得到执行**。*如果因为法律规定或许可条款之间产生不可调和的冲突，不得影响其他未发生冲突的条款之效力。条款的最小单位是可细分的，不应简单地以完整句子作为不可分割的整体。应当在法律允许的最大范围内，作出与作者利益最为有利且能够兼容的解释。本人系该项目的完整原作者，因此增加上述附加条款具有合理性。*
@@ -65,7 +69,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 最简单的合规方式是直接分享官方GitHub或B站链接，否则在任何情况下，您有义务保证所有显式或潜在的名字完全不会被 *移除、篡改或者误导性呈现*，非原版分发情况下，若署名因包括但不限于显示、或一切原因造成的出现任何问题，责任由您自行承担。<br>
 无论如何、任何情况下均严格禁止移除任何作者的任何名字，否则将本软件本身源码或可执行产物打包倒卖，或作为售卖的商品的赠品将被视为恶意、受到追究（最不能接受、危害最大的就是移除“哥哥”的名字，任何情况下均不可弱化署名）。
 
-本项目已适配的路由器品牌的官方原版、原厂固件开发者可以自行先行集成该程序，但是必须保留署名；署名具体的方式可以和相应公司官方商榷是否有更加合理的许可。
+本项目已适配的路由器品牌的官方原版、原厂固件开发者可以自行先行集成该程序，但是必须保留署名；署名具体的方式可以和相应公司官方商榷是否有更加合理的许可。任何偏离原有署名方式的做法，须事先取得我的明确同意。
 
 ### 集成建议
 请注意：如果您无法理解以下条件，请咨询专业的技术顾问或律师；在理解之前，您只能原样传播官方链接。
@@ -79,7 +83,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 #### 关于英文名称与拼音
 “哥哥科技”的推荐英文名称为 BroTech。汉语拼音不能代替英文译名，请不要用 Gege Keji 这类拼音写法来指代哥哥科技；单独使用的 gege 不在此列。从审美上说，我也不希望程序里出现不必要的拼音地狱。
 
-无论是 BroTech 还是任何拉丁字母形式都只能作为“哥哥科技”的补充，不能替代任何署名要求。除主许可证中关于技术限制的规定所允许、并已按其要求履行相应义务的情形外，未以“哥哥科技”署名的，一律视为不符合署名要求。
+无论是 BroTech 还是任何拉丁字母形式都只能作为“哥哥科技”的补充，不能替代任何署名要求。无论主许可证中关于技术限制的规定是否允许、相应义务是否已经履行，未以“哥哥科技”署名的，一律视为不符合署名要求。
 
 哥哥科技 2026 © Bro-Tech 版权所有
 
@@ -102,13 +106,17 @@ The four Chinese characters “哥哥科技” must be retained exactly as writt
 
 Even if the target runtime environment, display device, programming language, or other technical environment cannot properly display Chinese, “哥哥科技” must still be retained exactly as written in all source code, license texts, metadata, or other media capable of preserving that literal text using Unicode, UTF-8, GB 18030, or any other suitable encoding.
 
+*Retention in source code, license text, and metadata, and attribution in the end-user interface, are two separate and independent obligations: the former must still be kept, but it cannot stand in for the latter. **Attribution that appears only in the source code, where end users cannot see it, does not satisfy the attribution obligation of this Section.***
+
 If objective technical limitations prevent a user-visible interface from properly displaying “哥哥科技”, supplementary representations such as `BroTech`, `Bro-Tech`, the author's username, the project link, or other forms that clearly identify the author may be added, provided that the program's substantive representation of the Chinese characters “哥哥科技” is not removed. The author must also be promptly notified through GitHub or email.
 
 Any redistribution, modification, porting, merging, integration, translation, conversion to another programming language, or incorporation into a Larger Work must not diminish the prominence of the original manner in which “哥哥科技” is attributed, or reduce it below the level of attribution identifying the author in the original work; **no reduction whatsoever in the degree of display is permitted, any reduction at all is prohibited, not only a significant one.**
 
-If your work uses my code, "哥哥科技" must appear in the end-user interface that people actually use day to day no fewer times than it does in my original complete work. The attribution must not live only in deep menus that ordinary users never open, nor be tucked away somewhere unrelated to my main features. Attribution must not be hidden away solely in deep or secondary menus that users rarely visit, It must at least be placed near the relevant interface, framework, module, or area that primarily uses my code.
+If your work uses my code, "哥哥科技" must appear in the end-user interface that people actually use day to day no fewer times than it does in my original complete work. The attribution must not live only in deep menus that ordinary users never open, nor be tucked away somewhere unrelated to my main features. Attribution must not be hidden away solely in deep or secondary menus that users rarely visit. It must at least be placed near the relevant interface, framework, module, or area that primarily uses my code.
 
-For the avoidance of doubt, any termination under this paragraph is immediate, absolute, and non-curable, and shall operate strictly without regard to any cure period, notice requirement, lapse of time, or any other condition whatsoever.
+Within the interface or module where the attribution appears, "哥哥科技" must be at least as prominent as any other author, component, or third-party credit shown alongside it. Where the attribution carries a link or click-through entry, it must be kept as is together with the attribution, and its target must remain unchanged.
+
+For the avoidance of doubt, any termination under this paragraph is ***immediate（0day）, absolute, and non-curable,*** and shall operate strictly without regard to any cure period, notice requirement, lapse of time, or any other condition whatsoever; ***Termination of the license strips you of your license rights only. The obligation to keep the prominent attribution on every existing copy, derivative work, and distributed item shall survive any termination.***
 
 Preserving the complete literal text “哥哥科技”, together with its actual display, visibility, and prominence, is an inseparable condition of every license right granted by the author for this software.
 
@@ -121,13 +129,15 @@ Based on the actual source code of the Software and its technical characteristic
 
 *Whenever the Software is operating normally, there is no legitimate basis whatsoever for failing to display the name “哥哥科技” as required by the BroTech Prominent Attribution Requirements.*
 
-For the avoidance of doubt, anything anywhere in the entire code space that, in form or in substance, contains and/or displays “哥哥” or “哥哥科技”, or that matches the expression `/\bBro(?:ther)?(?:[-_ ]?Tech)?\b/i`, must never be altered, weakened, or presented under any name other than the one intended.
+**What I care about most is one thing: every version in circulation carries the name 哥哥科技 and that of my beloved.** This license governs the program itself: its source code, executable script, its copies, and runtime interface, and any version based on it, including modifications, rewrites, and translations. Data the software exports when run, such as CSV files, belongs to the user.
 
-Regardless of anything else the project provides, any breach of this clause is deemed copyright infringement, and every authorization I have granted, whether express, implied, potential, explicit, or in any other form, becomes void.
+**For the avoidance of doubt, anything anywhere in the entire codebase that, in form or in substance, contains and/or displays “哥哥”, “哥哥科技”, “晚橘”, "弟弟(科技)", "姐姐大人"**, or any name substantively used to identify the developer and/or their recognized aliases, or that matches the expression `/\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i`, must never be altered, weakened, or presented under any name other than the one intended.
 
 ***In any extreme case in which certain provisions of this License can be satisfied but other provisions cannot, including any case in which provisions are contradictory, incompatible, or opposed to one another, the BroTech Prominent Attribution Requirements—including the mandatory preservation and prominent display of the name “哥哥科技”—shall take absolute and unconditional priority over all other provisions of this License.***
 
-**In such a case, compliance with the BroTech Prominent Attribution Requirements is the first and overriding obligation. No other provision—including any provision imposing commercial-use restrictions or requirements concerning fees or charges—shall be treated as a mandatory obligation in preference to, or at the expense of, the BroTech Prominent Attribution Requirements.**
+**In such a case, compliance with the 哥哥科技 Prominent Attribution Requirements is the first and overriding obligation. No other provision—including any provision imposing commercial-use restrictions or requirements concerning fees or charges—shall be treated as a mandatory obligation in preference to, or at the expense of, the BroTech Prominent Attribution Requirements.**
+
+Regardless of anything else the project provides, any breach of this clause terminates the license immediately as of the moment of the breach; any copy, distribution, or use that does not carry the attribution as required never fell within the scope of the license and is deemed copyright infringement, and no authorization I have granted, whether express, implied, potential, explicit, or in any other form, covers it.
 ---
 ### Commercial Use Provisions
 *This section and the attribution section above are severable. Under all circumstances,* **the attribution provisions must be fully enforced.** *Any irreconcilable conflict arising from applicable law or between licensing provisions shall not affect the validity of other provisions that are not in conflict. Provisions may be subdivided into smaller constituent parts; a complete sentence shall not simply be treated as an indivisible whole. To the fullest extent permitted by law, an interpretation that reconciles the relevant provisions and is most favorable to the author's interests shall be adopted. I am the original author of this project in its entirety, and the addition of the foregoing supplemental terms is therefore reasonable.*
@@ -141,13 +151,13 @@ The simplest way is to share the official GitHub or Bilibili link directly. Othe
 
 Under no circumstances may any name of any author be removed. Packaging and reselling the software itself, in source-code or executable form, or providing it as a complimentary gift accompanying a product offered for sale, shall be deemed malicious and will be pursued. (Removing 哥哥's name is the least acceptable and most harmful act of all; the attribution may never be weakened under any circumstances.)
 
-Developers of official, original factory firmware for router brands already supported by this project may proceed with integration of this program on their own initiative, provided that attribution is retained. The specific form of attribution, and whether a more appropriate license can be provided, may be discussed with the relevant company's official representatives.
+Developers of official, original factory firmware for router brands already supported by this project may proceed with integration of this program on their own initiative, provided that attribution is retained. The specific form of attribution, and whether a more appropriate license can be provided, may be discussed with the relevant company's official representatives. Any departure from the original manner of attribution requires my prior explicit consent.
 
 ### Integration Guidance
 
 If you cannot understand the conditions below, please consult a qualified technical adviser or lawyer. Until you do, you may only share the official link as it is.
 
-We recommend integrating this tool the way "Tualatin Toolbox" bundles the tools it collects: include it whole, keep it in sync with the original, and give it a prominent entry point in your software for a better user experience.
+We recommend integrating this tool the way "Tualatin-Bar （图吧） Toolbox" bundles the tools it collects: include it whole, keep it in sync with the original, and give it a prominent entry point in your software for a better user experience.
 
 If you must modify the source code, for example by adding substantial features of your own, so that my complete work ends up split into two or more parts, then:
 
@@ -162,3 +172,9 @@ Whether BroTech or any other spelling, a Latin-script form may only supplement �
 哥哥科技 2026 © Bro-Tech. All rights reserved.
 
 END OF LICENSE. Strict compliance with this License constitutes an absolute condition precedent to the legality of using any code from this repository.
+
+### 适用法律与管辖 / Governing Law and Jurisdiction
+
+本许可证适用中华人民共和国境内法律（不含港澳台地区法律，且不适用其冲突法规则）。因本许可证产生的争议，由最初贡献者在武汉市汉口片区（江岸区、江汉区、硚口区）的住所地或经常居住地管辖法院，即武汉市江岸区人民法院管辖；但法律对级别管辖或专属管辖另有规定的，由武汉市有管辖权的其他人民法院（包括武汉市中级人民法院）管辖。
+
+This License is governed by the laws of the People's Republic of China (excluding the laws of Hong Kong, Macao, and Taiwan, and without regard to its conflict-of-law rules). Any dispute arising from this License shall be subject to the jurisdiction of the Jiang'an District People's Court of Wuhan, being the place of domicile or habitual residence of the Initial Contributor in the Hankow area of Wuhan (Jiang'an, Jianghan, or Qiaokou District); provided that, where mandatory rules on hierarchical or exclusive jurisdiction require otherwise, the competent People's Courts located in Wuhan City (including the Wuhan Intermediate People's Court) shall have jurisdiction.

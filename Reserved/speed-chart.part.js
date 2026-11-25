@@ -1,6 +1,8 @@
+let wu = '', wa;
 function 记总速率图(u, d) {
         u = u || 0; d = d || 0;
         const c = S.总图点数, i = c & 8191;
+        if (!i && c && CONFIG.WAN速率序列自动导出) { const a = wa ||= document.createElement('a'), t = Date.now(); wu && URL.revokeObjectURL(wu); a.href = wu = URL.createObjectURL(new Blob([`\uFEFF时间戳毫秒,${t}\n采样间隔秒,${window.gegeBActivated ? CONFIG.wanRefreshInterval : 3}\n上行bit/s,${S.总上行图.join()}\n下行bit/s,${S.总下行图.join()}`], {type: 'text/csv;charset=utf-8;'})); a.download = `哥哥科技_WAN速率序列_${t}.csv`; a.click(); }
         S.总上行图[i] = u; S.总下行图[i] = d; S.总图点数 = c + 1;
         if (u > S.wMaxU) S.wMaxU = u; if (d > S.wMaxD) S.wMaxD = d;
         if (u > 0 && u < S.wMinU) S.wMinU = u; if (d > 0 && d < S.wMinD) S.wMinD = d;

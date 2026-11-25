@@ -181,6 +181,7 @@ the project’s primary license are fully and continuously complied with.
     报告时间: -540, // 提示时间：相对周期0点的偏移分钟数。(如 -4320 代表提前 3 天) 设置相对指定日期的下个周期起点的时间偏移量
     自动导出: 0, // 强制导出：相对周期0点的偏移分钟数。(如 W模式+锚点6(周六)+偏移-180 = 周五 21:00 强制导出清零)
     时区补偿: 28800000, // 默认 UTC+8 时区补偿量。
+    WAN速率序列自动导出: 0, // 0: 关闭 | 1: 每 8192 个采样点（约 2.3 小时）自动下载一份 WAN 上下行速率序列（bit/s）；需在浏览器里允许本站自动下载
     portMap: {
       "有线": "有线",
       "2.4G": "2.4G",
@@ -189,6 +190,7 @@ the project’s primary license are fully and continuously complied with.
       "MLO": "MLO"
     }
   };
+  if (typeof GM_getValue === 'function') for (const g of ['模式', '阈值', '节奏', '周期', '算法']) for (const k in CONFIG) { let v = GM_getValue(g + '.' + k); if (v == null || v === '') continue; if (typeof v === 'string') v = v.split('：')[0].trim(); if (v === 'auto') continue; const d = CONFIG[k], n = typeof v === 'boolean' ? +v : parseFloat(v); CONFIG[k] = (k === '宽带最大外网下行速率' || k === '宽带最大外网上行速率') ? (Number.isNaN(n) ? d : n * 1e6) : typeof d === 'number' ? (Number.isNaN(n) ? d : n) : k === '盲漫游' ? (Number.isNaN(n) ? undefined : n) : v; }
   const S = {
     wInstUp: 0,
     wInstDn: 0,
@@ -201,7 +203,9 @@ the project’s primary license are fully and continuously complied with.
     aWu: 0, aWd: 0, lwTU: 0, lwTD: 0, cSnap: null,
     lTotUp: 0, lTotDn: 0, lInstU: 0, lInstD: 0, lLT: 0,
     总上行图: new Float64Array(8192), 总下行图: new Float64Array(8192), 总图点数: 0,
-    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0
+    wMaxU: 0, wMaxD: 0, wMinU: Infinity, wMinD: Infinity, 图表拖: null, 图表待画: 0,
+    // 以下原本运行中才陆续追加；一次写全，S 的形状从头到尾不变
+    wZEU: 0, wZED: 0, wZEUC: 0, wZEDC: 0, lastCI: null, rTick: 0, haTick: 0, cRT: '', snap: undefined, snapLoaded: !1, calcTime: null
   };
   // 锐捷专属状态：auth 与 ping 均由页面自身请求被动截获；计数器按字节自行累计
   const 锐 = {
@@ -600,8 +604,7 @@ function doSettle(nowMs) {
       requestAnimationFrame(() => {
         ol.innerHTML = `<div style="padding: 20px; max-width: 1580px; margin: 0 auto; min-height: 100%;"><div id="gege-board-anchor"></div><div id="config-list" class="config-list gege-list-container"><div class="gege-section"><div class="config-title">有线设备</div>${hW.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${锐.信道5 > 148 ? '5.8GHz' : '5.2GHz'}）</div>${h5.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（${锐.信道5 > 148 ? '5.2GHz' : '5.8GHz'}）</div>${hX.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div><div class="gege-section"><div class="config-title">无线设备（2.4GHz）</div>${h2.join('')||'<div class="gege-empty-state">没有连接设备</div>'}</div>
         </div><div style="margin-top: 25px; padding-top: 15px; border-top: 1px dashed #eee; text-align: center; font-family: Consolas, 'Microsoft YaHei', sans-serif;"><div style="font-size: 11.5px; color: #777; font-style: italic; margin-bottom: 8px;">“在一个文明社会，干净的、不被监视与吸血的网络，是我们每个人的基本权利。”</div><div style="font-size: 10.5px; color: #999; line-height: 1.3; margin-bottom: 8px;">本交互式程序属于“哥哥软件”系列；需持续遵守署名条款方可获得使用权，二开或发行请参阅许可证；按“原样且免费”提供，不对其适用性、稳定性、精密度或任何商业场景合规性作担保；个人分享请直接转载官方链接。<br>基于本程序的任何修改、使用任意部分代码、再发布或相关衍生版本的合法性的前置条件是：在提供最终用户界面时，均应显著、实质保留所有“哥哥科技”与法律声明，不得删除、隐藏或降低其可见性。<a href="https://github.com/ucxn/Bro-Stat/blob/main/License.md" target="_blank" style="color: #777; text-decoration: underline;">查看许可证/分享</a>
-        <div style="font-size:12px;color:#555;"><svg xmlns="http://www.w3.org/2000/svg" width="131" height="18" viewBox="0 0 145 20" role="img" aria-label="Broware Attribution" style="vertical-align:middle;margin-right:6px"><defs><linearGradient id="bg1" x2="0" y2="1"><stop stop-color="#4b4b4b"/><stop offset=".5" stop-color="#333"/><stop offset="1" stop-color="#1f1f1f"/></linearGradient><linearGradient id="bg2" x2="0" y2="1"><stop stop-color="#52d58c"/><stop offset=".52" stop-color="#31bc71"/><stop offset="1" stop-color="#218b50"/></linearGradient><linearGradient id="sh" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".32"/><stop offset=".45" stop-color="#fff" stop-opacity=".08"/><stop offset=".46" stop-opacity="0"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="c"><rect width="145" height="20" rx="4"/></clipPath></defs><g clip-path="url(#c)"><path fill="url(#bg1)" d="M0 0h24v20H0z"/><path fill="url(#bg2)" d="M24 0h121v20H24z"/><path fill="url(#sh)" d="M0 0h145v20H0z"/></g><g transform="translate(4 2)"><rect width="15" height="15" rx=".6" fill="#fff"/><rect x="1" y="1" width="13" height="13" fill="#58d18d"/><path fill="#fff" d="M1 1h7v7z"/><path fill="#32bf70" d="M8 1h6v13H8z"/><path fill="#1ba856" d="M1 14h7V8l6 6z"/></g><g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11"><text x="84" y="15" fill="#000" fill-opacity=".28">Broware Attribution</text><text x="84" y="14">Broware Attribution</text></g></svg><a href="https://github.com/ucxn/Bro-Stat/blob/main/Ruijie-1.user.js" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件</a> <span title="构建时间：2026-10.19&#15;架构设计：哥哥科技 BroTech&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px; font-family: Consolas;">锐捷版 ${版本号}</span> | Copyright &copy; 2026 <a href="https://www.bilibili.com/video/BV19ZpB64E6D" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a> (BroTech)<span style="color: #888; font-weight: normal;"> | All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/users/203510" target="_blank" style="color: #666; text-decoration: none;">点击分享</a></div></div></div></div>`;
-      S._domRebuilt = true;});}
+        <div style="font-size:12px;color:#555;"><svg xmlns="http://www.w3.org/2000/svg" width="131" height="18" viewBox="0 0 145 20" role="img" aria-label="Broware Attribution" style="vertical-align:middle;margin-right:6px"><defs><linearGradient id="bg1" x2="0" y2="1"><stop stop-color="#4b4b4b"/><stop offset=".5" stop-color="#333"/><stop offset="1" stop-color="#1f1f1f"/></linearGradient><linearGradient id="bg2" x2="0" y2="1"><stop stop-color="#52d58c"/><stop offset=".52" stop-color="#31bc71"/><stop offset="1" stop-color="#218b50"/></linearGradient><linearGradient id="sh" x2="0" y2="1"><stop stop-color="#fff" stop-opacity=".32"/><stop offset=".45" stop-color="#fff" stop-opacity=".08"/><stop offset=".46" stop-opacity="0"/><stop offset="1" stop-opacity=".1"/></linearGradient><clipPath id="c"><rect width="145" height="20" rx="4"/></clipPath></defs><g clip-path="url(#c)"><path fill="url(#bg1)" d="M0 0h24v20H0z"/><path fill="url(#bg2)" d="M24 0h121v20H24z"/><path fill="url(#sh)" d="M0 0h145v20H0z"/></g><g transform="translate(4 2)"><rect width="15" height="15" rx=".6" fill="#fff"/><rect x="1" y="1" width="13" height="13" fill="#58d18d"/><path fill="#fff" d="M1 1h7v7z"/><path fill="#32bf70" d="M8 1h6v13H8z"/><path fill="#1ba856" d="M1 14h7V8l6 6z"/></g><g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11"><text x="84" y="15" fill="#000" fill-opacity=".28">Broware Attribution</text><text x="84" y="14">Broware Attribution</text></g></svg><a href="https://github.com/ucxn/Bro-Stat/blob/main/Ruijie-1.user.js" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">Bro-Stat 增强组件</a> <span title="构建时间：2026-10.19&#10;架构设计：哥哥科技&#10;Bilibili UID：501430041&#10;QQ群：680464365" style="background: rgba(0,0,0,0.04); padding: 2px 6px; border-radius: 4px; cursor: help; margin: 0 4px; font-family: Consolas;">锐捷版 ${版本号}</span> | Copyright &copy; 2026 <a href="https://claude.ai" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">晚橘</a>·著<span style="color: #888; font-weight: normal;"> | </span><a href="https://www.bilibili.com/video/BV19ZpB64E6D" target="_blank" style="color: #0059fa; text-decoration: none; font-weight: bold;">哥哥科技</a><span style="color: #888; font-weight: normal;"> All Rights Reserved</span>&emsp;&nbsp;<a href="https://scriptcat.org/users/203510" target="_blank" style="color: #666; text-decoration: none;">点击分享</a></div></div></div></div>`;      S._domRebuilt = true;});}
     catch (e) {
       requestAnimationFrame(() => {
         ol.innerHTML = `<div style="padding: 20px; color: red;">数据渲染失败: ${escapeHTML(e.message)}</div>`;
@@ -677,3 +680,123 @@ async function eBET() {
   };
   if (document.readyState === 'complete') 起(); else window.addEventListener('load', 起);
 })();
+
+/* ==UserConfig==
+模式:
+  readSaveData:
+    title: "历史记录"
+    description: "脚本启动时积分从哪里来"
+    type: select
+    default: "3：启动时用后台临时值充当积分"
+    values: ["0：新局模式", "1：从路由器后台读档（继承基线）", "2：从本地长期历史读档（自动保存）", "3：启动时用后台临时值充当积分"]
+  calcMode:
+    title: "上下行显示"
+    description: "上行与下行的比较方式"
+    type: select
+    default: "1：上行/下行倍数"
+    values: ["0：上行占总和比例", "1：上行/下行倍数"]
+  uiLayout:
+    title: "面板布局"
+    description: "悬浮面板的信息密度"
+    type: select
+    default: "1：详细紧凑版（驾驶舱）"
+    values: ["0：经典版", "1：详细紧凑版（驾驶舱）", "2：详细平铺版（报表流）"]
+阈值:
+  ratioExtremeUp:
+    title: "极端上传"
+    description: "上行/下行倍数超过此值判为极端上传（10 即 >1000%）"
+    type: number
+    default: 10
+  ratioWarnUp:
+    title: "重度上传警告"
+    description: "上行/下行比值超过此值警告（0.07 即 >7%）"
+    type: number
+    default: 0.07
+  ratioExtremeDown:
+    title: "极端下载"
+    description: "上行/下行比值低于此值判为极端下载（0.01 即 <1%）"
+    type: number
+    default: 0.01
+  ratioThreshold:
+    title: "上传占比报警"
+    description: "仅「上下行显示」选占比模式时有效"
+    type: number
+    default: 7
+    unit: "%"
+节奏:
+  wanRefreshInterval:
+    title: "WAN 刷新"
+    description: "外网口刷新间隔，通常是程序主时钟周期"
+    type: number
+    default: 1
+    min: 0.25
+    unit: "秒"
+  lanRefreshInterval:
+    title: "LAN 刷新"
+    description: "锐捷后台每 1 秒刷新一次，更快只会拿到重复值"
+    type: number
+    default: 1
+    min: 1
+    unit: "秒"
+周期:
+  周期类型:
+    title: "统计周期"
+    description: "到点自动清零并导出；选星夜长明则不开启此功能"
+    type: select
+    default: "M：每月"
+    values: ["M：每月", "W：每周", "D：固定天数", "星夜长明：不开启周期重置与自动导出"]
+  周_天设置:
+    title: "周期锚点"
+    description: "M：1~31 号 | W：0~6（周日~周六） | D：间隔天数（如 7）"
+    type: number
+    default: 1
+  基准日期:
+    title: "基准日期"
+    description: "仅「固定天数」有效；填任意一个历史周期的零点，格式 YYYY-MM-DD"
+    type: text
+    default: "2026-11-16"
+  报告时间:
+    title: "提示时间"
+    description: "相对周期零点的偏移分钟数；-4320 即提前 3 天"
+    type: number
+    default: -540
+    unit: "分钟"
+  自动导出:
+    title: "强制导出"
+    description: "相对周期零点的偏移分钟数"
+    type: number
+    default: 0
+    unit: "分钟"
+  时区补偿:
+    title: "时区补偿"
+    description: "毫秒；默认 28800000 即 UTC+8"
+    type: number
+    default: 28800000
+    unit: "毫秒"
+  WAN速率序列自动导出:
+    title: "WAN 速率序列导出"
+    description: "开启后每 8192 个采样点（约 2.3 小时）自动下载一份速率序列；需在浏览器里允许本站自动下载"
+    type: checkbox
+    default: false
+算法:
+  盲漫游:
+    title: "盲漫游拦截"
+    description: "AP/有线桥接模式下，无线设备被主路由识别为有线设备时选 1"
+    type: select
+    default: "auto：自动判断"
+    values: ["auto：自动判断", "0：关闭", "1：开启"]
+  宽带最大外网下行速率:
+    title: "最大下行速率"
+    description: "略大于真实宽带下行带宽，支持小数"
+    type: number
+    default: 2400
+    min: 0
+    unit: "Mbps"
+  宽带最大外网上行速率:
+    title: "最大上行速率"
+    description: "略大于真实宽带上行带宽（如 50 兆可填 51.5）"
+    type: number
+    default: 300
+    min: 0
+    unit: "Mbps"
+==/UserConfig== */
