@@ -69,7 +69,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 最简单的合规方式是直接分享官方GitHub或B站链接，否则在任何情况下，您有义务保证所有显式或潜在的名字完全不会被 *移除、篡改或者误导性呈现*，非原版分发情况下，若署名因包括但不限于显示、或一切原因造成的出现任何问题，责任由您自行承担。<br>
 无论如何、任何情况下均严格禁止移除任何作者的任何名字，否则将本软件本身源码或可执行产物打包倒卖，或作为售卖的商品的赠品将被视为恶意、受到追究（最不能接受、危害最大的就是移除“哥哥”的名字，任何情况下均不可弱化署名）。
 
-本项目已适配的路由器品牌的官方原版、原厂固件开发者可以自行先行集成该程序，但是必须保留署名；署名具体的方式可以和相应公司官方商榷是否有更加合理的许可。
+本项目已适配的路由器品牌的官方原版、原厂固件开发者可以自行先行集成该程序，但是必须保留署名；署名具体的方式可以和相应公司官方商榷是否有更加合理的许可。任何偏离原有署名方式的做法，须事先取得我的明确同意。
 
 ### 集成建议
 请注意：如果您无法理解以下条件，请咨询专业的技术顾问或律师；在理解之前，您只能原样传播官方链接。
@@ -83,7 +83,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 #### 关于英文名称与拼音
 “哥哥科技”的推荐英文名称为 BroTech。汉语拼音不能代替英文译名，请不要用 Gege Keji 这类拼音写法来指代哥哥科技；单独使用的 gege 不在此列。从审美上说，我也不希望程序里出现不必要的拼音地狱。
 
-无论是 BroTech 还是任何拉丁字母形式都只能作为“哥哥科技”的补充，不能替代任何署名要求。除主许可证中关于技术限制的规定所允许、并已按其要求履行相应义务的情形外，未以“哥哥科技”署名的，一律视为不符合署名要求。
+无论是 BroTech 还是任何拉丁字母形式都只能作为“哥哥科技”的补充，不能替代任何署名要求。无论主许可证中关于技术限制的规定是否允许、相应义务是否已经履行，未以“哥哥科技”署名的，一律视为不符合署名要求。
 
 哥哥科技 2026 © Bro-Tech 版权所有
 
@@ -112,7 +112,7 @@ If objective technical limitations prevent a user-visible interface from properl
 
 Any redistribution, modification, porting, merging, integration, translation, conversion to another programming language, or incorporation into a Larger Work must not diminish the prominence of the original manner in which “哥哥科技” is attributed, or reduce it below the level of attribution identifying the author in the original work; **no reduction whatsoever in the degree of display is permitted, any reduction at all is prohibited, not only a significant one.**
 
-If your work uses my code, "哥哥科技" must appear in the end-user interface that people actually use day to day no fewer times than it does in my original complete work. The attribution must not live only in deep menus that ordinary users never open, nor be tucked away somewhere unrelated to my main features. Attribution must not be hidden away solely in deep or secondary menus that users rarely visit, It must at least be placed near the relevant interface, framework, module, or area that primarily uses my code.
+If your work uses my code, "哥哥科技" must appear in the end-user interface that people actually use day to day no fewer times than it does in my original complete work. The attribution must not live only in deep menus that ordinary users never open, nor be tucked away somewhere unrelated to my main features. Attribution must not be hidden away solely in deep or secondary menus that users rarely visit. It must at least be placed near the relevant interface, framework, module, or area that primarily uses my code.
 
 Within the interface or module where the attribution appears, "哥哥科技" must be at least as prominent as any other author, component, or third-party credit shown alongside it. Where the attribution carries a link or click-through entry, it must be kept as is together with the attribution, and its target must remain unchanged.
 
@@ -151,7 +151,7 @@ The simplest way is to share the official GitHub or Bilibili link directly. Othe
 
 Under no circumstances may any name of any author be removed. Packaging and reselling the software itself, in source-code or executable form, or providing it as a complimentary gift accompanying a product offered for sale, shall be deemed malicious and will be pursued. (Removing 哥哥's name is the least acceptable and most harmful act of all; the attribution may never be weakened under any circumstances.)
 
-Developers of official, original factory firmware for router brands already supported by this project may proceed with integration of this program on their own initiative, provided that attribution is retained. The specific form of attribution, and whether a more appropriate license can be provided, may be discussed with the relevant company's official representatives.
+Developers of official, original factory firmware for router brands already supported by this project may proceed with integration of this program on their own initiative, provided that attribution is retained. The specific form of attribution, and whether a more appropriate license can be provided, may be discussed with the relevant company's official representatives. Any departure from the original manner of attribution requires my prior explicit consent.
 
 ### Integration Guidance
 

@@ -9,7 +9,7 @@ Copyright © 2026 哥哥科技 (BroTech). All Rights Reserved.
 
 仅当完全且持续遵守项目主license里面的所有、全部署名要求时，以下授权才能生效。
 
-本文件夹中的内容按照[以下许可文件](https://github.com/ucxn/ZTE-Stat_Max/blob/main/LICENSE/license.txt)授权，若指向链接本身有过更新提交，则本目录具体文件更新时间之时的版本以及后续修订版本皆视为有效许可。
+本文件夹中的内容同时按照 [Adaptive Public License - Bro 0.1（APL-Bro 0.1）](https://github.com/ucxn/ZTE-Stat_Max/blob/main/LICENSE/license.txt) **AND** [Broware PBY-Attribution License 1.0（BR-PBY-1.0）](https://github.com/ucxn/ZTE-Stat_Max/blob/main/LICENSE/BR-PBY-1.0.md) 授权，两者共同适用、需要同时满足，若指向链接本身有过更新提交，则本目录具体文件更新时间之时的版本以及后续修订版本皆视为有效许可。
 
 引用的链接是为了方便访问及统一版本，并不代表两个GitHub库有任何关联；本存储库的许可绝不影响指向仓库自身的许可/权利，而指向仓库自身的许可方式也不影响本目录 - 我们引用的仅仅是单个逻辑文件本身。
 
@@ -20,11 +20,11 @@ The source fragments in this directory are Copyright © 2026 BroTech and are pro
 Unless BroTech expressly grants otherwise, content in this directory does not become licensed under a public or subordinate license declared by a `Source/` file merely because that file references it or because it is concatenated into a generated userscript.
 
 
-The following license is effective only if all attribution requirements set forth in
+The following licenses are effective only if all attribution requirements set forth in
 the project’s primary license are fully and continuously complied with.
 
-The contents of this folder are licensed under [The following license file](https://github.com/ucxn/ZTE-Stat_Max/blob/main/LICENSE/license.txt). If the linked URL itself has been updated, the version in effect at the time of the specific file's last update in this directory, as well as any subsequent revisions, shall be considered valid licenses.
+The contents of this folder are licensed under both the [Adaptive Public License - Bro 0.1 (APL-Bro 0.1)](https://github.com/ucxn/ZTE-Stat_Max/blob/main/LICENSE/license.txt) AND the [Broware PBY-Attribution License 1.0 (BR-PBY-1.0)](https://github.com/ucxn/ZTE-Stat_Max/blob/main/LICENSE/BR-PBY-1.0.md), which apply together. If the linked URL itself has been updated, the version in effect at the time of the specific file's last update in this directory, as well as any subsequent revisions, shall be considered valid licenses.
 
 The links provided are for ease of access and version consistency; they do not imply any association between the two GitHub repositories. The license for this repository in no way affects the license or rights associated with the repository itself, nor does the licensing of the repository itself affect this directory—we are referring solely to the individual logical file itself.
 
-For the sole purpose of applying the referenced license to this directory, project-specific references to the Initial Work, Designated Web Site, and project identity shall be construed as referring to the corresponding Reserved contents, the Bro-Stat repository, and BroTech, respectively. All other license terms remain unchanged. This does not make ZTE-Stat_Max itself part of the licensed work covered by this directory.
+For the sole purpose of applying the referenced licenses to this directory, project-specific references to the Initial Work, Designated Web Site, and project identity shall be construed as referring to the corresponding Reserved contents, the Bro-Stat repository, and BroTech, respectively. All other license terms remain unchanged. This does not make ZTE-Stat_Max itself part of the licensed work covered by this directory.
