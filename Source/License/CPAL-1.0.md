@@ -12,7 +12,7 @@ Compliance with the literal preservation and proactive appending of 『哥哥科
 许可证名称、SPDX 标识及其他简写仅用于识别。实际授权范围、条件及义务，以本仓库随软件发布的实际许可证文本、补充文件以及本文件中明确纳入的实际许可文本为准。
 
 无论使用何种许可证，都应当保留作者的显著署名。
-Regardless of the license used, the 哥哥科技's prominent attribution must be retained.
+Regardless of the license used, 哥哥科技's prominent attribution must be retained.
 
 绝对、一定、必须保留哥哥科技这几个字，并且不得以任何形式降低“原有的署名方式的显著程度”，而不仅仅是显著降低。
 

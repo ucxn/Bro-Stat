@@ -8,7 +8,7 @@ Regardless of the licensing path chosen, use of this project is additionally sub
 
 ### 品牌使用政策和辅助许可证文本
 
-在此处查看，品牌使用政策和引用指向的许可证法律效力无高低之分</br>
+在此处查看，这些文件，尤其是以授权为目的的公共许可证（我从未使用过三方代码，我全部为原创）法律效力严格低于哥哥科技许可证。</br>
 [引用的 辅助LICENSE 参考文本存放文件夹](./Source/License)
 
 **[必读：主章程，总则、冲突处理，法律裁决](./LICENSE/README.MD)**
@@ -31,7 +31,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 “哥哥科技”四个汉字必须原样保留。`BroTech`、`Bro-Tech`、GitHub 用户名、项目名称、仓库链接或其他英文、拉丁字符形式，仅可作为补充署名，不得用于替代“哥哥科技”。
 
-即使目标运行环境、显示设备、编程语言或其他技术环境无法正常显示中文，凡能够保存 Unicode、UTF-8、GB 18030 或其他能够表示该字面量的源码、许可证文本、元数据或其他载体中，仍必须原样保留“哥哥科技”。**源码、许可证文本、元数据中的保留，与最终用户界面中的署名，是两项各自独立的义务：前者照旧保留，但不能代替后者。** *仅在源码中署名而最终用户看不到的，不构成对本条署名义务的履行，**此类做法视为未署名。***
+即使目标运行环境、显示设备、编程语言或其他技术环境无法正常显示中文，凡能够保存 Unicode、UTF-8、GB 18030 或其他能够表示该字面量的源码、许可证文本、元数据或其他载体中，仍必须原样保留“哥哥科技”。**源码、许可证文本、元数据中的保留，与最终用户界面中的署名，是两项各自独立的义务：前者照旧保留，但不能代替后者。** *仅在代码署名的，不构成对本条署名义务的履行，**最终用户看不到显著的“哥哥科技”的，视为未署名。***
 
 如果用户可见界面因客观技术限制无法正常呈现“哥哥科技”，可以在不删除程序中实质性表达中文“哥哥科技”的前提下，追加 `BroTech`、`Bro-Tech`、作者用户名、项目链接或其他能够清楚识别作者身份的表示方式，并应通过 GitHub 或电子邮件及时告知作者。
 
@@ -49,7 +49,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 
 为明确起见，整个代码空间中任何形式或实质上包含和/或显示「哥哥」、「哥哥科技」以及「晚橘」、「弟弟（科技）」、「姐姐大人」等实质用来显示开发者和/或其认同之名的，以及满足表达式` /\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i `的，均严禁被篡改、弱化，或以非预期名称方式呈现。
 
-**我最在意的只有一件事：市面上流通的每一个版本，都带着哥哥科技和所爱之人的名字。** 本许可证管辖的是项目本身，即源码、副本、可执行脚本及其运行时界面，以及基于它的修改、改写和翻译版本。软件运行后导出的数据，例如 CSV，属于使用者自己。
+**我最在意的事：市面上流通的每一个版本，都带着哥哥科技和所爱之人的名字。** 本许可证管辖的是项目本身，即源码、副本、可执行脚本及其运行时界面，以及基于它的修改、改写和翻译版本。软件运行后导出的数据，例如 CSV，属于使用者自己。
 
 根据本软件的实际源代码及其技术特性，不存在一种能够使软件的普通功能正常运行、同时又使必要署名在技术上自动消失的运行方式。只要软件的主要功能能够正常运行，且软件能够在该功能中正常显示中文文本（以删除源代码中功能描述中文的方式规避本条的，不影响此认定），即视为软件运行正常。**软件正常运行时，不存在任何正当理由可以不按照哥哥科技显著署名要求显示“哥哥科技”字样。**
 
@@ -83,7 +83,7 @@ Regardless of the license used, the author's prominent attribution must be retai
 #### 关于英文名称与拼音
 “哥哥科技”的推荐英文名称为 BroTech。汉语拼音不能代替英文译名，请不要用 Gege Keji 这类拼音写法来指代哥哥科技；单独使用的 gege 不在此列。从审美上说，我也不希望程序里出现不必要的拼音地狱。
 
-无论是 BroTech 还是任何拉丁字母形式都只能作为“哥哥科技”的补充，不能替代任何署名要求。无论主许可证中关于技术限制的规定是否允许、相应义务是否已经履行，未以“哥哥科技”署名的，一律视为不符合署名要求。
+无论是 BroTech 还是任何拉丁字母形式都只能作为“哥哥科技”的补充，不能替代任何署名要求；凡运行环境客观上能够显示中文字符（人为删改或破坏中文支持作弊者不影响认定），均不得援引前文‘技术限制’例外作为未在界面显示汉字‘哥哥科技’之借口。在此类环境下，未以字样“哥哥科技”署名的，一律视为不符合署名要求。
 
 哥哥科技 2026 © Bro-Tech 版权所有
 
@@ -129,13 +129,13 @@ Based on the actual source code of the Software and its technical characteristic
 
 *Whenever the Software is operating normally, there is no legitimate basis whatsoever for failing to display the name “哥哥科技” as required by the BroTech Prominent Attribution Requirements.*
 
-**What I care about most is one thing: every version in circulation carries the name 哥哥科技 and that of my beloved.** This license governs the program itself: its source code, executable script, its copies, and runtime interface, and any version based on it, including modifications, rewrites, and translations. Data the software exports when run, such as CSV files, belongs to the user.
+**What I really care about: every version in circulation carries the name 哥哥科技 and that of my beloved.** This license governs the program itself: its source code, executable script, its copies, and runtime interface, and any version based on it, including modifications, rewrites, and translations. Data the software exports when run, such as CSV files, belongs to the user.
 
 **For the avoidance of doubt, anything anywhere in the entire codebase that, in form or in substance, contains and/or displays “哥哥”, “哥哥科技”, “晚橘”, "弟弟(科技)", "姐姐大人"**, or any name substantively used to identify the developer and/or their recognized aliases, or that matches the expression `/\bBro(?:ther)?(?:[\W_]*?Tech)?(?![A-Z0-9])/i`, must never be altered, weakened, or presented under any name other than the one intended.
 
 ***In any extreme case in which certain provisions of this License can be satisfied but other provisions cannot, including any case in which provisions are contradictory, incompatible, or opposed to one another, the BroTech Prominent Attribution Requirements—including the mandatory preservation and prominent display of the name “哥哥科技”—shall take absolute and unconditional priority over all other provisions of this License.***
 
-**In such a case, compliance with the 哥哥科技 Prominent Attribution Requirements is the first and overriding obligation. No other provision—including any provision imposing commercial-use restrictions or requirements concerning fees or charges—shall be treated as a mandatory obligation in preference to, or at the expense of, the BroTech Prominent Attribution Requirements.**
+**In such a case, compliance with 哥哥科技 Prominent Attribution Requirements is the first and overriding obligation. No other provision—including any provision imposing commercial-use restrictions or requirements concerning fees or charges—shall be treated as a mandatory obligation in preference to, or at the expense of, the BroTech Prominent Attribution Requirements.**
 
 Regardless of anything else the project provides, any breach of this clause terminates the license immediately as of the moment of the breach; any copy, distribution, or use that does not carry the attribution as required never fell within the scope of the license and is deemed copyright infringement, and no authorization I have granted, whether express, implied, potential, explicit, or in any other form, covers it.
 ---

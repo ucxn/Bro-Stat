@@ -50,7 +50,7 @@ When developing based on this program, the absolute depth level of the attributi
 For instance, when an end-user navigates into a module or feature primarily powered by this software, the text "哥哥科技" MUST be displayed prominently and without alteration in the exact original position designed by the Author on the UI of that specific directory/module. Any attempt to fold, collapse, or relocate the attribution into secondary or hidden menus is strictly forbidden.
 
 ## 授权结构、主协议及冲突处理
-哥哥科技许可证（BroTech Additional License）构成本项目的**主授权法律条件**、许可证、合同、协议、契约，是法律效力的必要条件。***也是在合法基本下限条件下，唯一需要遵守的协议。***
+哥哥科技许可证（BroTech Additional License）构成本项目的**主授权法律条件**、许可证、合同、协议、契约，是法律效力的必要条件。***也是在最低限度地满足合法使用最基本条件下，唯一需要遵守的协议。***
 
 在您充分理解、阅读以及同意上述规则以及**哥哥科技许可证**的情况下，理解为：本项目原创内容可以向公众提供一项完整、统一且不可任意拆分的复合授权，而非数份可以由接受者分别摘取、独立选择或相互替代的许可。
 
