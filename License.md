@@ -1,5 +1,27 @@
-Required Notice: Copyright © 2026 哥哥科技 (BroTech)  <br>
-Required Notice: https://github.com/ucxn/Bro-Stat
+# 哥哥科技许可证 · Deed
+<div align="center">
+
+<sub>**BroWare Prominent Attribution License · 免费软件（Free-to-Use Software）**</sub>
+
+### **无论何种使用方式，均必须保留 $\Large{\textbf{哥哥科技}}$ 的显著署名。**
+**No matter how it is used, the prominent attribution $\large{\textbf{哥哥科技}}$ MUST be kept.**
+
+<sub>Canonical URL:&nbsp; <a href="#哥哥科技许可证">查看完整法律文本 / See the Legal Code</a></sub>
+<h1><b><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="🅯" width="30" align="absmiddle">
+  &nbsp;<b>署名 — 哥哥科技 1.0 国际</b></h1>
+<p><i>Deed · 简明契据与核心主章程</i></p>
+ 
+> **Required Notice:** 哥哥科技 Bro-Stat\
+> **Motto:** 爱哥哥，也有个可爱的弟弟。
+ ### 您可以自由地 / You are free to:
+  **使用与共享（Use & Share）** — 零费用、无论是否商业环境，免费下载或直接分享官方 GitHub / B 站链接；\
+  **修改与集成（Adapt & Integrate）** — 完整原样集成，或在遵守所选子协议的前提下修改、移植至更大作品。
+  
+  </div>
+  
+> [!IMPORTANT]
+> ### 惟须遵守下列绝对先决条件 / Under the following core term:
+>  **显著署名（Prominent Attribution · `BY`）** — 在任何情况下，您有义务保证所有显式或潜在的 **「哥哥科技」** 和作者设计的人名，在最终用户界面中严格且完全不被 *删除、隐藏、折叠、篡改、弱化或误导性呈现。* 仅在源码中呈现视同未署名。
 
 ### License Scope Notice
 无论选择何种授权路径，均同时受本文件所载 哥哥科技显著署名附加条款 约束。
