@@ -7,7 +7,7 @@
 **No matter how it is used, the prominent attribution $\large{\textbf{哥哥科技}}$ MUST be kept.**
 
 <sub>Canonical URL:&nbsp; <a href="#哥哥科技许可证">查看完整法律文本 / See the Legal Code</a></sub>
-<h1><b><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="🅯" width="30" align="absmiddle">
+<h1><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="🅯" width="30" align="absmiddle">
   &nbsp;<b>署名 — 哥哥科技 1.0 国际</b></h1>
 <p><i>Deed · 简明契据与核心主章程</i></p>
  
