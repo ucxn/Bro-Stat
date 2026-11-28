@@ -277,8 +277,7 @@ const F_ARR_8 = ['0', '[1/8]', '[2/8]', '[3/8]', '[4/8]', '[5/8]', '[6/8]', '[7/
   const st = document.createElement('style');
     st.innerHTML = `/* @BroTech-Reserved style-panel.part.js */
     `;
-  document.head.
-  appendChild(st);
+  (document.head || document.documentElement).appendChild(st);
   window.gegeRenderedMacs = new Set();
   const TP_WAN_REQUEST = { network: { name: ["wan_status", "wan_status_2"] }, method: "get" };
   const TP_HOST_REQUEST = { hosts_info: { table: "online_host" }, method: "get" };

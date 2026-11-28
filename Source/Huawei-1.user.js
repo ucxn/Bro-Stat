@@ -719,7 +719,7 @@ async function eBET(fW = !0) {
     }, 12000);
   };
   setInterval(tKA, 216000);
-  window.addEventListener('load', () => {
+  const gegeBoot = () => {
         if (CONFIG.injectMode === 3 || (CONFIG.injectMode === 1 && +(window.location.hostname.slice(window.location.hostname.lastIndexOf('.') + 1)) < 6)) {
       if (window.createGegeFloatingBtn) window.createGegeFloatingBtn();
     }
@@ -737,7 +737,8 @@ async function eBET(fW = !0) {
         }
       }, 300);
     }
-  });
+  };
+  document.readyState === 'complete' ? gegeBoot() : window.addEventListener('load', gegeBoot);
 })();
 
 /* ==UserConfig==

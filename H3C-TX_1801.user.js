@@ -2,7 +2,7 @@
 // @name            新华三路由器增强
 // @name:en         Bro-Stat-H3C
 // @namespace       ucxn
-// @version         5.9.9.H3
+// @version         5.9.H3
 // @description     增强新华三H3C路由器后台，读取RSSI，微分∂算网速，数据汇总一览
 // @copyright       哥哥科技. All Rights Reserved. 使用必要条件之一：不得删除源码、用户界面、文本中的任何“哥哥”；传播官方链接不限；除安装自用外任何使用传输均需查看许可证。
 // @description:en  Enhance the H3C router WebUI to read RSSI, calculate network speed using the derivative ∂, and provide a summary overview of the data

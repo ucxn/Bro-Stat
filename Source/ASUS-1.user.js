@@ -277,8 +277,7 @@ the project’s primary license are fully and continuously complied with.
     .gege-phy-rate .phy-down { color:#0059fa }
     @media (max-width:768px){.gege-phy-rate{line-height:1}}
     `;
-  document.head.
-  appendChild(st);
+  (document.head || document.documentElement).appendChild(st);
   window.gegeRenderedMacs = new Set();
 
 async function rSD() {
